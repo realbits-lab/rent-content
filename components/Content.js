@@ -16,6 +16,7 @@ import {
   ListItem,
   Collapse,
   IconButton,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -137,7 +138,7 @@ const Content = ({
   //----------------------------------------------------------------------------
   // Draw each row in table.
   //----------------------------------------------------------------------------
-  const RegisterRowList = React.memo(({ element }) => {
+  const RegisterRowList = React.memo(function RegisterRowList({ element }) {
     return (
       <TableRow key={getUniqueKey()}>
         <TableCell component="th" scope="row">
@@ -398,7 +399,9 @@ const Content = ({
     );
   };
 
-  const UnregisterRowList = React.memo(({ nftAddress }) => {
+  const UnregisterRowList = React.memo(function UnregisterRowList({
+    nftAddress,
+  }) {
     console.log("call UnregisterRowList component");
 
     return myUnregisteredNFTArray
