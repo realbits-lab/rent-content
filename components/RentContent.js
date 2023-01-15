@@ -178,14 +178,14 @@ const RentContent = ({
 
     const initRentMarket = async () => {
       // console.log("rentMarketAddress: ", rentMarketAddress);
-      rentMarket.current = new RentMarket(
+      rentMarket.current = new RentMarket({
         rentMarketAddress,
         testNftAddress,
         blockchainNetwork,
         onEventFunc,
         setWriteToastMessage,
-        onErrorFunc
-      );
+        onErrorFunc,
+      });
       // console.log("rentMarket.current: ", rentMarket.current);
 
       // console.log("call rentMarket.current.initializeAll()");
