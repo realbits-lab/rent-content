@@ -13,6 +13,7 @@
     "@emotion/server": "^11.10.0",
     "@emotion/styled": "^11.10.5",
     "@metamask/detect-provider": "^2.0.0",
+    "@metamask/onboarding": "^1.0.1",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.3",
     "@next/font": "13.1.1",
