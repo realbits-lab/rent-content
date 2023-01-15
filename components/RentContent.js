@@ -93,7 +93,7 @@ const RentContent = ({
   blockchainNetwork,
   serviceAddress,
 }) => {
-  const DEFAULT_MENU_INDEX = 11;
+  const DEFAULT_MENU_INDEX = 1;
   const theme = useTheme();
 
   //----------------------------------------------------------------------------
