@@ -402,8 +402,6 @@ const RentContent = ({
         ) : selectedIndex === 1 ? (
           inputRentMarket && (
             <Collection
-              // rentMarketAddress={rentMarketAddress}
-              // nftAddress={testNftAddress}
               blockchainNetwork={blockchainNetwork}
               inputCollectionArray={collectionArray}
               inputRentMarket={inputRentMarket}
@@ -412,8 +410,6 @@ const RentContent = ({
         ) : selectedIndex === 2 ? (
           inputRentMarket && (
             <Service
-              // rentMarketAddress={rentMarketAddress}
-              // nftAddress={testNftAddress}
               blockchainNetwork={blockchainNetwork}
               inputServiceArray={serviceArray}
               inputRentMarket={inputRentMarket}

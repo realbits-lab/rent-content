@@ -22,13 +22,7 @@ import {
   shortenAddress,
 } from "rent-market";
 
-const Service = ({
-  rentMarketAddress,
-  nftAddress,
-  inputServiceArray,
-  inputRentMarket,
-  blockchainNetwork,
-}) => {
+const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
   //----------------------------------------------------------------------------
   // Handle text input change.
   //----------------------------------------------------------------------------
