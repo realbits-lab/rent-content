@@ -183,11 +183,12 @@ const RentContent = ({
         testNftAddress,
         blockchainNetwork,
         onEventFunc,
-        setWriteToastMessage
+        setWriteToastMessage,
+        onErrorFunc
       );
       // console.log("rentMarket.current: ", rentMarket.current);
 
-      // console.log("call rentMarket.current.init()");
+      // console.log("call rentMarket.current.initializeAll()");
       try {
         await rentMarket.current.initializeAll();
       } catch (error) {
@@ -209,6 +210,15 @@ const RentContent = ({
     // 1. Fetch token, collection, service, request/register data, and rent data to interconnect them.
     initRentMarket().catch(console.error);
   }, []);
+
+  const onErrorFunc = ({ message } = { message: "" }) => {
+    setWriteToastMessage({
+      snackbarSeverity: AlertSeverity.error,
+      snackbarMessage: message,
+      snackbarTime: new Date(),
+      snackbarOpen: true,
+    });
+  };
 
   const onEventFunc = (
     { event, message } = { event: undefined, message: undefined }
