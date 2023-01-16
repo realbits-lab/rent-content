@@ -312,7 +312,7 @@ export function RBSnackbar({ open, message, severity, currentTime }) {
     <Portal>
       <Snackbar
         open={openToast}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         autoHideDuration={5000}
         onClose={handleToastClose}
       >

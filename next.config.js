@@ -1,1 +1,1 @@
-module.exports = { reactStrictMode: true, transpilePackages: ["rent-market"] };
+module.exports = { reactStrictMode: false, transpilePackages: ["rent-market"] };

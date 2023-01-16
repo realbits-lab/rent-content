@@ -211,7 +211,8 @@ const RentContent = ({
 
       // console.log("call rentMarket.current.initializeAll()");
       try {
-        await rentMarket.current.initializeAll();
+        // await rentMarket.current.initializeAll();
+        rentMarket.current.initializeAll();
       } catch (error) {
         console.error(error);
         setWriteToastMessage({
@@ -235,9 +236,11 @@ const RentContent = ({
     initRentMarket().catch(console.error);
   }, []);
 
-  const onErrorFunc = ({ message } = { message: "" }) => {
+  const onErrorFunc = (
+    { severity, message } = { severity: AlertSeverity.error, message: "" }
+  ) => {
     setWriteToastMessage({
-      snackbarSeverity: AlertSeverity.error,
+      snackbarSeverity: severity,
       snackbarMessage: message,
       snackbarTime: new Date(),
       snackbarOpen: true,
