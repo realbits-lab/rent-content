@@ -119,6 +119,12 @@ const Content = ({
   // * -------------------------------------------------------------------------
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  // const [page, setPage] = React.useState([
+  //   { address: "0x0", mode: "register", page: 0 },
+  // ]);
+  // const [rowsPerPage, setRowsPerPage] = React.useState([
+  //   { address: "0x0", mode: "register", rowsPerPage: 5 },
+  // ]);
 
   // * -------------------------------------------------------------------------
   // * Initialize data.
@@ -365,85 +371,51 @@ const Content = ({
   };
 
   // * -------------------------------------------------------------------------
-  // * Draw each register data row head in table.
-  // * -------------------------------------------------------------------------
-  const buildRegisterRowHead = ({ openRow, setOpenRow, nftAddress }) => {
-    return (
-      <TableRow
-        sx={{ "& > *": { borderBottom: "unset" } }}
-        key={getUniqueKey()}
-      >
-        <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpenRow(!openRow)}
-          >
-            {openRow ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-        <TableCell component="th" scope="row">
-          {nftAddress}
-        </TableCell>
-        <TableCell align="right"></TableCell>
-        <TableCell align="right"></TableCell>
-        <TableCell align="right"></TableCell>
-      </TableRow>
-    );
-  };
-
-  // * -------------------------------------------------------------------------
   // * Draw each register data row body in table.
   // * -------------------------------------------------------------------------
-  const buildRegisterRowBody = ({ openRow, setOpenRow, nftAddress }) => {
+  const RegisterNftDataRowList = ({ nftContractAddress }) => {
     return (
       <TableRow key={getUniqueKey()}>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <Box sx={{ margin: 1 }}>
-            <Typography variant="h6" gutterBottom component="div">
-              NFT
-            </Typography>
-            <Table size="small" aria-label="purchases">
-              <TableHead>
-                <TableRow key={getUniqueKey()}>
-                  <TableCell>image</TableCell>
-                  <TableCell>name</TableCell>
-                  <TableCell align="right">tokenId</TableCell>
-                  <TableCell align="right">rent fee</TableCell>
-                  <TableCell align="right">rent duration</TableCell>
-                  <TableCell align="right">change</TableCell>
-                  <TableCell align="right">unregister</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {myRegisteredNFTArray
-                  .filter((element) => element.nftAddress === nftAddress)
-                  .map((element) => {
-                    // console.log(
-                    //   "typeof element.rentDuration: ",
-                    //   typeof element.rentDuration
-                    // );
-                    // console.log(
-                    //   "isBigNumber element.rentDuration: ",
-                    //   ethers.BigNumber.isBigNumber(element.rentDuration)
-                    // );
-                    return buildRegisterRowList({ element });
-                  })}
-              </TableBody>
-            </Table>
-          </Box>
+          <Table size="small" aria-label="purchases">
+            <TableHead>
+              <TableRow key={getUniqueKey()}>
+                <TableCell>image</TableCell>
+                <TableCell>name</TableCell>
+                <TableCell align="right">tokenId</TableCell>
+                <TableCell align="right">rent fee</TableCell>
+                <TableCell align="right">rent duration</TableCell>
+                <TableCell align="right">change</TableCell>
+                <TableCell align="right">unregister</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {myRegisteredNFTArray
+                .filter((element) => element.nftAddress === nftContractAddress)
+                .map((element) => {
+                  return buildRegisterRowList({ element });
+                })}
+            </TableBody>
+          </Table>
         </TableCell>
       </TableRow>
     );
   };
 
-  const RegisterRow = ({ nftAddress }) => {
+  const RegisterNftDataRow = ({ nftContractAddress }) => {
     const [openRow, setOpenRow] = React.useState(false);
 
     return (
       <TableBody>
-        {buildRegisterRowHead({ openRow, setOpenRow, nftAddress })}
-        {buildRegisterRowBody({ openRow, setOpenRow, nftAddress })}
+        <TableRow
+          sx={{ "& > *": { borderBottom: "unset" } }}
+          key={getUniqueKey()}
+        >
+          <TableCell component="th" scope="row">
+            {nftContractAddress}
+          </TableCell>
+        </TableRow>
+        <RegisterNftDataRowList nftContractAddress={nftContractAddress} />
       </TableBody>
     );
   };
@@ -453,17 +425,11 @@ const Content = ({
     // https://medium.com/@freshmilkdev/reactjs-render-optimization-for-collapsible-material-ui-long-list-with-checkboxes-231b36892e20
     return (
       <List>
-        {myRegisteredUniqueNFTAddressArray.map((nftAddress) => (
+        {myRegisteredUniqueNFTAddressArray.map((nftContractAddress) => (
           <ListItem key={getUniqueKey()}>
             <TableContainer component={Paper}>
               <Table aria-label="collapsible table">
-                <TableHead>
-                  <TableRow key={getUniqueKey()}>
-                    <TableCell />
-                    <TableCell>Address</TableCell>
-                  </TableRow>
-                </TableHead>
-                <RegisterRow nftAddress={nftAddress} />
+                <RegisterNftDataRow nftContractAddress={nftContractAddress} />
               </Table>
             </TableContainer>
           </ListItem>
@@ -547,8 +513,6 @@ const Content = ({
   const UnregisterNftDataRow = ({ nftContractAddress }) => {
     // console.log("call UnregisterNftDataRow()");
     // console.log("nftContractAddress: ", nftContractAddress);
-
-    const [openRow, setOpenRow] = React.useState(false);
 
     return (
       <React.Fragment key={`React.Fragment-${nftContractAddress}`}>
