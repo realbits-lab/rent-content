@@ -1,28 +1,25 @@
 import * as React from "react";
-import {
-  Grid,
-  Chip,
-  Typography,
-  Divider,
-  Box,
-  Button,
-  Card,
-  CardMedia,
-  CardContent,
-  Skeleton,
-  List,
-  ListItem,
-  ListItemButton,
-  Table,
-  TableBody,
-  TableCell,
-  IconButton,
-  Avatar,
-  TableHead,
-  TableRow,
-  Tooltip,
-  useTheme,
-} from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Chip from "@mui/material/Chip";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardMedia from "@mui/material/CardMedia";
+import CardContent from "@mui/material/CardContent";
+import Skeleton from "@mui/material/Skeleton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import Avatar from "@mui/material/Avatar";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Tooltip from "@mui/material/Tooltip";
+import useTheme from "@mui/material/useTheme";
 import { Metamask } from "rent-market";
 import {
   changeIPFSToGateway,
