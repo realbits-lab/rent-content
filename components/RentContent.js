@@ -48,6 +48,8 @@ const RENT_CONTENT_COMPONENT_DRAWER_WIDTH = 180;
 const Main = styled("main", {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
+  backgroundColor: "white",
+  height: "100vh",
   flexGrow: 1,
   padding: theme.spacing(3),
   marginLeft: `-${RENT_CONTENT_COMPONENT_DRAWER_WIDTH}px`,
@@ -456,6 +458,7 @@ const RentContent = ({
         ) : (
           <></>
         )}
+        <Box></Box>
       </Main>
 
       {/* // * --------------------------------------------------------------*/}
