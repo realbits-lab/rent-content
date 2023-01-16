@@ -604,6 +604,15 @@ const RentContent = ({
               inputBlockchainNetwork={blockchainNetwork}
             />
           )
+        ) : selectedIndex === CONTENT_MENU_INDEX ? (
+          inputRentMarket && (
+            <Content
+              inputRentMarket={inputRentMarket}
+              inputMyRegisteredNFTArray={myRegisteredNFTArray}
+              inputMyUnregisteredNFTArray={myUnregisteredNFTArray}
+              inputBlockchainNetwork={blockchainNetwork}
+            />
+          )
         ) : selectedIndex === COLLECTION_MENU_INDEX ? (
           inputRentMarket && (
             <Collection
