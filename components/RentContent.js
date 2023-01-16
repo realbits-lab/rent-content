@@ -1,33 +1,28 @@
 import React from "react";
-import {
-  styled,
-  useTheme,
-  Box,
-  Drawer,
-  CssBaseline,
-  Toolbar,
-  List,
-  Typography,
-  Divider,
-  IconButton,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Chip,
-  AppBar as MuiAppBar,
-} from "@mui/material";
-import {
-  MiscellaneousServices as MiscellaneousServicesIcon,
-  Sell as SellIcon,
-  ShoppingCart as ShoppingCartIcon,
-  Menu as MenuIcon,
-  Store as StoreIcon,
-  ChevronLeft as ChevronLeftIcon,
-  ChevronRight as ChevronRightIcon,
-  Collections as CollectionsIcon,
-  Circle as CircleIcon,
-} from "@mui/icons-material";
+import { styled } from "@mui/system";
+import { useTheme } from '@mui/material/styles';
+import Box from "@mui/material/Box";
+import Drawer from "@mui/material/Drawer";
+import Toolbar from "@mui/material/Toolbar";
+import List from "@mui/material/List";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import Chip from "@mui/material/Chip";
+import MuiAppBar from "@mui/material/AppBar";
+import MiscellaneousServicesIcon from "@mui/icons-material/MiscellaneousServices";
+import SellIcon from "@mui/icons-material/Sell";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import MenuIcon from "@mui/icons-material/Menu";
+import ListItemIcon from "@mui/icons-material/List";
+import CircleIcon from "@mui/icons-material/Circle";
+import StoreIcon from "@mui/icons-material/Store";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import CollectionsIcon from "@mui/icons-material/Collections";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
 import { RentMarket } from "rent-market";
 import My from "./My";
@@ -35,6 +30,11 @@ import Market from "./Market";
 import Content from "./Content";
 import Collection from "./Collection";
 import Service from "./Service";
+import Token from "./Token";
+import MonitorToken from "./MonitorToken";
+import MonitorRentNft from "./MonitorRentNft";
+import MonitorPendingRentFee from "./MonitorPendingRentFee";
+import MonitorAccountBalance from "./MonitorAccountBalance";
 import {
   AlertSeverity,
   RBSnackbar,
@@ -116,6 +116,11 @@ const RentContent = ({
   const MARKET_MENU_INDEX = 2;
   const COLLECTION_MENU_INDEX = 3;
   const SERVICE_MENU_INDEX = 4;
+  const TOKEN_MENU_INDEX = 5;
+  const MONITOR_TOKEN_MENU_INDEX = 6;
+  const MONITOR_ACCOUNT_BALANCE_MENU_INDEX = 7;
+  const MONITOR_PENDING_RENT_FEE_MENU_INDEX = 8;
+  const MONITOR_RENT_NFT_MENU_INDEX = 9;
 
   // * -------------------------------------------------------------------------
   // * Set MUI theme.
@@ -334,6 +339,16 @@ const RentContent = ({
               ? "Collection"
               : selectedIndex === SERVICE_MENU_INDEX
               ? "Service"
+              : selectedIndex === TOKEN_MENU_INDEX
+              ? "Token"
+              : selectedIndex === MONITOR_TOKEN_MENU_INDEX
+              ? "Monitor - Token"
+              : selectedIndex === MONITOR_ACCOUNT_BALANCE_MENU_INDEX
+              ? "Monitor - Account Balance"
+              : selectedIndex === MONITOR_PENDING_RENT_FEE_MENU_INDEX
+              ? "Monitor - Pending Rent Fee"
+              : selectedIndex === MONITOR_RENT_NFT_MENU_INDEX
+              ? "Monitor - Rent NFT"
               : "Rent Market"}
           </Typography>
         </Toolbar>
@@ -432,7 +447,7 @@ const RentContent = ({
           }
 
           {/* // * ----------------------------------------------------------*/}
-          {/* // * Market menu.                                             */}
+          {/* // * Market menu.                                              */}
           {/* // * ----------------------------------------------------------*/}
 
           <p />
@@ -468,6 +483,93 @@ const RentContent = ({
                   <MiscellaneousServicesIcon />
                 </ListItemIcon>
                 <ListItemText primary="Service" />
+              </ListItemButton>
+            </ListItem>
+          }
+          {/* {
+            <ListItem key="Token" disablePadding>
+              <ListItemButton
+                selected={selectedIndex === TOKEN_MENU_INDEX}
+                onClick={(event) => handleListItemClick(event, TOKEN_MENU_INDEX)}
+              >
+                <ListItemIcon>
+                  <TokenIcon />
+                </ListItemIcon>
+                <ListItemText primary="Token" />
+              </ListItemButton>
+            </ListItem>
+          } */}
+
+          {/* // * ----------------------------------------------------------*/}
+          {/* // * Monitor menu.                                             */}
+          {/* // * ----------------------------------------------------------*/}
+
+          <p />
+          <Divider>
+            <Chip label="Monitor" />
+          </Divider>
+          <p />
+
+          {
+            <ListItem key="Monitor-Token" disablePadding>
+              <ListItemButton
+                selected={selectedIndex === MONITOR_TOKEN_MENU_INDEX}
+                onClick={(event) =>
+                  handleListItemClick(event, MONITOR_TOKEN_MENU_INDEX)
+                }
+              >
+                <ListItemIcon>
+                  <CircleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Token" />
+              </ListItemButton>
+            </ListItem>
+          }
+          {
+            <ListItem key="Monitor-AccountBalance" disablePadding>
+              <ListItemButton
+                selected={selectedIndex === MONITOR_ACCOUNT_BALANCE_MENU_INDEX}
+                onClick={(event) =>
+                  handleListItemClick(event, MONITOR_ACCOUNT_BALANCE_MENU_INDEX)
+                }
+              >
+                <ListItemIcon>
+                  <CircleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Account Balance" />
+              </ListItemButton>
+            </ListItem>
+          }
+          {
+            <ListItem key="Monitor-PendingRentFee" disablePadding>
+              <ListItemButton
+                selected={selectedIndex === MONITOR_PENDING_RENT_FEE_MENU_INDEX}
+                onClick={(event) =>
+                  handleListItemClick(
+                    event,
+                    MONITOR_PENDING_RENT_FEE_MENU_INDEX
+                  )
+                }
+              >
+                <ListItemIcon>
+                  <CircleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Pending Rent Fee" />
+              </ListItemButton>
+            </ListItem>
+          }
+          {
+            <ListItem key="Monitor-RentNft" disablePadding>
+              <ListItemButton
+                selected={selectedIndex === MONITOR_RENT_NFT_MENU_INDEX}
+                onClick={(event) =>
+                  handleListItemClick(event, MONITOR_RENT_NFT_MENU_INDEX)
+                }
+              >
+                <ListItemIcon>
+                  <CircleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Rent NFT" />
               </ListItemButton>
             </ListItem>
           }
@@ -516,6 +618,47 @@ const RentContent = ({
               blockchainNetwork={blockchainNetwork}
               inputServiceArray={serviceArray}
               inputRentMarket={inputRentMarket}
+            />
+          )
+        ) : selectedIndex === TOKEN_MENU_INDEX ? (
+          inputRentMarket && (
+            <Token
+              blockchainNetwork={blockchainNetwork}
+              inputTokenArray={tokenArray}
+              inputRentMarket={inputRentMarket}
+              inputBlockchainNetwork={blockchainNetwork}
+            />
+          )
+        ) : selectedIndex === MONITOR_TOKEN_MENU_INDEX ? (
+          inputRentMarket && (
+            <MonitorToken
+              inputRentMarket={inputRentMarket}
+              rentMarketAddress={rentMarketAddress}
+              inputBlockchainNetwork={blockchainNetwork}
+            />
+          )
+        ) : selectedIndex === MONITOR_ACCOUNT_BALANCE_MENU_INDEX ? (
+          inputRentMarket && (
+            <MonitorAccountBalance
+              inputRentMarket={inputRentMarket}
+              rentMarketAddress={rentMarketAddress}
+              inputBlockchainNetwork={blockchainNetwork}
+            />
+          )
+        ) : selectedIndex === MONITOR_PENDING_RENT_FEE_MENU_INDEX ? (
+          inputRentMarket && (
+            <MonitorPendingRentFee
+              inputRentMarket={inputRentMarket}
+              rentMarketAddress={rentMarketAddress}
+              inputBlockchainNetwork={blockchainNetwork}
+            />
+          )
+        ) : selectedIndex === MONITOR_RENT_NFT_MENU_INDEX ? (
+          inputRentMarket && (
+            <MonitorRentNft
+              inputRentMarket={inputRentMarket}
+              rentMarketAddress={rentMarketAddress}
+              inputBlockchainNetwork={blockchainNetwork}
             />
           )
         ) : (
