@@ -40,18 +40,18 @@ const Market = ({
 }) => {
   const theme = useTheme();
 
-  //----------------------------------------------------------------------------
-  // Define copied local varialbe from input data.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Define copied local varialbe from input data.
+  // * -------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
   const [collectionArray, setCollectionArray] = React.useState([]);
   const [serviceAddress, setServiceAddress] = React.useState("");
   const [registerNFTArray, setRegisterNFTArray] = React.useState([]);
   const [blockchainNetwork, setBlockchainNetwork] = React.useState("");
 
-  //----------------------------------------------------------------------------
-  // Define collection array data.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Define collection array data.
+  // * -------------------------------------------------------------------------
   const [collectionMetadata, setCollectionMetadata] = React.useState({
     collectionAddress: "",
     collectionName: "",
@@ -75,9 +75,9 @@ const Market = ({
     });
   };
 
-  //----------------------------------------------------------------------------
-  // Define toast data.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Define toast data.
+  // * -------------------------------------------------------------------------
   const [snackbarValue, setSnackbarValue] = React.useState({
     snackbarSeverity: AlertSeverity.info,
     snackbarMessage: "",
@@ -87,9 +87,9 @@ const Market = ({
   const { snackbarSeverity, snackbarMessage, snackbarTime, snackbarOpen } =
     snackbarValue;
 
-  //----------------------------------------------------------------------------
-  // Initialize data.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Initialize data.
+  // * -------------------------------------------------------------------------
   React.useEffect(() => {
     // console.log("call React.useEffect()");
     // console.log("inputRentMarket: ", inputRentMarket);
@@ -475,16 +475,22 @@ const Market = ({
 
   return (
     <>
-      {/* 1. Show metamask component. */}
+      {/* // * --------------------------------------------------------------*/}
+      {/* // * Show metamask component.                                      */}
+      {/* // * --------------------------------------------------------------*/}
       <Divider>
         <Metamask blockchainNetwork={blockchainNetwork} />
       </Divider>
       <p />
 
-      {/* 2. Show collection array data. */}
+      {/* // * --------------------------------------------------------------*/}
+      {/* // * Show collection array data.                                   */}
+      {/* // * --------------------------------------------------------------*/}
       {buildAllCollectionTable()}
 
-      {/* 3. Show toast message. */}
+      {/* // * --------------------------------------------------------------*/}
+      {/* // * Show toast message.                                           */}
+      {/* // * --------------------------------------------------------------*/}
       <RBSnackbar
         open={snackbarOpen}
         message={snackbarMessage}
