@@ -19,7 +19,7 @@ import Avatar from "@mui/material/Avatar";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Tooltip from "@mui/material/Tooltip";
-import useTheme from "@mui/material/useTheme";
+import { useTheme } from '@mui/material/styles';
 import { Metamask } from "rent-market";
 import {
   changeIPFSToGateway,
