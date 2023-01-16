@@ -117,14 +117,10 @@ const Content = ({
   // * -------------------------------------------------------------------------
   // * Table pagination data.
   // * -------------------------------------------------------------------------
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  // const [page, setPage] = React.useState([
-  //   { address: "0x0", mode: "register", page: 0 },
-  // ]);
-  // const [rowsPerPage, setRowsPerPage] = React.useState([
-  //   { address: "0x0", mode: "register", rowsPerPage: 5 },
-  // ]);
+  // const [page, setPage] = React.useState(0);
+  // const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [page, setPage] = React.useState([]);
+  const [rowsPerPage, setRowsPerPage] = React.useState([]);
 
   // * -------------------------------------------------------------------------
   // * Initialize data.
@@ -138,16 +134,40 @@ const Content = ({
     setBlockchainNetwork(inputBlockchainNetwork);
 
     // Set unique data.
-    setMyRegisteredUniqueNFTAddressArray([
-      ...new Set(
-        inputMyRegisteredNFTArray.map((element) => element.nftAddress)
-      ),
-    ]);
-    setMyUnregisteredUniqueNFTAddressArray([
-      ...new Set(
-        inputMyUnregisteredNFTArray.map((element) => element.nftAddress)
-      ),
-    ]);
+    const uniqueRegisterNFTAddressSet = new Set(
+      inputMyRegisteredNFTArray.map((element) => element.nftAddress)
+    );
+    const uniqueUnregisterNFTAddressSet = new Set(
+      inputMyUnregisteredNFTArray.map((element) => element.nftAddress)
+    );
+    setMyRegisteredUniqueNFTAddressArray([...uniqueRegisterNFTAddressSet]);
+    setMyUnregisteredUniqueNFTAddressArray([...uniqueUnregisterNFTAddressSet]);
+
+    // * Add each register and unregister page and rowsPerPage per nft contract address.
+    for (const nftAddress of uniqueRegisterNFTAddressSet) {
+      page.push({
+        address: nftAddress,
+        mode: "register",
+        page: 0,
+      });
+      rowsPerPage.push({
+        address: nftAddress,
+        mode: "register",
+        rowsPerPage: 5,
+      });
+    }
+    for (const nftAddress of uniqueUnregisterNFTAddressSet) {
+      page.push({
+        address: nftAddress,
+        mode: "unregister",
+        page: 0,
+      });
+      rowsPerPage.push({
+        address: nftAddress,
+        mode: "unregister",
+        rowsPerPage: 5,
+      });
+    }
   }, [
     inputRentMarket,
     inputBlockchainNetwork,
@@ -230,75 +250,113 @@ const Content = ({
     );
   };
 
-  // * -------------------------------------------------------------------------
-  // * Draw each row in table.
-  // * -------------------------------------------------------------------------
-  const RegisterRowList = React.memo(function RegisterRowList({ element }) {
-    return (
-      <TableRow key={getUniqueKey()}>
-        <TableCell component="th" scope="row">
-          <Avatar
-            alt="image"
-            src={
-              element.metadata
-                ? changeIPFSToGateway(element.metadata.image)
-                : ""
-            }
-            sx={{ width: RBSize.big, height: RBSize.big }}
-          />
-        </TableCell>
-        <TableCell>
-          {element.metadata ? element.metadata.name : "N/A"}
-        </TableCell>
-        <TableCell align="right">{element.tokenId}</TableCell>
-        <TableCell align="right">
-          {element.rentFee / Math.pow(10, 18)}
-        </TableCell>
-        <TableCell align="right">{element.rentDuration}</TableCell>
-        <TableCell align="right">
-          <Button
-            size="small"
-            onClick={() => {
-              setChangeElement(element);
-              setFormValue((prevState) => {
-                return {
-                  ...prevState,
-                  inputRentFee: element.rentFee / Math.pow(10, 18),
-                  inputFeeTokenAddress: element.feeTokenAddress,
-                  inputRentFeeByToken:
-                    element.rentFeeByToken / Math.pow(10, 18),
-                  inputRentDuration: element.rentDuration,
-                };
-              });
-              setOpenInput(true);
-            }}
-          >
-            Change
-          </Button>
-        </TableCell>
-        <TableCell align="right">
-          <Button
-            size="small"
-            onClick={async () => {
-              try {
-                await rentMarketRef.current.unregisterNFT(element);
-              } catch (error) {
-                console.error(error);
-                setSnackbarValue({
-                  snackbarSeverity: AlertSeverity.error,
-                  snackbarMessage: error.reason,
-                  snackbarTime: new Date(),
-                  snackbarOpen: true,
-                });
-              }
-            }}
-          >
-            Unregister
-          </Button>
-        </TableCell>
-      </TableRow>
+  const getPage = ({ nftContractAddress, mode }) => {
+    const findPage = page.find(
+      (e) => e.address === nftContractAddress && e.mode === mode
     );
-  });
+    // console.log("findPage: ", findPage);
+    const tablePage = findPage ? findPage.page : 0;
+    return tablePage;
+  };
+
+  const getRowsPerPage = ({ nftContractAddress, mode }) => {
+    const findRowsPerPage = rowsPerPage.find(
+      (e) => e.address === nftContractAddress && e.mode === mode
+    );
+    // console.log("findRowsPerPage: ", findRowsPerPage);
+    const tableRowsPerPage = findRowsPerPage ? findRowsPerPage.rowsPerPage : 5;
+    return tableRowsPerPage;
+  };
+
+  const TablePageComponent = ({ nftContractAddress, mode }) => {
+    // console.log("call TablePageComponent()");
+    // console.log("nftContractAddress: ", nftContractAddress);
+    // console.log("page: ", page);
+    // console.log("rowsPerPage: ", rowsPerPage);
+
+    const tablePage = getPage({ nftContractAddress, mode });
+    const tableRowsPerPage = getRowsPerPage({ nftContractAddress, mode });
+    let count = 0;
+    if (mode === "register") {
+      count = myRegisteredNFTArray.filter(
+        (e) => e.nftAddress === nftContractAddress
+      ).length;
+    } else if (mode === "unregister") {
+      count = myUnregisteredNFTArray.filter(
+        (e) => e.nftAddress === nftContractAddress
+      ).length;
+    } else {
+      count = 0;
+    }
+
+    return (
+      <TablePagination
+        key={getUniqueKey()}
+        rowsPerPageOptions={[5, 10, 25]}
+        count={count}
+        // page={page}
+        // rowsPerPage={rowsPerPage}
+        page={tablePage}
+        rowsPerPage={tableRowsPerPage}
+        SelectProps={{
+          inputProps: {
+            "aria-label": "rows per page",
+          },
+          native: true,
+        }}
+        // onPageChange={handleChangePage}
+        // onRowsPerPageChange={handleChangeRowsPerPage}
+        // ActionsComponent={TablePaginationActions}
+        onPageChange={(event, newPage) => {
+          setPage((prevState) => {
+            const newState = prevState.map((e) => {
+              if (e.address === nftContractAddress) {
+                return {
+                  address: nftContractAddress,
+                  mode: mode,
+                  page: newPage,
+                };
+              } else {
+                return e;
+              }
+            });
+            return newState;
+          });
+        }}
+        onRowsPerPageChange={(event) => {
+          setRowsPerPage((prevState) => {
+            const newState = prevState.map((e) => {
+              if (e.address === nftContractAddress) {
+                return {
+                  address: nftContractAddress,
+                  mode: mode,
+                  rowsPerPage: parseInt(event.target.value, 10),
+                };
+              } else {
+                return e;
+              }
+            });
+            return newState;
+          });
+          setPage((prevState) => {
+            const newState = prevState.map((e) => {
+              if (e.address === nftContractAddress) {
+                return {
+                  address: nftContractAddress,
+                  mode: mode,
+                  page: 0,
+                };
+              } else {
+                return e;
+              }
+            });
+            return newState;
+          });
+        }}
+        ActionsComponent={TablePaginationActions}
+      />
+    );
+  };
 
   // * -------------------------------------------------------------------------
   // * Draw each register data row list in table.
@@ -374,37 +432,45 @@ const Content = ({
   // * Draw each register data row body in table.
   // * -------------------------------------------------------------------------
   const RegisterNftDataRowList = ({ nftContractAddress }) => {
+    // console.log("call RegisterNftDataRowList()");
+
+    const tablePage = getPage({ nftContractAddress, mode: "register" });
+    const tableRowsPerPage = getRowsPerPage({
+      nftContractAddress,
+      mode: "register",
+    });
+
     return (
-      <TableRow key={getUniqueKey()}>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <Table size="small" aria-label="purchases">
-            <TableHead>
-              <TableRow key={getUniqueKey()}>
-                <TableCell>image</TableCell>
-                <TableCell>name</TableCell>
-                <TableCell align="right">tokenId</TableCell>
-                <TableCell align="right">rent fee</TableCell>
-                <TableCell align="right">rent duration</TableCell>
-                <TableCell align="right">change</TableCell>
-                <TableCell align="right">unregister</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {myRegisteredNFTArray
-                .filter((element) => element.nftAddress === nftContractAddress)
-                .map((element) => {
-                  return buildRegisterRowList({ element });
-                })}
-            </TableBody>
-          </Table>
-        </TableCell>
-      </TableRow>
+      <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+        <Table size="small" aria-label="purchases">
+          <TableHead>
+            <TableRow key={getUniqueKey()}>
+              <TableCell>image</TableCell>
+              <TableCell>name</TableCell>
+              <TableCell align="right">tokenId</TableCell>
+              <TableCell align="right">rent fee</TableCell>
+              <TableCell align="right">rent duration</TableCell>
+              <TableCell align="right">change</TableCell>
+              <TableCell align="right">unregister</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {myRegisteredNFTArray
+              .filter((element) => element.nftAddress === nftContractAddress)
+              .slice(
+                tablePage * tableRowsPerPage,
+                tablePage * tableRowsPerPage + tableRowsPerPage
+              )
+              .map((element) => {
+                return buildRegisterRowList({ element });
+              })}
+          </TableBody>
+        </Table>
+      </TableCell>
     );
   };
 
   const RegisterNftDataRow = ({ nftContractAddress }) => {
-    const [openRow, setOpenRow] = React.useState(false);
-
     return (
       <TableBody>
         <TableRow
@@ -415,25 +481,36 @@ const Content = ({
             {nftContractAddress}
           </TableCell>
         </TableRow>
-        <RegisterNftDataRowList nftContractAddress={nftContractAddress} />
+
+        <TableRow key={getUniqueKey()}>
+          <RegisterNftDataRowList nftContractAddress={nftContractAddress} />
+        </TableRow>
       </TableBody>
     );
   };
 
   const showMyRegisteredNFTElementTable = () => {
-    // https://mui.com/material-ui/react-table/
-    // https://medium.com/@freshmilkdev/reactjs-render-optimization-for-collapsible-material-ui-long-list-with-checkboxes-231b36892e20
     return (
       <List>
-        {myRegisteredUniqueNFTAddressArray.map((nftContractAddress) => (
-          <ListItem key={getUniqueKey()}>
-            <TableContainer component={Paper}>
-              <Table aria-label="collapsible table">
-                <RegisterNftDataRow nftContractAddress={nftContractAddress} />
-              </Table>
-            </TableContainer>
-          </ListItem>
-        ))}
+        {myRegisteredUniqueNFTAddressArray.map((nftContractAddress) => {
+          return (
+            <ListItem key={getUniqueKey()}>
+              <TableContainer component={Paper}>
+                <Table aria-label="collapsible table">
+                  <RegisterNftDataRow nftContractAddress={nftContractAddress} />
+                  <TableFooter>
+                    <TableRow>
+                      <TablePageComponent
+                        nftContractAddress={nftContractAddress}
+                        mode={"register"}
+                      />
+                    </TableRow>
+                  </TableFooter>
+                </Table>
+              </TableContainer>
+            </ListItem>
+          );
+        })}
       </List>
     );
   };
@@ -461,104 +538,102 @@ const Content = ({
     );
   };
 
+  const buildUnregisterRowList = ({ element }) => {
+    return (
+      <TableRow key={`TableRow-NFT-${element.nftAddress}-${element.tokenId}`}>
+        <TableCell component="th" scope="row">
+          <Avatar
+            alt="image"
+            src={
+              element.metadata
+                ? changeIPFSToGateway(element.metadata.image)
+                : ""
+            }
+            sx={{ width: RBSize.big, height: RBSize.big }}
+          />
+        </TableCell>
+        <TableCell>{element.metadata.name}</TableCell>
+        <TableCell align="right">{element.tokenId}</TableCell>
+        <TableCell align="right">
+          <Button
+            size="small"
+            onClick={async () => {
+              try {
+                await rentMarketRef.current.registerNFT(element);
+              } catch (error) {
+                console.error(error);
+                setSnackbarValue({
+                  snackbarSeverity: AlertSeverity.error,
+                  snackbarMessage: error.reason,
+                  snackbarTime: new Date(),
+                  snackbarOpen: true,
+                });
+              }
+            }}
+          >
+            Launch
+          </Button>
+        </TableCell>
+      </TableRow>
+    );
+  };
+
   const UnregisterNftDataRowList = React.memo(
     function UnregisterNftDataRowList({ nftContractAddress }) {
       // console.log("call UnregisterNftDataRowList()");
 
-      return myUnregisteredNFTArray
-        .filter((element) => element.nftAddress === nftContractAddress)
-        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-        .map((element) => (
-          <TableRow
-            key={`TableRow-NFT-${element.nftAddress}-${element.tokenId}`}
-          >
-            <TableCell component="th" scope="row">
-              <Avatar
-                alt="image"
-                src={
-                  element.metadata
-                    ? changeIPFSToGateway(element.metadata.image)
-                    : ""
-                }
-                sx={{ width: RBSize.big, height: RBSize.big }}
-              />
-            </TableCell>
-            <TableCell>{element.metadata.name}</TableCell>
-            <TableCell align="right">{element.tokenId}</TableCell>
-            <TableCell align="right">
-              <Button
-                size="small"
-                onClick={async () => {
-                  try {
-                    await rentMarketRef.current.registerNFT(element);
-                  } catch (error) {
-                    console.error(error);
-                    setSnackbarValue({
-                      snackbarSeverity: AlertSeverity.error,
-                      snackbarMessage: error.reason,
-                      snackbarTime: new Date(),
-                      snackbarOpen: true,
-                    });
-                  }
-                }}
-              >
-                Launch
-              </Button>
-            </TableCell>
-          </TableRow>
-        ));
+      const tablePage = getPage({ nftContractAddress, mode: "unregister" });
+      const tableRowsPerPage = getRowsPerPage({
+        nftContractAddress,
+        mode: "unregister",
+      });
+      // console.log("tablePage: ", tablePage);
+      // console.log("tableRowsPerPage: ", tableRowsPerPage);
+
+      return (
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <Table size="small" aria-label="purchases">
+            <TableHead>
+              <TableRow key={getUniqueKey()}>
+                <TableCell>image</TableCell>
+                <TableCell>name</TableCell>
+                <TableCell align="right">tokenId</TableCell>
+                <TableCell align="right">launch</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {myUnregisteredNFTArray
+                .filter((element) => element.nftAddress === nftContractAddress)
+                .slice(
+                  tablePage * tableRowsPerPage,
+                  tablePage * tableRowsPerPage + tableRowsPerPage
+                )
+                .map((element) => {
+                  return buildUnregisterRowList({ element });
+                })}
+            </TableBody>
+          </Table>
+        </TableCell>
+      );
     }
   );
 
   const UnregisterNftDataRow = ({ nftContractAddress }) => {
-    // console.log("call UnregisterNftDataRow()");
-    // console.log("nftContractAddress: ", nftContractAddress);
-
     return (
-      <React.Fragment key={`React.Fragment-${nftContractAddress}`}>
-        <TableRow key={`TableRow-Content-${nftContractAddress}`}>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-            <Box sx={{ margin: 1 }}>
-              <Typography variant="h7" gutterBottom component="div">
-                {nftContractAddress}
-              </Typography>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow key={`TableRow-Head-${nftContractAddress}`}>
-                    <TableCell>image</TableCell>
-                    <TableCell>name</TableCell>
-                    <TableCell align="right">tokenId</TableCell>
-                    <TableCell align="right">launch</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <React.Suspense fallback={<UnregisterRowListSkeleton />}>
-                    <UnregisterNftDataRowList
-                      nftContractAddress={nftContractAddress}
-                    />
-                  </React.Suspense>
-                </TableBody>
-              </Table>
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
-                colSpan={4}
-                count={myUnregisteredNFTArray.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                SelectProps={{
-                  inputProps: {
-                    "aria-label": "rows per page",
-                  },
-                  native: true,
-                }}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                ActionsComponent={TablePaginationActions}
-              />
-            </Box>
+      <TableBody>
+        <TableRow
+          sx={{ "& > *": { borderBottom: "unset" } }}
+          key={getUniqueKey()}
+        >
+          <TableCell component="th" scope="row">
+            {nftContractAddress}
           </TableCell>
         </TableRow>
-      </React.Fragment>
+
+        <TableRow key={getUniqueKey()}>
+          <UnregisterNftDataRowList nftContractAddress={nftContractAddress} />
+        </TableRow>
+      </TableBody>
     );
   };
 
@@ -573,11 +648,17 @@ const Content = ({
             <ListItem key={getUniqueKey()}>
               <TableContainer component={Paper}>
                 <Table aria-label="collapsible table">
-                  <TableBody>
-                    <UnregisterNftDataRow
-                      nftContractAddress={nftContractAddress}
-                    />
-                  </TableBody>
+                  <UnregisterNftDataRow
+                    nftContractAddress={nftContractAddress}
+                  />
+                  <TableFooter>
+                    <TableRow>
+                      <TablePageComponent
+                        nftContractAddress={nftContractAddress}
+                        mode={"unregister"}
+                      />
+                    </TableRow>
+                  </TableFooter>
                 </Table>
               </TableContainer>
             </ListItem>
@@ -620,6 +701,8 @@ const Content = ({
       <p />
 
       {showMyUnregisteredNFTElementTable()}
+
+      <p />
 
       {/* // * --------------------------------------------------------------*/}
       {/* // * Show input dialog.                                            */}
