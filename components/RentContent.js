@@ -30,6 +30,8 @@ import {
 } from "@mui/icons-material";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
 import { RentMarket } from "rent-market";
+import My from "./My";
+import Market from "./Market";
 import Content from "./Content";
 import Collection from "./Collection";
 import Service from "./Service";
@@ -110,8 +112,10 @@ const RentContent = ({
   const DEFAULT_MENU_INDEX = 0;
 
   const CONTENT_MENU_INDEX = 0;
-  const COLLECTION_MENU_INDEX = 1;
-  const SERVICE_MENU_INDEX = 2;
+  const MY_MENU_INDEX = 1;
+  const MARKET_MENU_INDEX = 2;
+  const COLLECTION_MENU_INDEX = 3;
+  const SERVICE_MENU_INDEX = 4;
 
   // * -------------------------------------------------------------------------
   // * Set MUI theme.
@@ -320,7 +324,11 @@ const RentContent = ({
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            {selectedIndex === CONTENT_MENU_INDEX
+            {selectedIndex === MARKET_MENU_INDEX
+              ? "Market"
+              : selectedIndex === MY_MENU_INDEX
+              ? "My"
+              : selectedIndex === CONTENT_MENU_INDEX
               ? "Content"
               : selectedIndex === COLLECTION_MENU_INDEX
               ? "Collection"
@@ -358,6 +366,45 @@ const RentContent = ({
         </DrawerHeader>
         <Divider />
         <List>
+          {/* // * ----------------------------------------------------------*/}
+          {/* // * Market menu.                                             */}
+          {/* // * ----------------------------------------------------------*/}
+
+          <p />
+          <Divider>
+            <Chip label="User" />
+          </Divider>
+          <p />
+
+          {
+            <ListItem key="Market" disablePadding>
+              <ListItemButton
+                selected={selectedIndex === MARKET_MENU_INDEX}
+                onClick={(event) =>
+                  handleListItemClick(event, MARKET_MENU_INDEX)
+                }
+              >
+                <ListItemIcon>
+                  <StoreIcon />
+                </ListItemIcon>
+                <ListItemText primary="Market" />
+              </ListItemButton>
+            </ListItem>
+          }
+          {
+            <ListItem key="My" disablePadding>
+              <ListItemButton
+                selected={selectedIndex === MY_MENU_INDEX}
+                onClick={(event) => handleListItemClick(event, MY_MENU_INDEX)}
+              >
+                <ListItemIcon>
+                  <ShoppingCartIcon />
+                </ListItemIcon>
+                <ListItemText primary="My" />
+              </ListItemButton>
+            </ListItem>
+          }
+
           {/* // * ----------------------------------------------------------*/}
           {/* // * Content menu.                                             */}
           {/* // * ----------------------------------------------------------*/}
@@ -433,12 +480,25 @@ const RentContent = ({
       {/* // * --------------------------------------------------------------*/}
       <Main open={openDrawer}>
         <DrawerHeader />
-        {selectedIndex === CONTENT_MENU_INDEX ? (
+        {selectedIndex === MARKET_MENU_INDEX ? (
           inputRentMarket && (
-            <Content
+            <Market
               inputRentMarket={inputRentMarket}
+              inputCollectionArray={collectionArray}
+              inputServiceAddress={serviceAddress}
+              inputRegisterNFTArray={registerNFTArray}
+              inputBlockchainNetwork={blockchainNetwork}
+            />
+          )
+        ) : selectedIndex === MY_MENU_INDEX ? (
+          inputRentMarket && (
+            <My
+              // selectAvatarFunc={undefined}
+              inputRentMarket={inputRentMarket}
+              inputCollectionArray={collectionArray}
+              inputServiceAddress={serviceAddress}
               inputMyRegisteredNFTArray={myRegisteredNFTArray}
-              inputMyUnregisteredNFTArray={myUnregisteredNFTArray}
+              inputMyRentNFTArray={myRentNFTArray}
               inputBlockchainNetwork={blockchainNetwork}
             />
           )
