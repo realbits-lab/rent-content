@@ -49,9 +49,9 @@ const My = ({
 }) => {
   const theme = useTheme();
 
-  //----------------------------------------------------------------------------
-  // Define copied local varialbe from input data.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Define copied local varialbe from input data.
+  // * -------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
   const [collectionArray, setCollectionArray] = React.useState([]);
   const [serviceAddress, setServiceAddress] = React.useState("");
@@ -59,10 +59,10 @@ const My = ({
   const [myRentNFTArray, setMyRentNFTArray] = React.useState([]);
   const [blockchainNetwork, setBlockchainNetwork] = React.useState("");
 
-  //----------------------------------------------------------------------------
-  // Handle selected collection.
-  //----------------------------------------------------------------------------
-  // Default is own menu.
+  // * -------------------------------------------------------------------------
+  // * Handle selected collection.
+  // * Default is own menu.
+  // * -------------------------------------------------------------------------
   const [selectedItem, setSelectedItem] = React.useState(MyMenu.own);
   const [myNftStatus, setMyNftStatus] = React.useState({
     myNftType: MyMenu.own,
@@ -84,9 +84,9 @@ const My = ({
     }
   };
 
-  //----------------------------------------------------------------------------
-  // Handle toast mesage.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Handle toast mesage.
+  // * -------------------------------------------------------------------------
   const [snackbarValue, setSnackbarValue] = React.useState({
     snackbarSeverity: AlertSeverity.info,
     snackbarMessage: "",
@@ -96,14 +96,14 @@ const My = ({
   const { snackbarSeverity, snackbarMessage, snackbarTime, snackbarOpen } =
     snackbarValue;
 
-  //----------------------------------------------------------------------------
-  // Other variables.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Other variables.
+  // * -------------------------------------------------------------------------
   const [currentBlockNumber, setCurrentBlockNumber] = React.useState(0);
 
-  //----------------------------------------------------------------------------
-  // Initialize data.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Initialize data.
+  // * -------------------------------------------------------------------------
   React.useEffect(() => {
     // console.log("call React.useEffect() without condition");
   });
@@ -304,8 +304,6 @@ const My = ({
   };
 
   const buildCollectionTableRow = ({ collection }) => {
-    // TODO: Handle CardMedia image fallback.
-    // TODO: Handle table collapse later.
     return (
       <TableRow
         sx={{
@@ -313,20 +311,6 @@ const My = ({
         }}
         key={getUniqueKey()}
       >
-        {/* <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpenRow(!openRow)}
-          >
-            {openRow === true ? (
-              <KeyboardArrowUpIcon />
-            ) : (
-              <KeyboardArrowDownIcon />
-            )}
-          </IconButton>
-        </TableCell> */}
-
         <TableCell
           style={{
             paddingBottom: 0,
@@ -369,7 +353,6 @@ const My = ({
     );
   };
 
-  // TODO: Have setOpen bug for global usage.
   const buildCollapseMyTable = ({ collection, elementArray, type }) => {
     // 1. Check element length, if 0, don't show table.
     if (elementArray.length == 0) {
@@ -430,39 +413,25 @@ const My = ({
     );
   };
 
-  const buildMenuMetadata = () => {
-    return (
-      <Card sx={{ display: "flex" }}>
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <CardContent sx={{ flex: "1 0 auto" }}>
-            <Typography component="div" variant="h6">
-              {myNftType}
-            </Typography>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              component="div"
-            >
-              {myNftDescription}
-            </Typography>
-          </CardContent>
-        </Box>
-      </Card>
-    );
-  };
-
   const buildLeftMenu = () => {
     return (
       <List
         sx={{
-          // selected and (selected + hover) states
+          // * Selected and (selected + hover) state.
           "&& .Mui-selected, && .Mui-selected:hover": {
             bgcolor: "green",
             "&, & .MuiListItemIcon-root": {
               color: "white",
             },
           },
-          // hover states
+          // * Normal state.
+          "& .MuiListItemButton-root": {
+            bgcolor: "lightgrey",
+            "&, & .MuiListItemIcon-root": {
+              color: "darkgrey",
+            },
+          },
+          // * Hover state.
           "& .MuiListItemButton-root:hover": {
             bgcolor: "orange",
             "&, & .MuiListItemIcon-root": {
@@ -509,9 +478,6 @@ const My = ({
           {buildLeftMenu()}
         </Grid>
         <Grid item xs={10}>
-          {/* {buildMenuMetadata()}
-          <p /> */}
-
           {buildNFTTable()}
         </Grid>
       </Grid>
