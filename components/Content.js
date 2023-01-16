@@ -42,9 +42,9 @@ const Content = ({
   inputMyRegisteredNFTArray,
   inputMyUnregisteredNFTArray,
 }) => {
-  //----------------------------------------------------------------------------
-  // Define input copied variables.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Define input copied variables.
+  // * -------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
   const [blockchainNetwork, setBlockchainNetwork] = React.useState([]);
   const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState([]);
@@ -52,7 +52,9 @@ const Content = ({
     []
   );
 
-  // Set unique variables for table collapse.
+  // * -------------------------------------------------------------------------
+  // * Set unique variables for table collapse.
+  // * -------------------------------------------------------------------------
   const [
     myRegisteredUniqueNFTAddressArray,
     setMyRegisteredUniqueNFTAddressArray,
@@ -62,15 +64,15 @@ const Content = ({
     setMyUnregisteredUniqueNFTAddressArray,
   ] = React.useState([]);
 
-  //----------------------------------------------------------------------------
-  // Nft list data.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Nft list data.
+  // * -------------------------------------------------------------------------
   const [changeElement, setChangeElement] = React.useState([]);
   const [openInput, setOpenInput] = React.useState(false);
 
-  //----------------------------------------------------------------------------
-  // Handle toast message.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Handle toast message.
+  // * -------------------------------------------------------------------------
   const [snackbarValue, setSnackbarValue] = React.useState({
     snackbarSeverity: AlertSeverity.info,
     snackbarMessage: "",
@@ -80,10 +82,10 @@ const Content = ({
   const { snackbarSeverity, snackbarMessage, snackbarTime, snackbarOpen } =
     snackbarValue;
 
-  //----------------------------------------------------------------------------
-  // Handle text input change.
-  //----------------------------------------------------------------------------
-  // variables for changeNFT function.
+  // * -------------------------------------------------------------------------
+  // * Handle text input change.
+  // * Variables for changeNFT function.
+  // * -------------------------------------------------------------------------
   const [formValue, setFormValue] = React.useState({
     inputRentFee: 0,
     inputFeeTokenAddress: "",
@@ -106,9 +108,9 @@ const Content = ({
     });
   };
 
-  //----------------------------------------------------------------------------
-  // Initialize data.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Initialize data.
+  // * -------------------------------------------------------------------------
   React.useEffect(() => {
     // console.log("call React.useEffect()");
 
@@ -135,9 +137,9 @@ const Content = ({
     inputMyUnregisteredNFTArray,
   ]);
 
-  //----------------------------------------------------------------------------
-  // Draw each row in table.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Draw each row in table.
+  // * -------------------------------------------------------------------------
   const RegisterRowList = React.memo(function RegisterRowList({ element }) {
     return (
       <TableRow key={getUniqueKey()}>
@@ -205,6 +207,9 @@ const Content = ({
     );
   });
 
+  // * -------------------------------------------------------------------------
+  // * Draw each register data row list in table.
+  // * -------------------------------------------------------------------------
   const buildRegisterRowList = ({ element }) => {
     return (
       <TableRow key={getUniqueKey()}>
@@ -272,6 +277,9 @@ const Content = ({
     );
   };
 
+  // * -------------------------------------------------------------------------
+  // * Draw each register data row head in table.
+  // * -------------------------------------------------------------------------
   const buildRegisterRowHead = ({ openRow, setOpenRow, nftAddress }) => {
     return (
       <TableRow
@@ -297,6 +305,9 @@ const Content = ({
     );
   };
 
+  // * -------------------------------------------------------------------------
+  // * Draw each register data row body in table.
+  // * -------------------------------------------------------------------------
   const buildRegisterRowBody = ({ openRow, setOpenRow, nftAddress }) => {
     return (
       <TableRow key={getUniqueKey()}>
@@ -535,9 +546,9 @@ const Content = ({
 
   return (
     <div>
-      {/*--------------------------------------------------------------------*/}
-      {/* 1. Show metamask. */}
-      {/*--------------------------------------------------------------------*/}
+      {/* // * --------------------------------------------------------------*/}
+      {/* // * Show metamask.                                                */}
+      {/* // * --------------------------------------------------------------*/}
       <p />
       <Divider>
         <Chip label="Metamask" />
@@ -545,10 +556,9 @@ const Content = ({
       <p />
       <Metamask blockchainNetwork={blockchainNetwork} />
 
-      {/*--------------------------------------------------------------------*/}
-      {/* 2. Show registered NFT with change and unregister button. */}
-      {/*--------------------------------------------------------------------*/}
-
+      {/* // * --------------------------------------------------------------*/}
+      {/* // * Show registered NFT with change and unregister button.        */}
+      {/* // * --------------------------------------------------------------*/}
       <p />
       <Divider>
         <Chip label="My Registered NFT" />
@@ -557,10 +567,9 @@ const Content = ({
 
       {showMyRegisteredNFTElementTable()}
 
-      {/*--------------------------------------------------------------------*/}
-      {/* 3. Show my unregistered NFT with request register button. */}
-      {/*--------------------------------------------------------------------*/}
-
+      {/* // * --------------------------------------------------------------*/}
+      {/* // * Show my unregistered NFT with request register button.        */}
+      {/* // * --------------------------------------------------------------*/}
       <p />
       <Divider>
         <Chip label="My Unregistered NFT" />
@@ -569,9 +578,9 @@ const Content = ({
 
       {showMyUnregisteredNFTElementTable()}
 
-      {/*--------------------------------------------------------------------*/}
-      {/* 4. Show input dialog. */}
-      {/*--------------------------------------------------------------------*/}
+      {/* // * --------------------------------------------------------------*/}
+      {/* // * Show input dialog.                                            */}
+      {/* // * --------------------------------------------------------------*/}
       <Dialog
         fullWidth
         maxWidth="sm"
