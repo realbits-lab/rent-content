@@ -497,7 +497,7 @@ const Content = ({
 
   const UnregisterNftDataRowList = React.memo(
     function UnregisterNftDataRowList({ nftContractAddress }) {
-      console.log("call UnregisterNftDataRowList()");
+      // console.log("call UnregisterNftDataRowList()");
 
       return myUnregisteredNFTArray
         .filter((element) => element.nftAddress === nftContractAddress)
@@ -545,8 +545,8 @@ const Content = ({
   );
 
   const UnregisterNftDataRow = ({ nftContractAddress }) => {
-    console.log("call UnregisterNftDataRow()");
-    console.log("nftContractAddress: ", nftContractAddress);
+    // console.log("call UnregisterNftDataRow()");
+    // console.log("nftContractAddress: ", nftContractAddress);
 
     const [openRow, setOpenRow] = React.useState(false);
 
@@ -726,23 +726,23 @@ const Content = ({
           <Button
             onClick={async () => {
               try {
-                console.log("typeof inputRentFee: ", typeof inputRentFee);
-                console.log(
-                  "typeof inputFeeTokenAddress: ",
-                  typeof inputFeeTokenAddress
-                );
-                console.log(
-                  "typeof inputRentFeeByToken: ",
-                  typeof inputRentFeeByToken
-                );
-                console.log(
-                  "typeof inputRentDuration: ",
-                  typeof inputRentDuration
-                );
-                console.log("inputRentFee: ", inputRentFee);
-                console.log("inputFeeTokenAddress: ", inputFeeTokenAddress);
-                console.log("inputRentFeeByToken: ", inputRentFeeByToken);
-                console.log("inputRentDuration: ", inputRentDuration);
+                // console.log("typeof inputRentFee: ", typeof inputRentFee);
+                // console.log(
+                //   "typeof inputFeeTokenAddress: ",
+                //   typeof inputFeeTokenAddress
+                // );
+                // console.log(
+                //   "typeof inputRentFeeByToken: ",
+                //   typeof inputRentFeeByToken
+                // );
+                // console.log(
+                //   "typeof inputRentDuration: ",
+                //   typeof inputRentDuration
+                // );
+                // console.log("inputRentFee: ", inputRentFee);
+                // console.log("inputFeeTokenAddress: ", inputFeeTokenAddress);
+                // console.log("inputRentFeeByToken: ", inputRentFeeByToken);
+                // console.log("inputRentDuration: ", inputRentDuration);
                 await rentMarketRef.current.changeNFT(
                   changeElement,
                   inputRentFee.toString(),
