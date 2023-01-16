@@ -364,7 +364,7 @@ const My = ({
           >
             <TableCell sx={{ borderBottom: 0 }}>
               <Typography component="div" variant="body1">
-                You don't have any contents.
+                You do not have any contents.
               </Typography>
             </TableCell>
           </TableRow>
