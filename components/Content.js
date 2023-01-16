@@ -24,6 +24,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
+import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import { useTheme } from "@mui/material/styles";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -551,31 +552,11 @@ const Content = ({
 
     return (
       <React.Fragment key={`React.Fragment-${nftContractAddress}`}>
-        <TableRow
-          sx={{ "& > *": { borderBottom: "unset" } }}
-          key={`TableRow-Arrow-${nftContractAddress}`}
-        >
-          <TableCell>
-            <IconButton
-              aria-label="expand row"
-              size="small"
-              onClick={() => setOpenRow(!openRow)}
-            >
-              {openRow ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-            </IconButton>
-          </TableCell>
-          <TableCell component="th" scope="row">
-            {nftContractAddress}
-          </TableCell>
-          <TableCell align="right"></TableCell>
-          <TableCell align="right"></TableCell>
-          <TableCell align="right"></TableCell>
-        </TableRow>
         <TableRow key={`TableRow-Content-${nftContractAddress}`}>
           <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
             <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                NFT
+              <Typography variant="h7" gutterBottom component="div">
+                {nftContractAddress}
               </Typography>
               <Table size="small" aria-label="purchases">
                 <TableHead>
@@ -628,12 +609,6 @@ const Content = ({
             <ListItem key={getUniqueKey()}>
               <TableContainer component={Paper}>
                 <Table aria-label="collapsible table">
-                  <TableHead>
-                    <TableRow key={"addressHead"}>
-                      <TableCell />
-                      <TableCell>Address</TableCell>
-                    </TableRow>
-                  </TableHead>
                   <TableBody>
                     <UnregisterNftDataRow
                       nftContractAddress={nftContractAddress}
