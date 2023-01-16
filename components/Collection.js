@@ -25,8 +25,6 @@ import {
 } from "rent-market";
 
 const Collection = ({
-  rentMarketAddress,
-  nftAddress,
   inputCollectionArray,
   inputRentMarket,
   blockchainNetwork,
