@@ -206,9 +206,14 @@ const RentContent = ({
   // * Initialize data.
   React.useEffect(() => {
     // console.log("call React.useEffect()");
+    // console.log("rentMarketAddress: ", rentMarketAddress);
+    // console.log("testNftAddress: ", testNftAddress);
+    // console.log("blockchainNetwork: ", blockchainNetwork);
+    // console.log("serviceAddress: ", serviceAddress);
 
     const initRentMarket = async () => {
-      // console.log("rentMarketAddress: ", rentMarketAddress);
+      // console.log("call initRentMarket()");
+
       rentMarket.current = new RentMarket({
         rentMarketAddress,
         testNftAddress,
@@ -243,7 +248,7 @@ const RentContent = ({
     // * and rent data to interconnect them.
     // * -----------------------------------------------------------------------
     initRentMarket().catch(console.error);
-  }, []);
+  }, [rentMarketAddress, testNftAddress, blockchainNetwork, serviceAddress]);
 
   const onErrorFunc = (
     { severity, message } = { severity: AlertSeverity.error, message: "" }
