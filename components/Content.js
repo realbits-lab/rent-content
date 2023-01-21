@@ -538,7 +538,8 @@ const Content = ({
 
   const buildUnregisterRowList = ({ element }) => {
     return (
-      <TableRow key={`TableRow-NFT-${element.nftAddress}-${element.tokenId}`}>
+      // <TableRow key={`TableRow-NFT-${element.nftAddress}-${element.tokenId}`}>
+      <TableRow key={getUniqueKey()}>
         <TableCell component="th" scope="row">
           <Avatar
             alt="image"

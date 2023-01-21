@@ -19,7 +19,7 @@ import Avatar from "@mui/material/Avatar";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Tooltip from "@mui/material/Tooltip";
-import { useTheme } from '@mui/material/styles';
+import { useTheme } from "@mui/material/styles";
 import { Metamask } from "rent-market";
 import {
   changeIPFSToGateway,
@@ -131,7 +131,7 @@ const Market = ({
   ]);
 
   const buildRowList = ({ element }) => {
-    // console.log("rowKey: ", rowKey);
+    // console.log("call buildRowList()");
     // console.log("element: ", element);
 
     return (
@@ -163,43 +163,23 @@ const Market = ({
         <TableCell align="center">
           {element.rentFee / Math.pow(10, 18)}
         </TableCell>
-        <TableCell align="center">{element.rentDuration}</TableCell>
+        <TableCell align="center">{element.rentDuration.toNumber()}</TableCell>
         <TableCell align="center">
           <Button
             color="primary"
             variant="contained"
             onClick={async () => {
               console.log("call onClick()");
-              // const testMessage =
-              //   '[ethjs-query] while formatting outputs from RPC \'{"value":{"code":-32603,"data":{"code":-32603,"message":"Error: VM Exception while processing transaction: reverted with reason string \'RM9\'","data":{"message":"Error: VM Exception while processing transaction: reverted with reason string \'RM9\'","txHash":"0x14cdec3dbaaa5ab97fcf2524c28bc0acd482a4e1131deedc53ef441c1ba4a8a1","data":"0x08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003524d390000000000000000000000000000000000000000000000000000000000"}}}}\'';
-              // let regex = new RegExp(
-              //   "while formatting outputs from RPC '(.*)'"
-              // );
-              // let match = regex.exec(testMessage);
-              // console.log("match[1]: ", match[1]);
-              // let messageJson = JSON.parse(match[1]);
-              // console.log("messageJson: ", messageJson);
-              // console.log(
-              //   "messageJson.value.data.message: ",
-              //   messageJson.value.data.message
-              // );
-
-              // regex = new RegExp(
-              //   "Error: VM Exception while processing transaction: reverted with reason string '(.*)'"
-              // );
-              // match = regex.exec(messageJson.value.data.message);
-              // console.log("match[1]: ", match[1]);
-              // return;
-
               // console.log("serviceAddress: ", serviceAddress);
-              // TODO: Handle metamask internal error and rent market contract error code.
               try {
                 await rentMarketRef.current.rentNFT(element, serviceAddress);
               } catch (error) {
                 // console.log("catch error: ", error);
-                let message = error.reason || error.message || error;
+                let message =
+                  error.data.message || error.reason || error.message || error;
 
-                if (error.message) {
+                if (error.data.message) {
+                } else if (error.message) {
                   // const testMessage =
                   //   '[ethjs-query] while formatting outputs from RPC \'{"value":{"code":-32603,"data":{"code":-32603,"message":"Error: VM Exception while processing transaction: reverted with reason string \'RM9\'","data":{"message":"Error: VM Exception while processing transaction: reverted with reason string \'RM9\'","txHash":"0x14cdec3dbaaa5ab97fcf2524c28bc0acd482a4e1131deedc53ef441c1ba4a8a1","data":"0x08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003524d390000000000000000000000000000000000000000000000000000000000"}}}}\'';
                   let regex = new RegExp(
