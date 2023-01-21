@@ -430,7 +430,7 @@ export const getChainName = ({ chainId }) => {
     47805: "rei",
     55555: "reichain",
     71402: "godwoken",
-    80001: "mumbai",
+    80001: "maticmum",
     333999: "polis",
     888888: "vision",
     1313161554: "aurora",
@@ -440,7 +440,15 @@ export const getChainName = ({ chainId }) => {
   };
 
   // console.log("chainId: ", chainId);
-  return chainIds[Number(chainId)];
+  if (typeof chainId === "string" || chainId instanceof String) {
+    if (chainId.startsWith("0x") === true) {
+      return chainIds[Number(chainId)];
+    } else {
+      return chainId;
+    }
+  } else if (isInt(chainId) === true) {
+    return chainIds[chainId];
+  }
 };
 
 // https://levelup.gitconnected.com/how-to-check-for-an-object-in-javascript-object-null-check-3b2632330296
