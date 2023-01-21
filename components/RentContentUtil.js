@@ -48,7 +48,7 @@ export const humanFileSize = (bytes, si = false, dp = 1) => {
 // Switch to localhost network.
 //----------------------------------------------------------------------------
 export const switchNetworkLocalhost = async (provider) => {
-  console.log("call switchNetworkLocalhost()");
+  // console.log("call switchNetworkLocalhost()");
 
   let response;
   // TODO: Why localhost can't be changed in metamask?
@@ -58,24 +58,24 @@ export const switchNetworkLocalhost = async (provider) => {
       // 1337 decimal.
       params: [{ chainId: "0x539" }],
     });
-    console.log("response: ", response);
+    // console.log("response: ", response);
 
     if (response === null) {
       // Switch chain success.
-      console.log("wallet_switchEthereumChain success");
+      // console.log("wallet_switchEthereumChain success");
       return null;
     } else {
       return response;
     }
   } catch (switchError) {
     // Switch chain fail.
-    console.log("wallet_switchEthereumChain fail");
-    console.log("wallet_switchEthereumChain response: ", response);
-    console.log("wallet_switchEthereumChain switchError: ", switchError);
+    // console.log("wallet_switchEthereumChain fail");
+    // console.log("wallet_switchEthereumChain response: ", response);
+    // console.log("wallet_switchEthereumChain switchError: ", switchError);
 
     // https://github.com/MetaMask/metamask-mobile/issues/2944
     if (switchError.code === 4902 || switchError.code === -32603) {
-      console.log("Try to wallet_addEthereumChain");
+      // console.log("Try to wallet_addEthereumChain");
 
       try {
         response = await provider.request({
@@ -96,12 +96,12 @@ export const switchNetworkLocalhost = async (provider) => {
 
         if (response === null) {
           // Add chain success.
-          console.log("wallet_addEthereumChain success");
+          // console.log("wallet_addEthereumChain success");
           return null;
         } else {
           // Add chain fail.
-          console.log("wallet_addEthereumChain fail");
-          console.log("wallet_addEthereumChain response: ", response);
+          // console.log("wallet_addEthereumChain fail");
+          // console.log("wallet_addEthereumChain response: ", response);
           return response;
         }
       } catch (addError) {
@@ -117,8 +117,8 @@ export const switchNetworkLocalhost = async (provider) => {
 // Switch to mumbai network.
 //----------------------------------------------------------------------------
 export const switchNetworkMumbai = async (provider) => {
-  console.log("switchNetworkMumbai");
-  console.log("Try to wallet_switchEthereumChain");
+  // console.log("switchNetworkMumbai");
+  // console.log("Try to wallet_switchEthereumChain");
 
   let response;
   try {
@@ -128,18 +128,18 @@ export const switchNetworkMumbai = async (provider) => {
     });
     if (response === null) {
       // Switch chain success.
-      console.log("wallet_switchEthereumChain success");
+      // console.log("wallet_switchEthereumChain success");
       return null;
     } else {
       return response;
     }
   } catch (switchError) {
     // Switch chain fail.
-    console.log("wallet_switchEthereumChain fail.");
-    console.log("wallet_switchEthereumChain response: ", switchError);
+    // console.log("wallet_switchEthereumChain fail.");
+    // console.log("wallet_switchEthereumChain response: ", switchError);
 
     if (switchError.code === 4902 || switchError.code === -32603) {
-      console.log("Try to wallet_addEthereumChain");
+      // console.log("Try to wallet_addEthereumChain");
 
       try {
         response = await provider.request({
@@ -162,12 +162,12 @@ export const switchNetworkMumbai = async (provider) => {
 
         if (response === null) {
           // Add chain success.
-          console.log("wallet_addEthereumChain success");
+          // console.log("wallet_addEthereumChain success");
           return null;
         } else {
           // Add chain fail.
-          console.log("wallet_addEthereumChain fail");
-          console.log("wallet_addEthereumChain response: ", response);
+          // console.log("wallet_addEthereumChain fail");
+          // console.log("wallet_addEthereumChain response: ", response);
           return response;
         }
       } catch (addError) {
@@ -215,8 +215,14 @@ export const checkMobile = () => {
   return check;
 };
 
-export const shortenAddress = (address, number = 4, withLink = true) => {
+export const shortenAddress = ({ address, number = 4, withLink = "" }) => {
+  // console.log("address: ", address);
+  // console.log("withLink: ", withLink);
+
   const POLYGON_SCAN_URL = "https://mumbai.polygonscan.com/address/";
+  const OPENSEA_MATIC_URL = "https://opensea.io/assets?search[query]=";
+  const OPENSEA_MATICMUM_URL =
+    "https://testnets.opensea.io/assets?search[query]=";
   const polygonScanUrl = `${POLYGON_SCAN_URL}${address}`;
   let stringLength = 0;
   let middleString = "";
@@ -234,20 +240,42 @@ export const shortenAddress = (address, number = 4, withLink = true) => {
     (typeof address === "string" || address instanceof String) &&
     address.length > 0
   ) {
-    if (withLink === true) {
-      return (
-        <Link href={polygonScanUrl} target="_blank">
-          {`${address.substring(
-            0,
-            number + 2
-          )}${middleString}${address.substring(address.length - number)}`}
-        </Link>
-      );
-    } else {
-      return `${address.substring(
-        0,
-        number + 2
-      )}${middleString}${address.substring(address.length - number)}`;
+    switch (withLink) {
+      case "maticscan":
+        return (
+          <Link href={polygonScanUrl} target="_blank">
+            {`${address.substring(
+              0,
+              number + 2
+            )}${middleString}${address.substring(address.length - number)}`}
+          </Link>
+        );
+
+      case "opensea_matic":
+        return (
+          <Link href={`${OPENSEA_MATIC_URL}${address}`} target="_blank">
+            {`${address.substring(
+              0,
+              number + 2
+            )}${middleString}${address.substring(address.length - number)}`}
+          </Link>
+        );
+
+      case "opensea_maticmum":
+        return (
+          <Link href={`${OPENSEA_MATICMUM_URL}${address}`} target="_blank">
+            {`${address.substring(
+              0,
+              number + 2
+            )}${middleString}${address.substring(address.length - number)}`}
+          </Link>
+        );
+
+      default:
+        return `${address.substring(
+          0,
+          number + 2
+        )}${middleString}${address.substring(address.length - number)}`;
     }
   } else {
     return "";
@@ -453,6 +481,12 @@ export const getChainName = ({ chainId }) => {
 
 // https://levelup.gitconnected.com/how-to-check-for-an-object-in-javascript-object-null-check-3b2632330296
 export const isObject = (value) => typeof value === "object" && value !== null;
+
+// https://stackoverflow.com/questions/14636536/how-to-check-if-a-variable-is-an-integer-in-javascript
+export const isInt = (value) => {
+  const x = parseFloat(value);
+  return !isNaN(value) && (x | 0) === x;
+};
 
 export const writeToastMessageState = atom({
   key: "writeToastMessageState",

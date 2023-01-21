@@ -392,14 +392,17 @@ const MonitorRentNft = ({
                   }}
                 >
                   <TableCell align="right">
-                    {shortenAddress(row.nftAddress, 2)}
+                    {shortenAddress({ address: row.nftAddress, number: 2 })}
                   </TableCell>
                   <TableCell align="right">{row.tokenId}</TableCell>
                   <TableCell align="right">
                     {row.rentFee / Math.pow(10, 18)}
                   </TableCell>
                   <TableCell align="right">
-                    {shortenAddress(row.feeTokenAddress, 2)}
+                    {shortenAddress({
+                      address: row.feeTokenAddress,
+                      number: 2,
+                    })}
                   </TableCell>
                   <TableCell align="right">{row.rentFeeByToken}</TableCell>
                   <TableCell align="right">
@@ -470,24 +473,27 @@ const MonitorRentNft = ({
                   }}
                 >
                   <TableCell align="right">
-                    {shortenAddress(row.nftAddress, 2)}
+                    {shortenAddress({ address: row.nftAddress, number: 2 })}
                   </TableCell>
                   <TableCell align="right">{row.tokenId}</TableCell>
                   <TableCell align="right">{row.rentFee}</TableCell>
                   <TableCell align="right">
-                    {shortenAddress(row.feeTokenAddress, 2)}
+                    {shortenAddress({
+                      address: row.feeTokenAddress,
+                      number: 2,
+                    })}
                   </TableCell>
                   <TableCell align="right">{row.rentFeeByToken}</TableCell>
                   <TableCell align="right">{row.isRentByToken}</TableCell>
                   <TableCell align="right">{row.rentDuration}</TableCell>
                   <TableCell align="right">
-                    {shortenAddress(row.renterAddress, 2)}
+                    {shortenAddress({ address: row.renterAddress, number: 2 })}
                   </TableCell>
                   <TableCell align="right">
-                    {shortenAddress(row.renteeAddress, 2)}
+                    {shortenAddress({ address: row.renteeAddress, number: 2 })}
                   </TableCell>
                   <TableCell align="right">
-                    {shortenAddress(row.serviceAddress, 2)}
+                    {shortenAddress({ address: row.serviceAddress, number: 2 })}
                   </TableCell>
                   <TableCell align="right">
                     {row.rentStartTimestamp.toString()}

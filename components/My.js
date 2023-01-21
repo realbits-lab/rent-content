@@ -343,7 +343,10 @@ const My = ({
                   color="text.secondary"
                   component="div"
                 >
-                  {shortenAddress(collection.collectionAddress, 5)}
+                  {shortenAddress({
+                    address: collection.collectionAddress,
+                    number: 5,
+                  })}
                 </Typography>
               </CardContent>
             </Box>
