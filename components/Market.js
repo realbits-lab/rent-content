@@ -15,11 +15,18 @@ import ListItemButton from "@mui/material/ListItemButton";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
+import TableFooter from "@mui/material/TableFooter";
+import TablePagination from "@mui/material/TablePagination";
+import IconButton from "@mui/material/IconButton";
 import Avatar from "@mui/material/Avatar";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Tooltip from "@mui/material/Tooltip";
 import { useTheme } from "@mui/material/styles";
+import LastPageIcon from "@mui/icons-material/LastPage";
+import FirstPageIcon from "@mui/icons-material/FirstPage";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import { Metamask } from "rent-market";
 import {
   changeIPFSToGateway,
@@ -86,6 +93,12 @@ const Market = ({
   });
   const { snackbarSeverity, snackbarMessage, snackbarTime, snackbarOpen } =
     snackbarValue;
+
+  // * -------------------------------------------------------------------------
+  // * Define pagination data.
+  // * -------------------------------------------------------------------------
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   // * -------------------------------------------------------------------------
   // * Initialize data.
@@ -336,18 +349,11 @@ const Market = ({
     if (collectionArray.length === 0) {
       return buildNFTDataTableSkeleton();
     } else {
-      const selectedRegisterNFTArray = registerNFTArray
-        .filter(
-          (element) =>
-            element.nftAddress === collectionAddress &&
-            element.renterAddress === "0"
-        )
-        .map((element) => {
-          // console.log("element: ", element);
-          return buildRowList({
-            element,
-          });
-        });
+      const selectedRegisterNFTArray = registerNFTArray.filter(
+        (element) =>
+          element.nftAddress === collectionAddress &&
+          element.renterAddress === "0"
+      );
 
       return (
         <Table size="small" aria-label="purchases">
@@ -367,7 +373,23 @@ const Market = ({
             </TableRow>
           </TableHead>
 
-          <TableBody key={getUniqueKey()}>{selectedRegisterNFTArray}</TableBody>
+          <TableBody key={getUniqueKey()}>
+            {selectedRegisterNFTArray
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((element) => {
+                // console.log("element: ", element);
+                return buildRowList({
+                  element,
+                });
+              })}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePageComponent
+                selectedRegisterNFTArray={selectedRegisterNFTArray}
+              />
+            </TableRow>
+          </TableFooter>
         </Table>
       );
     }
@@ -452,7 +474,104 @@ const Market = ({
     );
   };
 
-  // console.log("Build Market component.");
+  const TablePaginationActions = (props) => {
+    const theme = useTheme();
+    const { count, page, rowsPerPage, onPageChange } = props;
+
+    const handleFirstPageButtonClick = (event) => {
+      onPageChange(event, 0);
+    };
+
+    const handleBackButtonClick = (event) => {
+      onPageChange(event, page - 1);
+    };
+
+    const handleNextButtonClick = (event) => {
+      onPageChange(event, page + 1);
+    };
+
+    const handleLastPageButtonClick = (event) => {
+      onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+    };
+
+    return (
+      // <Box sx={{ flexShrink: 1, ml: 2.5 }}>
+      <Box sx={{ display: "inline-flex" }}>
+        <IconButton
+          onClick={handleFirstPageButtonClick}
+          disabled={page === 0}
+          aria-label="first page"
+        >
+          {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
+        </IconButton>
+        <IconButton
+          onClick={handleBackButtonClick}
+          disabled={page === 0}
+          aria-label="previous page"
+        >
+          {theme.direction === "rtl" ? (
+            <KeyboardArrowRight />
+          ) : (
+            <KeyboardArrowLeft />
+          )}
+        </IconButton>
+        <IconButton
+          onClick={handleNextButtonClick}
+          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+          aria-label="next page"
+        >
+          {theme.direction === "rtl" ? (
+            <KeyboardArrowLeft />
+          ) : (
+            <KeyboardArrowRight />
+          )}
+        </IconButton>
+        <IconButton
+          onClick={handleLastPageButtonClick}
+          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+          aria-label="last page"
+        >
+          {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
+        </IconButton>
+      </Box>
+    );
+  };
+
+  const TablePageComponent = ({ selectedRegisterNFTArray }) => {
+    // console.log("call TablePageComponent()");
+    // console.log("page: ", page);
+    // console.log("rowsPerPage: ", rowsPerPage);
+
+    return (
+      <TablePagination
+        key={getUniqueKey()}
+        rowsPerPageOptions={[5, 10, 25]}
+        count={selectedRegisterNFTArray.length}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        SelectProps={{
+          inputProps: {
+            "aria-label": "rows per page",
+          },
+          native: true,
+        }}
+        onPageChange={(event, newPage) => {
+          setPage((prevState) => {
+            return newPage;
+          });
+        }}
+        onRowsPerPageChange={(event) => {
+          setRowsPerPage((prevState) => {
+            return parseInt(event.target.value, 10);
+          });
+          setPage((prevState) => {
+            return 0;
+          });
+        }}
+        ActionsComponent={TablePaginationActions}
+      />
+    );
+  };
 
   return (
     <>

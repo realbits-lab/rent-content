@@ -7,7 +7,7 @@ module.exports = {
   webpack: (config) => {
     return {
       ...config,
-      devtool: prod ? "inline-source-map" : "source-map",
+      devtool: prod ? "inline-source-map" : "inline-source-map",
     };
   },
 };
