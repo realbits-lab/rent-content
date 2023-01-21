@@ -52,7 +52,6 @@ const Content = ({
   // * Define input copied variables.
   // * -------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
-  const [blockchainNetwork, setBlockchainNetwork] = React.useState([]);
   const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState([]);
   const [myUnregisteredNFTArray, setMyUnregisteredNFTArray] = React.useState(
     []
@@ -131,7 +130,6 @@ const Content = ({
     rentMarketRef.current = inputRentMarket;
     setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
     setMyUnregisteredNFTArray(inputMyUnregisteredNFTArray);
-    setBlockchainNetwork(inputBlockchainNetwork);
 
     // Set unique data.
     const uniqueRegisterNFTAddressSet = new Set(
@@ -678,7 +676,7 @@ const Content = ({
         <Chip label="Metamask" />
       </Divider>
       <p />
-      <Metamask blockchainNetwork={blockchainNetwork} />
+      <Metamask blockchainNetwork={inputBlockchainNetwork} />
 
       {/* // * --------------------------------------------------------------*/}
       {/* // * Show registered NFT with change and unregister button.        */}
