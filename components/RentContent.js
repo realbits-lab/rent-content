@@ -206,13 +206,13 @@ const RentContent = ({
   // * Initialize data.
   React.useEffect(() => {
     // console.log("call React.useEffect()");
-    console.log("rentMarketAddress: ", rentMarketAddress);
-    console.log("testNftAddress: ", testNftAddress);
-    console.log("blockchainNetwork: ", blockchainNetwork);
-    console.log("serviceAddress: ", serviceAddress);
+    // console.log("rentMarketAddress: ", rentMarketAddress);
+    // console.log("testNftAddress: ", testNftAddress);
+    // console.log("blockchainNetwork: ", blockchainNetwork);
+    // console.log("serviceAddress: ", serviceAddress);
 
     const initRentMarket = async () => {
-      console.log("call initRentMarket()");
+      // console.log("call initRentMarket()");
 
       rentMarket.current = new RentMarket({
         rentMarketAddress,
