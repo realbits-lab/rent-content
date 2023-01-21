@@ -174,12 +174,13 @@ const Market = ({
               try {
                 await rentMarketRef.current.rentNFT(element, serviceAddress);
               } catch (error) {
-                // console.log("catch error: ", error);
-                let message =
-                  error.data.message || error.reason || error.message || error;
+                console.log("error: ", error);
 
-                if (error.data.message) {
-                } else if (error.message) {
+                let message = error.data
+                  ? error.data.message
+                  : error.reason || error.message || error || "";
+
+                if (error.message) {
                   // const testMessage =
                   //   '[ethjs-query] while formatting outputs from RPC \'{"value":{"code":-32603,"data":{"code":-32603,"message":"Error: VM Exception while processing transaction: reverted with reason string \'RM9\'","data":{"message":"Error: VM Exception while processing transaction: reverted with reason string \'RM9\'","txHash":"0x14cdec3dbaaa5ab97fcf2524c28bc0acd482a4e1131deedc53ef441c1ba4a8a1","data":"0x08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003524d390000000000000000000000000000000000000000000000000000000000"}}}}\'';
                   let regex = new RegExp(
