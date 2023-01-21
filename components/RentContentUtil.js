@@ -391,7 +391,7 @@ export const getChainName = ({ chainId }) => {
     108: "thundercore",
     122: "fuse",
     128: "heco",
-    137: "polygon",
+    137: "matic",
     200: "xdaiarb",
     246: "energyweb",
     250: "fantom",
