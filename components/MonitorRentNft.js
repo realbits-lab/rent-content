@@ -50,7 +50,7 @@ const MonitorRentNft = ({
   // Define alchemy configuration.
   //----------------------------------------------------------------------------
   const settings = {
-    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY_MUMBAI,
+    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
     network: Network.MATIC_MUMBAI,
   };
   const alchemy = new Alchemy(settings);
