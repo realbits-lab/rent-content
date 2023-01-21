@@ -86,7 +86,7 @@ const MonitorPendingRentFee = ({
         (resultPendingRentFeeArray) =>
           setPendingRentFeeArray(resultPendingRentFeeArray),
         (error) => {
-          console.log("getAllAccountBalance error: ", error);
+          // console.log("getAllAccountBalance error: ", error);
           setWriteToastMessage({
             snackbarSeverity: AlertSeverity.error,
             snackbarMessage: error?.message,

@@ -80,13 +80,13 @@ const MonitorAccountBalance = ({
       inputRentMarket !== undefined &&
       inputRentMarket?.rentMarketContract !== undefined
     ) {
-      console.log("inputRentMarket: ", inputRentMarket);
+      // console.log("inputRentMarket: ", inputRentMarket);
       rentMarketRef.current = inputRentMarket;
       rentMarketRef.current.getAllAccountBalance().then(
         (resultAccountBalanceArray) =>
           setAccountBalanceArray(resultAccountBalanceArray),
         (error) => {
-          console.log("getAllAccountBalance error: ", error);
+          // console.log("getAllAccountBalance error: ", error);
           setWriteToastMessage({
             snackbarSeverity: AlertSeverity.error,
             snackbarMessage: error?.message,
@@ -112,14 +112,14 @@ const MonitorAccountBalance = ({
         variant="contained"
         onClick={async () => {
           try {
-            console.log("rentMarketRef.current: ", rentMarketRef.current);
-            console.log("recipient: ", recipient);
-            console.log("tokenAddress: ", tokenAddress);
+            // console.log("rentMarketRef.current: ", rentMarketRef.current);
+            // console.log("recipient: ", recipient);
+            // console.log("tokenAddress: ", tokenAddress);
             await rentMarketRef.current.withdrawMyBalance(
               recipient,
               tokenAddress
             );
-            console.log("withdrawMyBalance done.");
+            // console.log("withdrawMyBalance done.");
           } catch (error) {
             console.error(error);
             setWriteToastMessage({

@@ -169,12 +169,12 @@ const Market = ({
             color="primary"
             variant="contained"
             onClick={async () => {
-              console.log("call onClick()");
+              // console.log("call onClick()");
               // console.log("serviceAddress: ", serviceAddress);
               try {
                 await rentMarketRef.current.rentNFT(element, serviceAddress);
               } catch (error) {
-                console.log("error: ", error);
+                // console.log("error: ", error);
 
                 let message = error.data
                   ? error.data.message
@@ -218,7 +218,7 @@ const Market = ({
                   snackbarOpen: true,
                 });
               }
-              console.log("done onClick()");
+              // console.log("done onClick()");
             }}
           >
             RENT
