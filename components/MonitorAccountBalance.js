@@ -184,10 +184,10 @@ const MonitorAccountBalance = ({
                   }}
                 >
                   <TableCell align="right">
-                    {shortenAddress(row.accountAddress, 4)}
+                    {shortenAddress({ address: row.accountAddress, number: 4 })}
                   </TableCell>
                   <TableCell align="right">
-                    {shortenAddress(row.tokenAddress, 4)}
+                    {shortenAddress({ address: row.tokenAddress, number: 4 })}
                   </TableCell>
                   <TableCell align="right">
                     {row.amount / Math.pow(10, 18)}

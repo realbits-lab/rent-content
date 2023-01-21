@@ -169,7 +169,7 @@ const MonitorToken = ({
                 >
                   <TableCell align="right">{row.name}</TableCell>
                   <TableCell align="right">
-                    {shortenAddress(tow.tokenAddress, 4)}
+                    {shortenAddress({ address: tow.tokenAddress, number: 4 })}
                   </TableCell>
                 </TableRow>
               );

@@ -19,6 +19,7 @@ import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
 import IconButton from "@mui/material/IconButton";
 import Avatar from "@mui/material/Avatar";
+import Link from "@mui/material/Link";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Tooltip from "@mui/material/Tooltip";
@@ -36,6 +37,7 @@ import {
   shortenAddress,
   getUniqueKey,
   getErrorDescription,
+  getChainName,
 } from "./RentContentUtil";
 
 const Market = ({
@@ -270,6 +272,18 @@ const Market = ({
     } else {
       const url = changeIPFSToGateway(collectionImage);
       // console.log("url: ", url);
+      // console.log("inputBlockchainNetwork: ", inputBlockchainNetwork);
+      let openseaMode;
+      if (getChainName({ chainId: inputBlockchainNetwork }) === "matic") {
+        openseaMode = "opensea_matic";
+      } else if (
+        getChainName({ chainId: inputBlockchainNetwork }) === "maticmum"
+      ) {
+        openseaMode = "opensea_maticmum";
+      } else {
+        openseaMode = "";
+      }
+
       return (
         <Card sx={{ display: "flex" }}>
           <CardMedia
@@ -294,7 +308,24 @@ const Market = ({
                 color="text.secondary"
                 component="div"
               >
-                {shortenAddress(collectionAddress, 5)}
+                OpenSea:{" "}
+                {shortenAddress({
+                  address: collectionAddress,
+                  number: 5,
+                  withLink: openseaMode,
+                })}
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                component="div"
+              >
+                PolygonScan :{" "}
+                {shortenAddress({
+                  address: collectionAddress,
+                  number: 5,
+                  withLink: "maticscan",
+                })}
               </Typography>
             </CardContent>
           </Box>

@@ -214,7 +214,7 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
                     {element.name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {shortenAddress(element.serviceAddress)}
+                    {shortenAddress({ address: element.serviceAddress })}
                   </Typography>
                 </CardContent>
                 <CardActions>

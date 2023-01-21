@@ -154,13 +154,16 @@ const MonitorPendingRentFee = ({
                   }}
                 >
                   <TableCell align="right">
-                    {shortenAddress(row.renterAddress, 4)}
+                    {shortenAddress({ address: row.renterAddress, number: 4 })}
                   </TableCell>
                   <TableCell align="right">
-                    {shortenAddress(row.serviceAddress, 4)}
+                    {shortenAddress({ address: row.serviceAddress, number: 4 })}
                   </TableCell>
                   <TableCell align="right">
-                    {shortenAddress(row.feeTokenAddress, 4)}
+                    {shortenAddress({
+                      address: row.feeTokenAddress,
+                      number: 4,
+                    })}
                   </TableCell>
                   <TableCell align="right">
                     {row.amount / Math.pow(10, 18)}
