@@ -376,11 +376,7 @@ const Market = ({
     );
 
     return (
-      <Table
-        spacing={0}
-        size="small"
-        sx={{ maxWidth: "90vw", fontSize: "1.5rem" }}
-      >
+      <Table spacing={0} size="small" sx={{ width: "90vw" }}>
         <TableHead>
           <TableRow key={getUniqueKey()} spacing={0}>
             <TableCell align="center">Avatar</TableCell>
@@ -424,7 +420,7 @@ const Market = ({
         display="flex"
         direction="column"
         justifyContent="flex-start"
-        alignItems="flex-start"
+        alignItems="center"
       >
         <Grid item xs={1} sm={1} md={1} lg={1} xl={1}>
           {buildCollectionMetadataCard()}
