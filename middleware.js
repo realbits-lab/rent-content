@@ -18,6 +18,7 @@ export default function middleware(request) {
     device.type === "mobile" &&
     headerUserAgent.includes("MetaMaskMobile") === false
   ) {
-    return NextResponse.redirect(`${METAMASK_DAPP_URL}${url}`);
+    // return NextResponse.redirect(`${METAMASK_DAPP_URL}${url}`);
+    return NextResponse.next();
   }
 }
