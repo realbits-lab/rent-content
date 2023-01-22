@@ -184,7 +184,11 @@ const Market = ({
             color="primary"
             variant="contained"
             onClick={async () => {
-              // console.log("call onClick()");
+              console.log("call onClick()");
+              console.log(
+                "rentMarketContractRef.current: ",
+                rentMarketContractRef.current
+              );
               // console.log("serviceAddress: ", serviceAddress);
               try {
                 await rentMarketContractRef.current.rentNFT(

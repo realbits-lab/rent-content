@@ -131,7 +131,7 @@ const RentContent = ({
   // * -------------------------------------------------------------------------
   // * Define rent market class.
   // * -------------------------------------------------------------------------
-  const rentMarket = React.useRef();
+  const rentMarketClassRef = React.useRef();
 
   // * -------------------------------------------------------------------------
   // * Data list.
@@ -218,19 +218,19 @@ const RentContent = ({
     async function initRentMarket() {
       // console.log("call initRentMarket()");
 
-      rentMarket.current = new RentMarket({
+      rentMarketClassRef.current = new RentMarket({
         rentMarketAddress,
         testNftAddress,
         blockchainNetwork,
         onEventFunc,
         onErrorFunc,
       });
-      // console.log("rentMarket.current: ", rentMarket.current);
+      // console.log("rentMarketClassRef.current: ", rentMarketClassRef.current);
 
-      // console.log("call rentMarket.current.initializeAll()");
+      // console.log("call rentMarketClassRef.current.initializeAll()");
       try {
-        // await rentMarket.current.initializeAll();
-        rentMarket.current.initializeAll();
+        // await rentMarketClassRef.current.initializeAll();
+        rentMarketClassRef.current.initializeAll();
       } catch (error) {
         console.error(error);
         setWriteToastMessage({
@@ -244,7 +244,7 @@ const RentContent = ({
       // * Set inputRentMarket for updating component which uses rentMarket.
       // * For calling function of rentMarket contract.
       // console.log("call setInputRentMarket()");
-      setInputRentMarket(rentMarket.current);
+      setInputRentMarket(rentMarketClassRef.current);
 
       // * Close drawer in mobile browser.
       isMobileRef.current = checkMobile();
@@ -281,33 +281,35 @@ const RentContent = ({
     // console.log("call onEventFunc()");
 
     // console.log(
-    //   "rentMarket.current.registerNFTArray: ",
-    //   rentMarket.current.registerNFTArray
+    //   "rentMarketClassRef.current.registerNFTArray: ",
+    //   rentMarketClassRef.current.registerNFTArray
     // );
     // console.log(
-    //   "rentMarket.current.myRentNFTArray: ",
-    //   rentMarket.current.myRentNFTArray
+    //   "rentMarketClassRef.current.myRentNFTArray: ",
+    //   rentMarketClassRef.current.myRentNFTArray
     // );
     // console.log(
-    //   "rentMarket.current.collectionArray: ",
-    //   rentMarket.current.collectionArray
+    //   "rentMarketClassRef.current.collectionArray: ",
+    //   rentMarketClassRef.current.collectionArray
     // );
     // console.log(
-    //   "rentMarket.current.myRegisteredNFTArray: ",
-    //   rentMarket.current.myRegisteredNFTArray
+    //   "rentMarketClassRef.current.myRegisteredNFTArray: ",
+    //   rentMarketClassRef.current.myRegisteredNFTArray
     // );
     // console.log(
-    //   "rentMarket.current.myUnregisteredNFTArray: ",
-    //   rentMarket.current.myUnregisteredNFTArray
+    //   "rentMarketClassRef.current.myUnregisteredNFTArray: ",
+    //   rentMarketClassRef.current.myUnregisteredNFTArray
     // );
 
-    setMyRegisteredNFTArray(rentMarket.current.myRegisteredNFTArray);
-    setMyUnregisteredNFTArray(rentMarket.current.myUnregisteredNFTArray);
-    setRegisterNFTArray(rentMarket.current.registerNFTArray);
-    setMyRentNFTArray(rentMarket.current.myRentNFTArray);
-    setCollectionArray(rentMarket.current.collectionArray);
-    setServiceArray(rentMarket.current.serviceArray);
-    setTokenArray(rentMarket.current.tokenArray);
+    setMyRegisteredNFTArray(rentMarketClassRef.current.myRegisteredNFTArray);
+    setMyUnregisteredNFTArray(
+      rentMarketClassRef.current.myUnregisteredNFTArray
+    );
+    setRegisterNFTArray(rentMarketClassRef.current.registerNFTArray);
+    setMyRentNFTArray(rentMarketClassRef.current.myRentNFTArray);
+    setCollectionArray(rentMarketClassRef.current.collectionArray);
+    setServiceArray(rentMarketClassRef.current.serviceArray);
+    setTokenArray(rentMarketClassRef.current.tokenArray);
 
     if (message) {
       setWriteToastMessage({
