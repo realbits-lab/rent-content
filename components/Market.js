@@ -41,7 +41,7 @@ import {
 } from "./RentContentUtil";
 
 const Market = ({
-  inputRentMarket,
+  inputRentMarketContract,
   inputCollectionArray,
   inputServiceAddress,
   inputRegisterNFTArray,
@@ -52,7 +52,7 @@ const Market = ({
   // * -------------------------------------------------------------------------
   // * Define copied local varialbe from input data.
   // * -------------------------------------------------------------------------
-  const rentMarketRef = React.useRef();
+  const rentMarketContractRef = React.useRef();
   const [collectionArray, setCollectionArray] = React.useState([]);
   const [serviceAddress, setServiceAddress] = React.useState("");
   const [registerNFTArray, setRegisterNFTArray] = React.useState([]);
@@ -107,14 +107,14 @@ const Market = ({
   // * -------------------------------------------------------------------------
   React.useEffect(() => {
     // console.log("call React.useEffect()");
-    // console.log("inputRentMarket: ", inputRentMarket);
+    // console.log("inputRentMarketContract: ", inputRentMarketContract);
     // console.log("inputCollectionArray: ", inputCollectionArray);
     // console.log("inputServiceAddress: ", inputServiceAddress);
     // console.log("inputRegisterNFTArray: ", inputRegisterNFTArray);
     // console.log("inputBlockchainNetwork: ", inputBlockchainNetwork);
 
-    if (inputRentMarket) {
-      rentMarketRef.current = inputRentMarket;
+    if (inputRentMarketContract) {
+      rentMarketContractRef.current = inputRentMarketContract;
     }
     if (Array.isArray(inputCollectionArray) === true) {
       setCollectionArray(inputCollectionArray);
@@ -138,7 +138,7 @@ const Market = ({
       setBlockchainNetwork(inputBlockchainNetwork);
     }
   }, [
-    inputRentMarket,
+    inputRentMarketContract,
     inputCollectionArray,
     inputServiceAddress,
     inputRegisterNFTArray,
@@ -187,7 +187,10 @@ const Market = ({
               // console.log("call onClick()");
               // console.log("serviceAddress: ", serviceAddress);
               try {
-                await rentMarketRef.current.rentNFT(element, serviceAddress);
+                await rentMarketContractRef.current.rentNFT(
+                  element,
+                  serviceAddress
+                );
               } catch (error) {
                 // console.log("error: ", error);
 
@@ -241,7 +244,7 @@ const Market = ({
         </TableCell>
       </TableRow>
     );
-  };
+  }
 
   function buildCollectionMetadataCard() {
     if (collectionArray.length === 0) {
@@ -332,7 +335,7 @@ const Market = ({
         </Card>
       );
     }
-  };
+  }
 
   function buildNFTDataTableSkeleton() {
     return (
@@ -374,7 +377,7 @@ const Market = ({
         </TableBody>
       </Table>
     );
-  };
+  }
 
   function buildNFTDataTable() {
     if (collectionArray.length === 0) {
@@ -424,7 +427,7 @@ const Market = ({
         </Table>
       );
     }
-  };
+  }
 
   function buildCollectionDataTable() {
     return (
@@ -433,7 +436,7 @@ const Market = ({
         {buildNFTDataTable()}
       </Grid>
     );
-  };
+  }
 
   function buildCollectionGrid() {
     return (
@@ -482,7 +485,7 @@ const Market = ({
         </List>
       </Grid>
     );
-  };
+  }
 
   function buildAllCollectionTable() {
     // https://mui.com/material-ui/react-grid/
@@ -503,7 +506,7 @@ const Market = ({
         {buildCollectionDataTable()}
       </Grid>
     );
-  };
+  }
 
   function TablePaginationActions(props) {
     const theme = useTheme();
@@ -566,7 +569,7 @@ const Market = ({
         </IconButton>
       </Box>
     );
-  };
+  }
 
   function TablePageComponent({ selectedRegisterNFTArray }) {
     // console.log("call TablePageComponent()");
@@ -602,7 +605,7 @@ const Market = ({
         ActionsComponent={TablePaginationActions}
       />
     );
-  };
+  }
 
   return (
     <>
