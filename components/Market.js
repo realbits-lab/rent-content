@@ -177,7 +177,7 @@ const Market = ({
         <TableCell align="center">
           {element.rentFee / Math.pow(10, 18)}
         </TableCell>
-        <TableCell align="center">{element.rentDuration.toNumber()}</TableCell>
+        {/* <TableCell align="center">{element.rentDuration.toNumber()}</TableCell> */}
         <TableCell align="center">
           <Button
             color="primary"
@@ -367,51 +367,52 @@ const Market = ({
   function buildNFTDataTable() {
     if (collectionArray.length === 0) {
       return buildNFTDataTableSkeleton();
-    } else {
-      const selectedRegisterNFTArray = registerNFTArray.filter(
-        (element) =>
-          element.nftAddress === collectionAddress &&
-          element.renterAddress === "0"
-      );
-
-      return (
-        <Table size="small" aria-label="purchases">
-          <TableHead>
-            <TableRow key={getUniqueKey()}>
-              <TableCell align="center">Avatar</TableCell>
-              <TableCell align="center">Name</TableCell>
-              <TableCell align="center">
-                Fee <br />
-                (matic)
-              </TableCell>
-              <TableCell align="center">
-                Duration
-                <br /> (blocks)
-              </TableCell>
-              <TableCell align="center">Rent</TableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody key={getUniqueKey()}>
-            {selectedRegisterNFTArray
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((element) => {
-                // console.log("element: ", element);
-                return buildRowList({
-                  element,
-                });
-              })}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TablePageComponent
-                selectedRegisterNFTArray={selectedRegisterNFTArray}
-              />
-            </TableRow>
-          </TableFooter>
-        </Table>
-      );
     }
+
+    const selectedRegisterNFTArray = registerNFTArray.filter(
+      (element) =>
+        element.nftAddress === collectionAddress &&
+        element.renterAddress === "0"
+    );
+
+    return (
+      <Table
+        spacing={0}
+        size="small"
+        sx={{ maxWidth: "90vw", fontSize: "1.5rem" }}
+      >
+        <TableHead>
+          <TableRow key={getUniqueKey()} spacing={0}>
+            <TableCell align="center">Avatar</TableCell>
+            <TableCell align="center">Name</TableCell>
+            <TableCell align="center">Fee</TableCell>
+            {/* <TableCell align="center">
+              Duration
+              <br /> (blocks)
+            </TableCell> */}
+            <TableCell align="center">Rent</TableCell>
+          </TableRow>
+        </TableHead>
+
+        <TableBody key={getUniqueKey()} spacing={0}>
+          {selectedRegisterNFTArray
+            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            .map((element) => {
+              // console.log("element: ", element);
+              return buildRowList({
+                element,
+              });
+            })}
+        </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TablePageComponent
+              selectedRegisterNFTArray={selectedRegisterNFTArray}
+            />
+          </TableRow>
+        </TableFooter>
+      </Table>
+    );
   }
 
   function buildCollectionDataTable() {
@@ -515,8 +516,7 @@ const Market = ({
     };
 
     return (
-      // <Box sx={{ flexShrink: 1, ml: 2.5 }}>
-      <Box sx={{ display: "inline-flex" }}>
+      <Box spacing={0} sx={{ display: "flex", flexDirection: "row" }}>
         <IconButton
           onClick={handleFirstPageButtonClick}
           disabled={page === 0}
@@ -569,6 +569,7 @@ const Market = ({
         count={selectedRegisterNFTArray.length}
         page={page}
         rowsPerPage={rowsPerPage}
+        labelRowsPerPage={""}
         SelectProps={{
           inputProps: {
             "aria-label": "rows per page",
