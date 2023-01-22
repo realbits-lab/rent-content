@@ -145,7 +145,7 @@ const Market = ({
     inputBlockchainNetwork,
   ]);
 
-  const buildRowList = ({ element }) => {
+  function buildRowList({ element }) {
     // console.log("call buildRowList()");
     // console.log("element: ", element);
 
@@ -243,7 +243,7 @@ const Market = ({
     );
   };
 
-  const buildCollectionMetadataCard = () => {
+  function buildCollectionMetadataCard() {
     if (collectionArray.length === 0) {
       return (
         <Card sx={{ display: "flex" }}>
@@ -334,7 +334,7 @@ const Market = ({
     }
   };
 
-  const buildNFTDataTableSkeleton = () => {
+  function buildNFTDataTableSkeleton() {
     return (
       <Table size="small" aria-label="purchases">
         <TableHead>
@@ -376,7 +376,7 @@ const Market = ({
     );
   };
 
-  const buildNFTDataTable = () => {
+  function buildNFTDataTable() {
     if (collectionArray.length === 0) {
       return buildNFTDataTableSkeleton();
     } else {
@@ -426,7 +426,7 @@ const Market = ({
     }
   };
 
-  const buildCollectionDataTable = () => {
+  function buildCollectionDataTable() {
     return (
       <Grid item xs={10}>
         {buildCollectionMetadataCard()}
@@ -435,7 +435,7 @@ const Market = ({
     );
   };
 
-  const buildCollectionGrid = () => {
+  function buildCollectionGrid() {
     return (
       <Grid
         item
@@ -484,7 +484,7 @@ const Market = ({
     );
   };
 
-  const buildAllCollectionTable = () => {
+  function buildAllCollectionTable() {
     // https://mui.com/material-ui/react-grid/
     // Set the direct alignment based on direction.
     // justifyContent="flex-start"
@@ -505,7 +505,7 @@ const Market = ({
     );
   };
 
-  const TablePaginationActions = (props) => {
+  function TablePaginationActions(props) {
     const theme = useTheme();
     const { count, page, rowsPerPage, onPageChange } = props;
 
@@ -568,7 +568,7 @@ const Market = ({
     );
   };
 
-  const TablePageComponent = ({ selectedRegisterNFTArray }) => {
+  function TablePageComponent({ selectedRegisterNFTArray }) {
     // console.log("call TablePageComponent()");
     // console.log("page: ", page);
     // console.log("rowsPerPage: ", rowsPerPage);
