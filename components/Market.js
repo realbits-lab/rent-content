@@ -106,8 +106,8 @@ const Market = ({
   // * Initialize data.
   // * -------------------------------------------------------------------------
   React.useEffect(() => {
-    console.log("call React.useEffect()");
-    console.log("inputRentMarketClass: ", inputRentMarketClass);
+    // console.log("call React.useEffect()");
+    // console.log("inputRentMarketClass: ", inputRentMarketClass);
     // console.log("inputCollectionArray: ", inputCollectionArray);
     // console.log("inputServiceAddress: ", inputServiceAddress);
     // console.log("inputRegisterNFTArray: ", inputRegisterNFTArray);
@@ -184,11 +184,11 @@ const Market = ({
             color="primary"
             variant="contained"
             onClick={async () => {
-              console.log("call onClick()");
-              console.log(
-                "rentMarketClassRef.current: ",
-                rentMarketClassRef.current
-              );
+              // console.log("call onClick()");
+              // console.log(
+              //   "rentMarketClassRef.current: ",
+              //   rentMarketClassRef.current
+              // );
               // console.log("serviceAddress: ", serviceAddress);
               try {
                 await rentMarketClassRef.current.rentNFT(
