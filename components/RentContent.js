@@ -40,6 +40,7 @@ import {
   RBSnackbar,
   writeToastMessageState,
   readToastMessageState,
+  checkMobile,
 } from "./RentContentUtil";
 
 const RENT_CONTENT_COMPONENT_DRAWER_WIDTH = 180;
@@ -143,6 +144,7 @@ const RentContent = ({
   const [serviceArray, setServiceArray] = React.useState([]);
   const [tokenArray, setTokenArray] = React.useState([]);
   const [inputRentMarket, setInputRentMarket] = React.useState();
+  const isMobileRef = React.useRef(false);
 
   // * -------------------------------------------------------------------------
   // * If undefined, it'd loading status.
@@ -151,7 +153,7 @@ const RentContent = ({
   const [myRentNFTArray, setMyRentNFTArray] = React.useState();
 
   // * -------------------------------------------------------------------------
-  // * Handle open drawer.
+  // * Handle drawer open.
   // * -------------------------------------------------------------------------
   const [openDrawer, setOpenDrawer] = React.useState(true);
   const handleDrawerOpen = () => {
@@ -159,6 +161,20 @@ const RentContent = ({
   };
   const handleDrawerClose = () => {
     setOpenDrawer(false);
+  };
+
+  // * -------------------------------------------------------------------------
+  // * Handle drawer selected index.
+  // * -------------------------------------------------------------------------
+  const [selectedIndex, setSelectedIndex] = React.useState(DEFAULT_MENU_INDEX);
+  const handleListItemClick = (event, index) => {
+    // * Set selected index.
+    setSelectedIndex(index);
+
+    // * Close drawer in mobile browser.
+    if (isMobileRef.current === true) {
+      handleDrawerClose();
+    }
   };
 
   // * -------------------------------------------------------------------------
@@ -191,18 +207,6 @@ const RentContent = ({
         };
   });
 
-  // * -------------------------------------------------------------------------
-  // * Handle selected index.
-  // * -------------------------------------------------------------------------
-  const [selectedIndex, setSelectedIndex] = React.useState(DEFAULT_MENU_INDEX);
-  const handleListItemClick = (event, index) => {
-    // Set selected index.
-    setSelectedIndex(index);
-
-    // Close drawer.
-    // handleDrawerClose();
-  };
-
   // * Initialize data.
   React.useEffect(() => {
     // console.log("call React.useEffect()");
@@ -211,7 +215,7 @@ const RentContent = ({
     // console.log("blockchainNetwork: ", blockchainNetwork);
     // console.log("serviceAddress: ", serviceAddress);
 
-    const initRentMarket = async () => {
+    async function initRentMarket() {
       // console.log("call initRentMarket()");
 
       rentMarket.current = new RentMarket({
@@ -237,11 +241,18 @@ const RentContent = ({
         });
       }
 
-      // Set inputRentMarket for updating component which uses rentMarket.
-      // For calling function of rentMarket contract.
+      // * Set inputRentMarket for updating component which uses rentMarket.
+      // * For calling function of rentMarket contract.
       // console.log("call setInputRentMarket()");
       setInputRentMarket(rentMarket.current);
-    };
+
+      // * Close drawer in mobile browser.
+      isMobileRef.current = checkMobile();
+      console.log("isMobileRef.current: ", isMobileRef.current);
+      if (isMobileRef.current === true) {
+        setOpenDrawer(false);
+      }
+    }
 
     // * -----------------------------------------------------------------------
     // * Fetch token, collection, service, request/register data,
@@ -250,20 +261,20 @@ const RentContent = ({
     initRentMarket().catch(console.error);
   }, [rentMarketAddress, testNftAddress, blockchainNetwork, serviceAddress]);
 
-  const onErrorFunc = (
+  function onErrorFunc(
     { severity, message } = { severity: AlertSeverity.error, message: "" }
-  ) => {
+  ) {
     setWriteToastMessage({
       snackbarSeverity: severity,
       snackbarMessage: message,
       snackbarTime: new Date(),
       snackbarOpen: true,
     });
-  };
+  }
 
-  const onEventFunc = (
+  function onEventFunc(
     { event, message } = { event: undefined, message: undefined }
-  ) => {
+  ) {
     if (event !== undefined) {
       console.log("event: ", event);
     }
@@ -306,7 +317,7 @@ const RentContent = ({
         snackbarOpen: true,
       });
     }
-  };
+  }
 
   // console.log("Build RentContent component.");
 
