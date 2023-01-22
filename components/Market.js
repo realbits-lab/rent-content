@@ -448,11 +448,10 @@ const Market = ({
         xs={2}
         display="flex"
         container
-        direction="column"
-        justifyContent="center"
-        alignItems="center"
+        direction="row"
+        justifyContent="flex-start"
+        alignItems="flex-start"
       >
-        <Chip label="Collection" color="primary" />
         <List>
           {collectionArray.length !== 0 ? (
             collectionArray.map((element) => {
@@ -501,7 +500,7 @@ const Market = ({
         container
         spacing={2}
         display="flex"
-        direction="row"
+        direction="column"
         justifyContent="flex-start"
         alignItems="flex-start"
       >
