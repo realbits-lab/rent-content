@@ -41,7 +41,7 @@ import {
 } from "./RentContentUtil";
 
 const Market = ({
-  inputRentMarketContract,
+  inputRentMarketClass,
   inputCollectionArray,
   inputServiceAddress,
   inputRegisterNFTArray,
@@ -52,7 +52,7 @@ const Market = ({
   // * -------------------------------------------------------------------------
   // * Define copied local varialbe from input data.
   // * -------------------------------------------------------------------------
-  const rentMarketContractRef = React.useRef();
+  const rentMarketClassRef = React.useRef();
   const [collectionArray, setCollectionArray] = React.useState([]);
   const [serviceAddress, setServiceAddress] = React.useState("");
   const [registerNFTArray, setRegisterNFTArray] = React.useState([]);
@@ -106,15 +106,15 @@ const Market = ({
   // * Initialize data.
   // * -------------------------------------------------------------------------
   React.useEffect(() => {
-    // console.log("call React.useEffect()");
-    // console.log("inputRentMarketContract: ", inputRentMarketContract);
+    console.log("call React.useEffect()");
+    console.log("inputRentMarketClass: ", inputRentMarketClass);
     // console.log("inputCollectionArray: ", inputCollectionArray);
     // console.log("inputServiceAddress: ", inputServiceAddress);
     // console.log("inputRegisterNFTArray: ", inputRegisterNFTArray);
     // console.log("inputBlockchainNetwork: ", inputBlockchainNetwork);
 
-    if (inputRentMarketContract) {
-      rentMarketContractRef.current = inputRentMarketContract;
+    if (inputRentMarketClass) {
+      rentMarketClassRef.current = inputRentMarketClass;
     }
     if (Array.isArray(inputCollectionArray) === true) {
       setCollectionArray(inputCollectionArray);
@@ -138,7 +138,7 @@ const Market = ({
       setBlockchainNetwork(inputBlockchainNetwork);
     }
   }, [
-    inputRentMarketContract,
+    inputRentMarketClass,
     inputCollectionArray,
     inputServiceAddress,
     inputRegisterNFTArray,
@@ -186,12 +186,12 @@ const Market = ({
             onClick={async () => {
               console.log("call onClick()");
               console.log(
-                "rentMarketContractRef.current: ",
-                rentMarketContractRef.current
+                "rentMarketClassRef.current: ",
+                rentMarketClassRef.current
               );
               // console.log("serviceAddress: ", serviceAddress);
               try {
-                await rentMarketContractRef.current.rentNFT(
+                await rentMarketClassRef.current.rentNFT(
                   element,
                   serviceAddress
                 );

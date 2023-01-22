@@ -225,7 +225,7 @@ const RentContent = ({
         onEventFunc,
         onErrorFunc,
       });
-      // console.log("rentMarketClassRef.current: ", rentMarketClassRef.current);
+      console.log("rentMarketClassRef.current: ", rentMarketClassRef.current);
 
       // console.log("call rentMarketClassRef.current.initializeAll()");
       try {
@@ -603,7 +603,7 @@ const RentContent = ({
         {selectedIndex === MARKET_MENU_INDEX ? (
           inputRentMarket && (
             <Market
-              inputRentMarket={inputRentMarket}
+              inputRentMarketClass={inputRentMarket}
               inputCollectionArray={collectionArray}
               inputServiceAddress={serviceAddress}
               inputRegisterNFTArray={registerNFTArray}
