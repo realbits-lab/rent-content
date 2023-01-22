@@ -275,69 +275,51 @@ const Market = ({
           </Box>
         </Card>
       );
-    } else {
-      const url = changeIPFSToGateway(collectionImage);
-      // console.log("url: ", url);
-      // console.log("inputBlockchainNetwork: ", inputBlockchainNetwork);
-      let openseaMode;
-      if (getChainName({ chainId: inputBlockchainNetwork }) === "matic") {
-        openseaMode = "opensea_matic";
-      } else if (
-        getChainName({ chainId: inputBlockchainNetwork }) === "maticmum"
-      ) {
-        openseaMode = "opensea_maticmum";
-      } else {
-        openseaMode = "";
-      }
-
-      return (
-        <Card sx={{ display: "flex" }}>
-          <CardMedia
-            component="img"
-            sx={{ width: RBSize.double }}
-            image={url}
-          />
-          <Box sx={{ display: "flex", flexDirection: "column" }}>
-            <CardContent sx={{ flex: "1 0 auto" }}>
-              <Typography component="div" variant="h6">
-                {collectionName}
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                component="div"
-              >
-                {collectionDescription}
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                component="div"
-              >
-                OpenSea:{" "}
-                {shortenAddress({
-                  address: collectionAddress,
-                  number: 5,
-                  withLink: openseaMode,
-                })}
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                component="div"
-              >
-                PolygonScan :{" "}
-                {shortenAddress({
-                  address: collectionAddress,
-                  number: 5,
-                  withLink: "maticscan",
-                })}
-              </Typography>
-            </CardContent>
-          </Box>
-        </Card>
-      );
     }
+
+    const url = changeIPFSToGateway(collectionImage);
+    // console.log("url: ", url);
+    // console.log("inputBlockchainNetwork: ", inputBlockchainNetwork);
+    let openseaMode;
+    if (getChainName({ chainId: inputBlockchainNetwork }) === "matic") {
+      openseaMode = "opensea_matic";
+    } else if (
+      getChainName({ chainId: inputBlockchainNetwork }) === "maticmum"
+    ) {
+      openseaMode = "opensea_maticmum";
+    } else {
+      openseaMode = "";
+    }
+
+    return (
+      <Card sx={{ display: "flex", flexDirection: "row", width: "90vw" }}>
+        <CardMedia component="img" sx={{ width: RBSize.double }} image={url} />
+        <CardContent sx={{ display: "flex", flexDirection: "column" }}>
+          <Typography component="div" variant="h6">
+            {collectionName}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {collectionDescription}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            OpenSea:{" "}
+            {shortenAddress({
+              address: collectionAddress,
+              number: 5,
+              withLink: openseaMode,
+            })}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            PolygonScan :{" "}
+            {shortenAddress({
+              address: collectionAddress,
+              number: 5,
+              withLink: "maticscan",
+            })}
+          </Typography>
+        </CardContent>
+      </Card>
+    );
   }
 
   function buildNFTDataTableSkeleton() {
@@ -434,78 +416,80 @@ const Market = ({
 
   function buildCollectionDataTable() {
     return (
-      <Grid item xs={10}>
-        {buildCollectionMetadataCard()}
-        {buildNFTDataTable()}
-      </Grid>
-    );
-  }
-
-  function buildCollectionGrid() {
-    return (
-      <Grid
-        item
-        xs={2}
-        display="flex"
-        container
-        direction="row"
-        justifyContent="flex-start"
-        alignItems="flex-start"
-      >
-        <List>
-          {collectionArray.length !== 0 ? (
-            collectionArray.map((element) => {
-              // console.log("list collectionArray element: ", element);
-              // console.log("ListItem key element.key: ", element.key);
-              return (
-                <ListItem key={element.key} disablePadding>
-                  <ListItemButton
-                    selected={collectionAddress === element.collectionAddress}
-                    onClick={(event) => handleListCollectionClick(element)}
-                  >
-                    <Tooltip
-                      title={element.metadata ? element.metadata.name : "n/a"}
-                    >
-                      <Avatar
-                        src={element.metadata ? element.metadata.image : "n/a"}
-                        variant="rounded"
-                        sx={{ width: RBSize.middle, height: RBSize.middle }}
-                      />
-                    </Tooltip>
-                  </ListItemButton>
-                  <p />
-                </ListItem>
-              );
-            })
-          ) : (
-            <Skeleton
-              variant="rounded"
-              width={RBSize.middle}
-              height={RBSize.middle}
-            />
-          )}
-        </List>
-      </Grid>
-    );
-  }
-
-  function buildAllCollectionTable() {
-    // https://mui.com/material-ui/react-grid/
-    // Set the direct alignment based on direction.
-    // justifyContent="flex-start"
-    // Set the cross alignment based on direction.
-    // alignItems="flex-start"
-    return (
       <Grid
         container
-        spacing={2}
+        padding={0}
+        spacing={0}
         display="flex"
         direction="column"
         justifyContent="flex-start"
         alignItems="flex-start"
       >
-        {buildCollectionGrid()}
-        {buildCollectionDataTable()}
+        <Grid item xs={1} sm={1} md={1} lg={1} xl={1}>
+          {buildCollectionMetadataCard()}
+        </Grid>
+        <Grid item xs={11} sm={11} md={11} lg={11} xl={11}>
+          {buildNFTDataTable()}
+        </Grid>
+      </Grid>
+    );
+  }
+
+  function buildCollectionList() {
+    return (
+      <List>
+        {collectionArray.length !== 0 ? (
+          collectionArray.map((element) => {
+            // console.log("list collectionArray element: ", element);
+            // console.log("ListItem key element.key: ", element.key);
+            return (
+              <ListItem key={element.key} disablePadding>
+                <ListItemButton
+                  selected={collectionAddress === element.collectionAddress}
+                  onClick={(event) => handleListCollectionClick(element)}
+                >
+                  <Tooltip
+                    title={element.metadata ? element.metadata.name : "n/a"}
+                  >
+                    <Avatar
+                      src={element.metadata ? element.metadata.image : "n/a"}
+                      variant="rounded"
+                      sx={{ width: RBSize.middle, height: RBSize.middle }}
+                    />
+                  </Tooltip>
+                </ListItemButton>
+                <p />
+              </ListItem>
+            );
+          })
+        ) : (
+          <Skeleton
+            variant="rounded"
+            width={RBSize.middle}
+            height={RBSize.middle}
+          />
+        )}
+      </List>
+    );
+  }
+
+  function buildAllCollectionTable() {
+    return (
+      <Grid
+        container
+        padding={0}
+        spacing={0}
+        display="flex"
+        direction="column"
+        justifyContent="flex-start"
+        alignItems="flex-start"
+      >
+        <Grid item xs={2} sm={2} md={2} lg={2} xl={2}>
+          {buildCollectionList()}
+        </Grid>
+        <Grid item xs={10} sm={10} md={10} lg={10} xl={10}>
+          {buildCollectionDataTable()}
+        </Grid>
       </Grid>
     );
   }
