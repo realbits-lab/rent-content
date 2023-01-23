@@ -292,7 +292,7 @@ const Market = ({
     }
 
     return (
-      <Card sx={{ display: "flex", flexDirection: "row", width: "95vw" }}>
+      <Card sx={{ display: "flex", flexDirection: "row" }}>
         <CardMedia component="img" sx={{ width: RBSize.double }} image={url} />
         <CardContent sx={{ display: "flex", flexDirection: "column" }}>
           <Typography component="div" variant="h6">
@@ -376,7 +376,7 @@ const Market = ({
     );
 
     return (
-      <Table spacing={0} size="small" sx={{ width: "90vw" }}>
+      <Table spacing={0} size="small">
         <TableHead>
           <TableRow key={getUniqueKey()} spacing={0}>
             <TableCell align="center">Avatar</TableCell>
