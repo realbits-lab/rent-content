@@ -52,9 +52,8 @@ const Main = styled("main", {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   backgroundColor: "white",
-  // height: "100vh",
   flexGrow: 1,
-  padding: theme.spacing(3),
+  padding: theme.spacing(1),
   marginLeft: `-${RENT_CONTENT_COMPONENT_DRAWER_WIDTH}px`,
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
