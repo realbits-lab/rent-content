@@ -360,6 +360,8 @@ const Content = ({
   // * Draw each register data row list in table.
   // * -------------------------------------------------------------------------
   const buildRegisterRowList = ({ element }) => {
+    // console.log("element: ", element);
+
     return (
       <TableRow key={getUniqueKey()}>
         <TableCell component="th" scope="row">
@@ -376,11 +378,11 @@ const Content = ({
         <TableCell>
           {element.metadata ? element.metadata.name : "N/A"}
         </TableCell>
-        <TableCell align="right">{element.tokenId}</TableCell>
+        <TableCell align="right">{element.tokenId.toNumber()}</TableCell>
         <TableCell align="right">
           {element.rentFee / Math.pow(10, 18)}
         </TableCell>
-        <TableCell align="right">{element.rentDuration}</TableCell>
+        <TableCell align="right">{element.rentDuration.toNumber()}</TableCell>
         <TableCell align="right">
           <Button
             size="small"
