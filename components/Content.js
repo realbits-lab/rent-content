@@ -34,6 +34,8 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import EditRoundedIcon from "@mui/icons-material/EditRounded";
+import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import {
   changeIPFSToGateway,
   AlertSeverity,
@@ -347,7 +349,7 @@ const Content = ({
 
     return (
       <TableRow key={getUniqueKey()}>
-        <TableCell component="th" scope="row" align="center">
+        <TableCell component="th" scope="row" align="center" padding="normal">
           <Avatar
             alt="image"
             src={
@@ -358,7 +360,7 @@ const Content = ({
             sx={{ width: RBSize.middle, height: RBSize.middle }}
           />
         </TableCell>
-        <TableCell align="center">
+        <TableCell align="center" padding="none">
           {element.metadata ? element.metadata.name : "N/A"}
         </TableCell>
         <TableCell align="center">{element.tokenId.toNumber()}</TableCell>
@@ -383,7 +385,7 @@ const Content = ({
               setOpenInput(true);
             }}
           >
-            Change
+            <EditRoundedIcon />
           </Button>
         </TableCell>
         <TableCell align="center">
@@ -403,7 +405,7 @@ const Content = ({
               }
             }}
           >
-            Unregister
+            <DeleteRoundedIcon />
           </Button>
         </TableCell>
       </TableRow>
@@ -426,14 +428,28 @@ const Content = ({
       <Table size="small" padding="none">
         <TableHead>
           <TableRow key={getUniqueKey()}>
-            <TableCell sx={{ fontSize: "12px" }} align="center">
+            <TableCell
+              sx={{ fontSize: "12px" }}
+              align="center"
+              padding="normal"
+            >
               image
             </TableCell>
-            <TableCell align="center">name</TableCell>
-            <TableCell align="center">id</TableCell>
-            <TableCell align="center">fee</TableCell>
-            <TableCell align="center">change</TableCell>
-            <TableCell align="center">unregister</TableCell>
+            <TableCell align="center" padding="normal">
+              name
+            </TableCell>
+            <TableCell align="center" padding="normal">
+              id
+            </TableCell>
+            <TableCell align="center" padding="normal">
+              fee
+            </TableCell>
+            <TableCell align="center" padding="normal">
+              change
+            </TableCell>
+            <TableCell align="center" padding="normal">
+              delete
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
