@@ -225,7 +225,7 @@ const RentContent = ({
         onEventFunc,
         onErrorFunc,
       });
-      console.log("rentMarketClassRef.current: ", rentMarketClassRef.current);
+      // console.log("rentMarketClassRef.current: ", rentMarketClassRef.current);
 
       // console.log("call rentMarketClassRef.current.initializeAll()");
       try {
@@ -248,7 +248,7 @@ const RentContent = ({
 
       // * Close drawer in mobile browser.
       isMobileRef.current = checkMobile();
-      console.log("isMobileRef.current: ", isMobileRef.current);
+      // console.log("isMobileRef.current: ", isMobileRef.current);
       if (isMobileRef.current === true) {
         setOpenDrawer(false);
       }
@@ -275,9 +275,6 @@ const RentContent = ({
   function onEventFunc(
     { event, message } = { event: undefined, message: undefined }
   ) {
-    if (event !== undefined) {
-      console.log("event: ", event);
-    }
     // console.log("call onEventFunc()");
 
     // console.log(
