@@ -49,8 +49,8 @@ import { shortenAddress } from "./RentContentUtil";
 const Content = ({
   inputRentMarket,
   inputBlockchainNetwork,
-  inputMyRegisterNFTArray,
-  inputMyUnregisterNFTArray,
+  inputMyRegisteredNFTArray,
+  inputMyUnregisteredNFTArray,
 }) => {
   // * -------------------------------------------------------------------------
   // * Define input copied variables.
@@ -128,18 +128,18 @@ const Content = ({
   // * -------------------------------------------------------------------------
   React.useEffect(() => {
     console.log("call React.useEffect()");
-    console.log("inputMyRegisterNFTArray: ", inputMyRegisterNFTArray);
+    console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
 
     rentMarketRef.current = inputRentMarket;
-    setMyRegisteredNFTArray(inputMyRegisterNFTArray);
-    setMyUnregisteredNFTArray(inputMyUnregisterNFTArray);
+    setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
+    setMyUnregisteredNFTArray(inputMyUnregisteredNFTArray);
 
     // Set unique data.
     const uniqueRegisterNFTAddressSet = new Set(
-      inputMyRegisterNFTArray.map((element) => element.nftAddress)
+      inputMyRegisteredNFTArray.map((element) => element.nftAddress)
     );
     const uniqueUnregisterNFTAddressSet = new Set(
-      inputMyUnregisterNFTArray.map((element) => element.nftAddress)
+      inputMyUnregisteredNFTArray.map((element) => element.nftAddress)
     );
     setMyRegisteredUniqueNFTAddressArray([...uniqueRegisterNFTAddressSet]);
     setMyUnregisteredUniqueNFTAddressArray([...uniqueUnregisterNFTAddressSet]);
@@ -172,8 +172,8 @@ const Content = ({
   }, [
     inputRentMarket,
     inputBlockchainNetwork,
-    inputMyRegisterNFTArray,
-    inputMyUnregisterNFTArray,
+    inputMyRegisteredNFTArray,
+    inputMyUnregisteredNFTArray,
   ]);
 
   function TablePaginationActions(props) {
