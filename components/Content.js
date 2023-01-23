@@ -196,8 +196,7 @@ const Content = ({
     };
 
     return (
-      // <Box sx={{ flexShrink: 1, ml: 2.5 }}>
-      <Box sx={{ display: "inline-flex" }}>
+      <Box spacing={0} sx={{ display: "flex", flexDirection: "row" }}>
         <IconButton
           onClick={handleFirstPageButtonClick}
           disabled={page === 0}
@@ -280,10 +279,11 @@ const Content = ({
     return (
       <TablePagination
         key={getUniqueKey()}
-        rowsPerPageOptions={[5, 10, 25]}
+        rowsPerPageOptions={[5, 10, 20]}
         count={count}
         page={tablePage}
         rowsPerPage={tableRowsPerPage}
+        labelRowsPerPage={""}
         SelectProps={{
           inputProps: {
             "aria-label": "rows per page",

@@ -561,7 +561,7 @@ const Market = ({
     return (
       <TablePagination
         key={getUniqueKey()}
-        rowsPerPageOptions={[5, 10, 25]}
+        rowsPerPageOptions={[5, 10, 20]}
         count={selectedRegisterNFTArray.length}
         page={page}
         rowsPerPage={rowsPerPage}
