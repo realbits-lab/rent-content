@@ -477,42 +477,6 @@ const Content = ({
     );
   };
 
-  const RegisterNftDataRowOriginal = ({ nftContractAddress }) => {
-    let openseaMode;
-
-    if (getChainName({ chainId: inputBlockchainNetwork }) === "matic") {
-      openseaMode = "opensea_matic";
-    } else if (
-      getChainName({ chainId: inputBlockchainNetwork }) === "maticmum"
-    ) {
-      openseaMode = "opensea_maticmum";
-    } else {
-      openseaMode = "";
-    }
-
-    return (
-      <TableBody>
-        <TableRow
-          sx={{ "& > *": { borderBottom: "unset" } }}
-          key={getUniqueKey()}
-        >
-          <TableCell component="th" scope="row">
-            OpenSea:{" "}
-            {shortenAddress({
-              address: nftContractAddress,
-              number: 4,
-              withLink: openseaMode,
-            })}
-          </TableCell>
-        </TableRow>
-
-        <TableRow key={getUniqueKey()}>
-          <RegisterNftDataRowList nftContractAddress={nftContractAddress} />
-        </TableRow>
-      </TableBody>
-    );
-  };
-
   const showMyRegisteredNFTElementTable = () => {
     let openseaMode;
 
