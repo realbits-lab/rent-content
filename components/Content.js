@@ -39,7 +39,6 @@ import {
   AlertSeverity,
   RBSnackbar,
   RBSize,
-  Metamask,
   getUniqueKey,
   getChainName,
 } from "rent-market";
@@ -646,16 +645,6 @@ const Content = ({
 
   return (
     <div>
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Show metamask.                                                */}
-      {/* // * --------------------------------------------------------------*/}
-      <p />
-      <Divider>
-        <Chip label="Metamask" />
-      </Divider>
-      <p />
-      <Metamask blockchainNetwork={inputBlockchainNetwork} />
-
       {/* // * --------------------------------------------------------------*/}
       {/* // * Show registered NFT with change and unregister button.        */}
       {/* // * --------------------------------------------------------------*/}
