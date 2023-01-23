@@ -684,7 +684,6 @@ const Content = ({
       {/* // * --------------------------------------------------------------*/}
       <Dialog
         fullWidth
-        maxWidth="sm"
         open={openInput}
         onClose={() => {
           setOpenInput(false);
@@ -692,49 +691,45 @@ const Content = ({
       >
         <DialogTitle>Rent Fee</DialogTitle>
         <DialogContent>
-          <p />
           <TextField
             fullWidth
             required
-            id="outlined"
-            label="Rent Fee"
+            id="outlined-required"
+            label="Rent Fee (matic unit)"
             name="inputRentFee"
-            InputProps={{ style: { fontSize: 12 } }}
             value={inputRentFee}
             onChange={handleChange}
+            sx={{ marginTop: "10px", marginBottom: "10px" }}
           />
-          <p />
           <TextField
             fullWidth
             required
             id="outlined"
             label="Token Address"
             name="inputFeeTokenAddress"
-            InputProps={{ style: { fontSize: 12 } }}
             value={inputFeeTokenAddress}
             onChange={handleChange}
+            sx={{ marginTop: "10px", marginBottom: "10px" }}
           />
-          <p />
           <TextField
             fullWidth
             required
             id="outlined"
-            label="Rent Fee by Token"
+            label="Rent Fee by Token (ether unit)"
             name="inputRentFeeByToken"
-            InputProps={{ style: { fontSize: 12 } }}
             value={inputRentFeeByToken}
             onChange={handleChange}
+            sx={{ marginTop: "10px", marginBottom: "10px" }}
           />
-          <p />
           <TextField
             fullWidth
             required
             id="outlined"
-            label="Rent Duration"
+            label="Rent Duration (second unit)"
             name="inputRentDuration"
-            InputProps={{ style: { fontSize: 12 } }}
             value={inputRentDuration}
             onChange={handleChange}
+            sx={{ marginTop: "10px", marginBottom: "10px" }}
           />
         </DialogContent>
         <DialogActions>
@@ -765,6 +760,7 @@ const Content = ({
                 // console.log("inputFeeTokenAddress: ", inputFeeTokenAddress);
                 // console.log("inputRentFeeByToken: ", inputRentFeeByToken);
                 // console.log("inputRentDuration: ", inputRentDuration);
+                // * rent fee and rent fee by token should be an ether unit expression.
                 await rentMarketRef.current.changeNFT(
                   changeElement,
                   inputRentFee.toString(),
