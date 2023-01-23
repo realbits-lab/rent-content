@@ -109,7 +109,7 @@ const RentContent = ({
   // * -------------------------------------------------------------------------
   // * Define each menu index.
   // * -------------------------------------------------------------------------
-  const DEFAULT_MENU_INDEX = 0;
+  const DEFAULT_MENU_INDEX = 1;
 
   const CONTENT_MENU_INDEX = 0;
   const MY_MENU_INDEX = 1;
