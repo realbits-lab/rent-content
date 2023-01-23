@@ -443,35 +443,41 @@ const Content = ({
     });
 
     return (
-      <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-        <Table size="small" aria-label="purchases">
-          <TableHead>
-            <TableRow key={getUniqueKey()}>
-              <TableCell>image</TableCell>
-              <TableCell>name</TableCell>
-              <TableCell align="right">id</TableCell>
-              <TableCell align="right">fee</TableCell>
-              <TableCell align="right">change</TableCell>
-              <TableCell align="right">unregister</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {myRegisteredNFTArray
-              .filter((element) => element.nftAddress === nftContractAddress)
-              .slice(
-                tablePage * tableRowsPerPage,
-                tablePage * tableRowsPerPage + tableRowsPerPage
-              )
-              .map((element) => {
-                return buildRegisterRowList({ element });
-              })}
-          </TableBody>
-        </Table>
-      </TableCell>
+      <Table size="small">
+        <TableHead>
+          <TableRow key={getUniqueKey()}>
+            <TableCell>image</TableCell>
+            <TableCell>name</TableCell>
+            <TableCell align="right">id</TableCell>
+            <TableCell align="right">fee</TableCell>
+            <TableCell align="right">change</TableCell>
+            <TableCell align="right">unregister</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {myRegisteredNFTArray
+            .filter((element) => element.nftAddress === nftContractAddress)
+            .slice(
+              tablePage * tableRowsPerPage,
+              tablePage * tableRowsPerPage + tableRowsPerPage
+            )
+            .map((element) => {
+              return buildRegisterRowList({ element });
+            })}
+        </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TablePageComponent
+              nftContractAddress={nftContractAddress}
+              mode={"register"}
+            />
+          </TableRow>
+        </TableFooter>
+      </Table>
     );
   };
 
-  const RegisterNftDataRow = ({ nftContractAddress }) => {
+  const RegisterNftDataRowOriginal = ({ nftContractAddress }) => {
     let openseaMode;
 
     if (getChainName({ chainId: inputBlockchainNetwork }) === "matic") {
@@ -508,21 +514,37 @@ const Content = ({
   };
 
   const showMyRegisteredNFTElementTable = () => {
-    return myRegisteredUniqueNFTAddressArray.map((nftContractAddress) => {
-      return (
-        <Table key={getUniqueKey()}>
-          <RegisterNftDataRow nftContractAddress={nftContractAddress} />
-          <TableFooter>
-            <TableRow>
-              <TablePageComponent
-                nftContractAddress={nftContractAddress}
-                mode={"register"}
-              />
-            </TableRow>
-          </TableFooter>
-        </Table>
-      );
-    });
+    let openseaMode;
+
+    if (getChainName({ chainId: inputBlockchainNetwork }) === "matic") {
+      openseaMode = "opensea_matic";
+    } else if (
+      getChainName({ chainId: inputBlockchainNetwork }) === "maticmum"
+    ) {
+      openseaMode = "opensea_maticmum";
+    } else {
+      openseaMode = "";
+    }
+
+    return (
+      <Grid>
+        {myRegisteredUniqueNFTAddressArray.map((nftContractAddress) => {
+          return (
+            <Grid key={getUniqueKey()}>
+              <Typography variant="caption" color={"black"}>
+                OpenSea:{" "}
+                {shortenAddress({
+                  address: nftContractAddress,
+                  number: 4,
+                  withLink: openseaMode,
+                })}
+              </Typography>
+              <RegisterNftDataRowList nftContractAddress={nftContractAddress} />
+            </Grid>
+          );
+        })}
+      </Grid>
+    );
   };
 
   const UnregisterRowListSkeleton = () => {
