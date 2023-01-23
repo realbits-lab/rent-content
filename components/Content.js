@@ -119,8 +119,6 @@ const Content = ({
   // * -------------------------------------------------------------------------
   // * Table pagination data.
   // * -------------------------------------------------------------------------
-  // const [page, setPage] = React.useState(0);
-  // const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [page, setPage] = React.useState([]);
   const [rowsPerPage, setRowsPerPage] = React.useState([]);
 
@@ -176,19 +174,7 @@ const Content = ({
     inputMyUnregisteredNFTArray,
   ]);
 
-  // * -------------------------------------------------------------------------
-  // * Handle table pagination data.
-  // * -------------------------------------------------------------------------
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const TablePaginationActions = (props) => {
+  function TablePaginationActions(props) {
     const theme = useTheme();
     const { count, page, rowsPerPage, onPageChange } = props;
 
@@ -249,27 +235,27 @@ const Content = ({
         </IconButton>
       </Box>
     );
-  };
+  }
 
-  const getPage = ({ nftContractAddress, mode }) => {
+  function getPage({ nftContractAddress, mode }) {
     const findPage = page.find(
       (e) => e.address === nftContractAddress && e.mode === mode
     );
     // console.log("findPage: ", findPage);
     const tablePage = findPage ? findPage.page : 0;
     return tablePage;
-  };
+  }
 
-  const getRowsPerPage = ({ nftContractAddress, mode }) => {
+  function getRowsPerPage({ nftContractAddress, mode }) {
     const findRowsPerPage = rowsPerPage.find(
       (e) => e.address === nftContractAddress && e.mode === mode
     );
     // console.log("findRowsPerPage: ", findRowsPerPage);
     const tableRowsPerPage = findRowsPerPage ? findRowsPerPage.rowsPerPage : 5;
     return tableRowsPerPage;
-  };
+  }
 
-  const TablePageComponent = ({ nftContractAddress, mode }) => {
+  function TablePageComponent({ nftContractAddress, mode }) {
     // console.log("call TablePageComponent()");
     // console.log("nftContractAddress: ", nftContractAddress);
     // console.log("page: ", page);
@@ -295,8 +281,6 @@ const Content = ({
         key={getUniqueKey()}
         rowsPerPageOptions={[5, 10, 25]}
         count={count}
-        // page={page}
-        // rowsPerPage={rowsPerPage}
         page={tablePage}
         rowsPerPage={tableRowsPerPage}
         SelectProps={{
@@ -305,9 +289,6 @@ const Content = ({
           },
           native: true,
         }}
-        // onPageChange={handleChangePage}
-        // onRowsPerPageChange={handleChangeRowsPerPage}
-        // ActionsComponent={TablePaginationActions}
         onPageChange={(event, newPage) => {
           setPage((prevState) => {
             const newState = prevState.map((e) => {
@@ -357,12 +338,12 @@ const Content = ({
         ActionsComponent={TablePaginationActions}
       />
     );
-  };
+  }
 
   // * -------------------------------------------------------------------------
   // * Draw each register data row list in table.
   // * -------------------------------------------------------------------------
-  const buildRegisterRowList = ({ element }) => {
+  function buildRegisterRowList({ element }) {
     // console.log("element: ", element);
 
     return (
@@ -428,12 +409,12 @@ const Content = ({
         </TableCell>
       </TableRow>
     );
-  };
+  }
 
   // * -------------------------------------------------------------------------
   // * Draw each register data row body in table.
   // * -------------------------------------------------------------------------
-  const RegisterNftDataRowList = ({ nftContractAddress }) => {
+  function RegisterNftDataRowList({ nftContractAddress }) {
     // console.log("call RegisterNftDataRowList()");
 
     const tablePage = getPage({ nftContractAddress, mode: "register" });
@@ -475,9 +456,9 @@ const Content = ({
         </TableFooter>
       </Table>
     );
-  };
+  }
 
-  const showMyRegisteredNFTElementTable = () => {
+  function showMyRegisteredNFTElementTable() {
     let openseaMode;
 
     if (getChainName({ chainId: inputBlockchainNetwork }) === "matic") {
@@ -509,9 +490,9 @@ const Content = ({
         })}
       </Grid>
     );
-  };
+  }
 
-  const UnregisterRowListSkeleton = () => {
+  function UnregisterRowListSkeleton() {
     return (
       <TableRow key={getUniqueKey()}>
         <TableCell component="th" scope="row">
@@ -532,9 +513,9 @@ const Content = ({
         </TableCell>
       </TableRow>
     );
-  };
+  }
 
-  const buildUnregisterRowList = ({ element }) => {
+  function buildUnregisterRowList({ element }) {
     return (
       // <TableRow key={`TableRow-NFT-${element.nftAddress}-${element.tokenId}`}>
       <TableRow key={getUniqueKey()}>
@@ -573,49 +554,47 @@ const Content = ({
         </TableCell>
       </TableRow>
     );
-  };
+  }
 
-  const UnregisterNftDataRowList = React.memo(
-    function UnregisterNftDataRowList({ nftContractAddress }) {
-      // console.log("call UnregisterNftDataRowList()");
+  function UnregisterNftDataRowList({ nftContractAddress }) {
+    // console.log("call UnregisterNftDataRowList()");
 
-      const tablePage = getPage({ nftContractAddress, mode: "unregister" });
-      const tableRowsPerPage = getRowsPerPage({
-        nftContractAddress,
-        mode: "unregister",
-      });
-      // console.log("tablePage: ", tablePage);
-      // console.log("tableRowsPerPage: ", tableRowsPerPage);
+    const tablePage = getPage({ nftContractAddress, mode: "unregister" });
+    const tableRowsPerPage = getRowsPerPage({
+      nftContractAddress,
+      mode: "unregister",
+    });
+    // console.log("tablePage: ", tablePage);
+    // console.log("tableRowsPerPage: ", tableRowsPerPage);
 
-      return (
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <Table size="small" aria-label="purchases">
-            <TableHead>
-              <TableRow key={getUniqueKey()}>
-                <TableCell>image</TableCell>
-                <TableCell>name</TableCell>
-                <TableCell align="right">tokenId</TableCell>
-                <TableCell align="right">launch</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {myUnregisteredNFTArray
-                .filter((element) => element.nftAddress === nftContractAddress)
-                .slice(
-                  tablePage * tableRowsPerPage,
-                  tablePage * tableRowsPerPage + tableRowsPerPage
-                )
-                .map((element) => {
-                  return buildUnregisterRowList({ element });
-                })}
-            </TableBody>
-          </Table>
-        </TableCell>
-      );
-    }
-  );
+    return (
+      <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+        <Table size="small" aria-label="purchases">
+          <TableHead>
+            <TableRow key={getUniqueKey()}>
+              <TableCell>image</TableCell>
+              <TableCell>name</TableCell>
+              <TableCell align="right">tokenId</TableCell>
+              <TableCell align="right">launch</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {myUnregisteredNFTArray
+              .filter((element) => element.nftAddress === nftContractAddress)
+              .slice(
+                tablePage * tableRowsPerPage,
+                tablePage * tableRowsPerPage + tableRowsPerPage
+              )
+              .map((element) => {
+                return buildUnregisterRowList({ element });
+              })}
+          </TableBody>
+        </Table>
+      </TableCell>
+    );
+  }
 
-  const UnregisterNftDataRow = ({ nftContractAddress }) => {
+  function UnregisterNftDataRow({ nftContractAddress }) {
     return (
       <TableBody>
         <TableRow
@@ -632,9 +611,9 @@ const Content = ({
         </TableRow>
       </TableBody>
     );
-  };
+  }
 
-  const showMyUnregisteredNFTElementTable = () => {
+  function showMyUnregisteredNFTElementTable() {
     // console.log("call showMyUnregisteredNFTElementTable()");
     // https://mui.com/material-ui/react-table/
     // https://medium.com/@freshmilkdev/reactjs-render-optimization-for-collapsible-material-ui-long-list-with-checkboxes-231b36892e20
@@ -663,7 +642,7 @@ const Content = ({
         })}
       </List>
     );
-  };
+  }
 
   return (
     <div>
