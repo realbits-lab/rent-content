@@ -382,7 +382,6 @@ const Content = ({
         <TableCell align="right">
           {element.rentFee / Math.pow(10, 18)}
         </TableCell>
-        <TableCell align="right">{element.rentDuration.toNumber()}</TableCell>
         <TableCell align="right">
           <Button
             size="small"
@@ -447,9 +446,8 @@ const Content = ({
             <TableRow key={getUniqueKey()}>
               <TableCell>image</TableCell>
               <TableCell>name</TableCell>
-              <TableCell align="right">tokenId</TableCell>
-              <TableCell align="right">rent fee</TableCell>
-              <TableCell align="right">rent duration</TableCell>
+              <TableCell align="right">id</TableCell>
+              <TableCell align="right">fee</TableCell>
               <TableCell align="right">change</TableCell>
               <TableCell align="right">unregister</TableCell>
             </TableRow>
@@ -495,8 +493,11 @@ const Content = ({
         {myRegisteredUniqueNFTAddressArray.map((nftContractAddress) => {
           return (
             <ListItem key={getUniqueKey()}>
-              <TableContainer component={Paper}>
-                <Table aria-label="collapsible table">
+              <TableContainer
+                component={Paper}
+                sx={{ display: "flex", width: "90vw" }}
+              >
+                <Table>
                   <RegisterNftDataRow nftContractAddress={nftContractAddress} />
                   <TableFooter>
                     <TableRow>
