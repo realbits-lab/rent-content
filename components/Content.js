@@ -41,7 +41,9 @@ import {
   RBSize,
   Metamask,
   getUniqueKey,
+  getChainName,
 } from "rent-market";
+import { shortenAddress } from "./RentContentUtil";
 
 const Content = ({
   inputRentMarket,
@@ -470,6 +472,18 @@ const Content = ({
   };
 
   const RegisterNftDataRow = ({ nftContractAddress }) => {
+    let openseaMode;
+
+    if (getChainName({ chainId: inputBlockchainNetwork }) === "matic") {
+      openseaMode = "opensea_matic";
+    } else if (
+      getChainName({ chainId: inputBlockchainNetwork }) === "maticmum"
+    ) {
+      openseaMode = "opensea_maticmum";
+    } else {
+      openseaMode = "";
+    }
+
     return (
       <TableBody>
         <TableRow
@@ -477,7 +491,12 @@ const Content = ({
           key={getUniqueKey()}
         >
           <TableCell component="th" scope="row">
-            {nftContractAddress}
+            OpenSea:{" "}
+            {shortenAddress({
+              address: nftContractAddress,
+              number: 4,
+              withLink: openseaMode,
+            })}
           </TableCell>
         </TableRow>
 
