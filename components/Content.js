@@ -127,8 +127,8 @@ const Content = ({
   // * Initialize data.
   // * -------------------------------------------------------------------------
   React.useEffect(() => {
-    console.log("call React.useEffect()");
-    console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
+    // console.log("call React.useEffect()");
+    // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
 
     rentMarketRef.current = inputRentMarket;
     setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
