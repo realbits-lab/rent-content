@@ -1,33 +1,23 @@
 import React from "react";
 import { ethers } from "ethers";
-import {
-  useTheme,
-  Grid,
-  Fab,
-  Divider,
-  Collapse,
-  Box,
-  Card,
-  CardMedia,
-  Paper,
-  IconButton,
-  CardContent,
-  Typography,
-  List,
-  ListItem,
-  ListItemButton,
-  Table,
-  TableBody,
-  TableCell,
-  Avatar,
-  TableHead,
-  TableContainer,
-  TableRow,
-} from "@mui/material";
-import { red, blue, blueGrey } from "@mui/material/colors";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { Metamask } from "rent-market";
+import Grid from "@mui/material/Grid";
+import Divider from "@mui/material/Divider";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import CardMedia from "@mui/material/CardMedia";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import Avatar from "@mui/material/Avatar";
+import TableHead from "@mui/material/TableHead";
+import TableContainer from "@mui/material/TableContainer";
+import TableRow from "@mui/material/TableRow";
+import { useTheme } from "@mui/material/styles";
 import {
   changeIPFSToGateway,
   MyMenu,
@@ -248,7 +238,9 @@ const My = ({
                 {element.rentFee / Math.pow(10, 18)}
               </TableCell>
               <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                {type === MyMenu.own ? element.rentDuration : remainTimestamp}
+                {type === MyMenu.own
+                  ? element.rentDuration.toNumber()
+                  : remainTimestamp}
               </TableCell>
             </TableRow>
           );
@@ -471,11 +463,6 @@ const My = ({
 
   return (
     <div>
-      <Divider>
-        <Metamask blockchainNetwork={blockchainNetwork} />
-      </Divider>
-      <p />
-
       <Grid container spacing={2}>
         <Grid item xs={2}>
           {buildLeftMenu()}
