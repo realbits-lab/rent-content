@@ -292,7 +292,7 @@ const Market = ({
     }
 
     return (
-      <Card sx={{ display: "flex", flexDirection: "row", width: "90vw" }}>
+      <Card sx={{ display: "flex", flexDirection: "row", width: "95vw" }}>
         <CardMedia component="img" sx={{ width: RBSize.double }} image={url} />
         <CardContent sx={{ display: "flex", flexDirection: "column" }}>
           <Typography component="div" variant="h6">
