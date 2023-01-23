@@ -87,17 +87,8 @@ const My = ({
     snackbarValue;
 
   // * -------------------------------------------------------------------------
-  // * Other variables.
-  // * -------------------------------------------------------------------------
-  const [currentBlockNumber, setCurrentBlockNumber] = React.useState(0);
-
-  // * -------------------------------------------------------------------------
   // * Initialize data.
   // * -------------------------------------------------------------------------
-  React.useEffect(() => {
-    // console.log("call React.useEffect() without condition");
-  });
-
   React.useEffect(() => {
     // console.log("call React.useEffect() with condition");
     // console.log("inputRentMarket: ", inputRentMarket);
@@ -132,28 +123,6 @@ const My = ({
       inputBlockchainNetwork instanceof String
     ) {
       setBlockchainNetwork(inputBlockchainNetwork);
-    }
-
-    // Get and set the latest block number.
-    // TODO: Change duration process from block number to block timestamp.
-    let provider;
-    try {
-      provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-    } catch (error) {
-      console.error(error);
-    }
-
-    // console.log("provider: ", provider);
-
-    if (provider) {
-      provider.getBlockNumber().then((blockNumber) => {
-        // console.log("local chain blockNumber: ", blockNumber);
-        setCurrentBlockNumber(blockNumber);
-      });
-      provider.on("block", (blockNumber) => {
-        // console.log("new block number: ", blockNumber);
-        setCurrentBlockNumber(blockNumber);
-      });
     }
   }, [
     selectAvatarFunc,
@@ -459,17 +428,15 @@ const My = ({
     );
   };
 
-  // console.log("Build My component.");
-
   return (
     <div>
-      <Grid container spacing={2}>
-        <Grid item xs={2}>
-          {buildLeftMenu()}
-        </Grid>
-        <Grid item xs={10}>
-          {buildNFTTable()}
-        </Grid>
+      <Grid
+        container
+        spacing={2}
+        sx={{ display: "flex", flexDirection: "column" }}
+      >
+        <Grid item>{buildLeftMenu()}</Grid>
+        <Grid item>{buildNFTTable()}</Grid>
       </Grid>
 
       <RBSnackbar
