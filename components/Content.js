@@ -12,6 +12,7 @@ import Typography from "@mui/material/Typography";
 import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import IconButton from "@mui/material/IconButton";
@@ -488,32 +489,21 @@ const Content = ({
   };
 
   const showMyRegisteredNFTElementTable = () => {
-    return (
-      <List>
-        {myRegisteredUniqueNFTAddressArray.map((nftContractAddress) => {
-          return (
-            <ListItem key={getUniqueKey()}>
-              <TableContainer
-                component={Paper}
-                sx={{ display: "flex", width: "90vw" }}
-              >
-                <Table>
-                  <RegisterNftDataRow nftContractAddress={nftContractAddress} />
-                  <TableFooter>
-                    <TableRow>
-                      <TablePageComponent
-                        nftContractAddress={nftContractAddress}
-                        mode={"register"}
-                      />
-                    </TableRow>
-                  </TableFooter>
-                </Table>
-              </TableContainer>
-            </ListItem>
-          );
-        })}
-      </List>
-    );
+    return myRegisteredUniqueNFTAddressArray.map((nftContractAddress) => {
+      return (
+        <Table key={getUniqueKey()}>
+          <RegisterNftDataRow nftContractAddress={nftContractAddress} />
+          <TableFooter>
+            <TableRow>
+              <TablePageComponent
+                nftContractAddress={nftContractAddress}
+                mode={"register"}
+              />
+            </TableRow>
+          </TableFooter>
+        </Table>
+      );
+    });
   };
 
   const UnregisterRowListSkeleton = () => {
