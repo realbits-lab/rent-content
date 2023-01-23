@@ -347,7 +347,7 @@ const Content = ({
 
     return (
       <TableRow key={getUniqueKey()}>
-        <TableCell component="th" scope="row">
+        <TableCell component="th" scope="row" align="center">
           <Avatar
             alt="image"
             src={
@@ -355,17 +355,17 @@ const Content = ({
                 ? changeIPFSToGateway(element.metadata.image)
                 : ""
             }
-            sx={{ width: RBSize.big, height: RBSize.big }}
+            sx={{ width: RBSize.middle, height: RBSize.middle }}
           />
         </TableCell>
-        <TableCell>
+        <TableCell align="center">
           {element.metadata ? element.metadata.name : "N/A"}
         </TableCell>
-        <TableCell align="right">{element.tokenId.toNumber()}</TableCell>
-        <TableCell align="right">
+        <TableCell align="center">{element.tokenId.toNumber()}</TableCell>
+        <TableCell align="center">
           {element.rentFee / Math.pow(10, 18)}
         </TableCell>
-        <TableCell align="right">
+        <TableCell align="center">
           <Button
             size="small"
             onClick={() => {
@@ -386,7 +386,7 @@ const Content = ({
             Change
           </Button>
         </TableCell>
-        <TableCell align="right">
+        <TableCell align="center">
           <Button
             size="small"
             onClick={async () => {
@@ -423,15 +423,17 @@ const Content = ({
     });
 
     return (
-      <Table size="small">
+      <Table size="small" padding="none">
         <TableHead>
           <TableRow key={getUniqueKey()}>
-            <TableCell>image</TableCell>
-            <TableCell>name</TableCell>
-            <TableCell align="right">id</TableCell>
-            <TableCell align="right">fee</TableCell>
-            <TableCell align="right">change</TableCell>
-            <TableCell align="right">unregister</TableCell>
+            <TableCell sx={{ fontSize: "12px" }} align="center">
+              image
+            </TableCell>
+            <TableCell align="center">name</TableCell>
+            <TableCell align="center">id</TableCell>
+            <TableCell align="center">fee</TableCell>
+            <TableCell align="center">change</TableCell>
+            <TableCell align="center">unregister</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
