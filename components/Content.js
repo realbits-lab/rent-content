@@ -666,26 +666,18 @@ const Content = ({
       {/* // * --------------------------------------------------------------*/}
       {/* // * Show registered NFT with change and unregister button.        */}
       {/* // * --------------------------------------------------------------*/}
-      <p />
-      <Divider>
+      <Divider sx={{ marginBottom: "5px" }}>
         <Chip label="My Registered NFT" />
       </Divider>
-      <p />
-
       {showMyRegisteredNFTElementTable()}
 
       {/* // * --------------------------------------------------------------*/}
       {/* // * Show my unregistered NFT with request register button.        */}
       {/* // * --------------------------------------------------------------*/}
-      <p />
-      <Divider>
+      <Divider sx={{ marginTop: "5px", marginBottom: "5px" }}>
         <Chip label="My Unregistered NFT" />
       </Divider>
-      <p />
-
       {showMyUnregisteredNFTElementTable()}
-
-      <p />
 
       {/* // * --------------------------------------------------------------*/}
       {/* // * Show input dialog.                                            */}
