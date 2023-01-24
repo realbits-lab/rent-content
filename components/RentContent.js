@@ -260,9 +260,7 @@ const RentContent = ({
     initRentMarket().catch(console.error);
   }, [rentMarketAddress, testNftAddress, blockchainNetwork, serviceAddress]);
 
-  function onErrorFunc(
-    { severity, message } = { severity: AlertSeverity.error, message: "" }
-  ) {
+  function onErrorFunc({ severity = AlertSeverity.error, message = "" }) {
     setWriteToastMessage({
       snackbarSeverity: severity,
       snackbarMessage: message,
