@@ -226,6 +226,11 @@ const RentContent = ({
       });
       // console.log("rentMarketClassRef.current: ", rentMarketClassRef.current);
 
+      // * Set inputRentMarket for updating component which uses rentMarket.
+      // * For calling function of rentMarket contract.
+      // console.log("call setInputRentMarket()");
+      setInputRentMarket(rentMarketClassRef.current);
+
       // console.log("call rentMarketClassRef.current.initializeAll()");
       try {
         // await rentMarketClassRef.current.initializeAll();
@@ -239,11 +244,6 @@ const RentContent = ({
           snackbarOpen: true,
         });
       }
-
-      // * Set inputRentMarket for updating component which uses rentMarket.
-      // * For calling function of rentMarket contract.
-      // console.log("call setInputRentMarket()");
-      setInputRentMarket(rentMarketClassRef.current);
 
       // * Close drawer in mobile browser.
       isMobileRef.current = checkMobile();

@@ -14,7 +14,6 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
 import { useRecoilStateLoadable } from "recoil";
 import {
   getUniqueKey,
@@ -22,7 +21,6 @@ import {
   AlertSeverity,
   writeToastMessageState,
   getChainName,
-  LOCAL_CHAIN_ID,
 } from "./RentContentUtil";
 
 // TODO: Add event monitor of settleRentData.
@@ -32,9 +30,6 @@ const MonitorRentNft = ({
   rentMarketAddress,
   inputBlockchainNetwork,
 }) => {
-  // * Define constant varialbe.
-  const TABLE_MIN_WIDTH = 400;
-
   // * Define rent market class.
   const rentMarketRef = React.useRef();
   const [rentArray, setRentArray] = React.useState([]);
@@ -43,15 +38,18 @@ const MonitorRentNft = ({
   // * Define alchemy configuration.
   const settings = {
     apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
-    network: Network.MATIC_MUMBAI,
+    network:
+      process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK === "maticmum"
+        ? Network.MATIC_MUMBAI
+        : Network.MATIC_MAINNET,
   };
   const alchemy = new Alchemy(settings);
 
   // * Handle toast message.
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
-  const writeToastMessage = React.useMemo(() => {
-    return writeToastMessageLoadable?.state === "hasValue"
+  const writeToastMessage =
+    writeToastMessageLoadable?.state === "hasValue"
       ? writeToastMessageLoadable.contents
       : {
           snackbarSeverity: AlertSeverity.info,
@@ -59,42 +57,46 @@ const MonitorRentNft = ({
           snackbarTime: new Date(),
           snackbarOpen: true,
         };
-  });
 
-  // * Init function.
-  React.useEffect(() => {
-    window.Buffer = window.Buffer || Buffer;
+  async function initializeRentMarket() {
+    // console.log("call initializeRentMarket()");
+    // console.log("inputRentMarket: ", inputRentMarket);
+    // console.log(
+    //   "inputRentMarket.rentMarketContract: ",
+    //   inputRentMarket.rentMarketContract
+    // );
 
     if (
       inputRentMarket !== undefined &&
       inputRentMarket.rentMarketContract !== undefined
     ) {
       rentMarketRef.current = inputRentMarket;
-      rentMarketRef.current.getAllRentData().then(
-        (resultRentArray) => setRentArray(resultRentArray),
-        (error) => {
-          // console.log("getAllAccountBalance error: ", error);
-          setWriteToastMessage({
-            snackbarSeverity: AlertSeverity.error,
-            snackbarMessage: error?.message,
-            snackbarTime: new Date(),
-            snackbarOpen: true,
-          });
-        }
-      );
+
+      try {
+        const resultRentArray = await rentMarketRef.current.getAllRentData();
+        // console.log("resultRentArray: ", resultRentArray);
+        setRentArray((prevState) => resultRentArray);
+      } catch (error) {
+        // console.log("getAllAccountBalance error: ", error);
+        setWriteToastMessage({
+          snackbarSeverity: AlertSeverity.error,
+          snackbarMessage: error?.message,
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        });
+      }
     } else {
       const chainName = getChainName({ chainId: inputBlockchainNetwork });
       setWriteToastMessage({
-        snackbarSeverity: AlertSeverity.error,
-        snackbarMessage: `Metamask is not connect or not connected to ${chainName}.`,
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage: "Getting rent market contract.",
         snackbarTime: new Date(),
         snackbarOpen: true,
       });
     }
+  }
 
-    // Get and set the latest block number.
-    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-
+  async function initializeGetLogs() {
     const eventHash = keccak256(
       "RentNFT(address,uint256,uint256,address,uint256,bool,uint256,address,address,address,uint256)"
     );
@@ -120,116 +122,126 @@ const MonitorRentNft = ({
     // https://docs.alchemy.com/docs/deep-dive-into-eth_getlogs
     let fromBlock;
     let promiseGetLogs;
-    if (inputBlockchainNetwork === LOCAL_CHAIN_ID) {
+    let provider;
+    if (getChainName({ chainId: inputBlockchainNetwork }) === "localhost") {
       fromBlock = 0;
-      promiseGetLogs = provider.getLogs({
-        // https://mumbai.polygonscan.com/address/0xde55A9C006a2786BFC365D1Fbc7c769b907D6709
-        fromBlock: fromBlock,
-        toBlock: "latest",
-        address: rentMarketAddress,
-        topics: [topicHash],
-      });
+      provider = new ethers.providers.Web3Provider(window.ethereum, "any");
     } else {
       fromBlock = 27956165;
-      promiseGetLogs = alchemy.core.getLogs({
-        // https://mumbai.polygonscan.com/address/0xde55A9C006a2786BFC365D1Fbc7c769b907D6709
-        fromBlock: fromBlock,
-        toBlock: "latest",
-        address: rentMarketAddress,
-        topics: [topicHash],
-      });
+      provider = alchemy.core;
     }
 
-    promiseGetLogs.then((response) => {
-      // console.log("response: ", response);
-      const eventArray = response.map((event) => {
-        // data value
-        // 0x
-        // 00000000000000000000000000000000000000000000000000038d7ea4c68000
-        // 0000000000000000000000000000000000000000000000000000000000000000
-        // 0000000000000000000000000000000000000000000000000000000000000000
-        // 0000000000000000000000000000000000000000000000000000000000000000
-        // 0000000000000000000000000000000000000000000000000000000000000064
-        // 0000000000000000000000001e60cf7b8fb0b7ead221cf8d0e7d19c863ffbe40
-        // 00000000000000000000000070997970c51812dc3a010c7d01b50e0d17dc79c8
-        // 0000000000000000000000000000000000000000000000000000000001aa9e95
-        // console.log("event: ", event);
-        // data has 514 bytes with "0x"
-        const startIndex = 2;
-        const endIndex = 66;
-
-        // const nftAddress = Buffer.from(event.topics[0]).toString("hex");
-        const nftAddress = `0x${event.topics[1].slice(
-          startIndex + 24,
-          endIndex
-        )}`;
-        const tokenId = Number(event.topics[2]).toString();
-        const renteeAddress = `0x${event.topics[3].slice(
-          startIndex + 24,
-          endIndex
-        )}`;
-
-        const rentFee =
-          ethers.BigNumber.from(`0x${event.data.slice(startIndex, endIndex)}`) /
-          Math.pow(10, 18);
-        const feeTokenAddress = `0x${event.data.slice(
-          startIndex + 64 + 24,
-          endIndex + 64
-        )}`;
-        const rentFeeByToken =
-          ethers.BigNumber.from(
-            event.data.slice(startIndex + 128, endIndex + 128)
-          ) / Math.pow(10, 18);
-        const isRentByToken = new Boolean(
-          Number(`0x${event.data.slice(startIndex + 192, endIndex + 192)}`)
-        ).toString();
-        const rentDuration = Number(
-          `0x${event.data.slice(startIndex + 256, endIndex + 256)}`
-        );
-        // address is 40 bytes, so add 24 (total is 64 bbytes)
-        const renterAddress = `0x${event.data.slice(
-          startIndex + 320 + 24,
-          endIndex + 320
-        )}`;
-        const serviceAddress = `0x${event.data.slice(
-          startIndex + 384 + 24,
-          endIndex + 384
-        )}`;
-        const rentStartTimestamp = Number(
-          `0x${event.data.slice(startIndex + 448, endIndex + 448)}`
-        );
-
-        // console.log("nftAddress: ", nftAddress);
-        // console.log("tokenId: ", tokenId);
-        // console.log("rentFee: ", rentFee);
-        // console.log("feeTokenAddress: ", feeTokenAddress);
-        // console.log("rentFeeByToken: ", rentFeeByToken);
-        // console.log("isRentByToken: ", isRentByToken);
-        // console.log("rentDuration: ", rentDuration);
-        // console.log("renterAddress: ", renterAddress);
-        // console.log("renteeAddress: ", renteeAddress);
-        // console.log("serviceAddress: ", serviceAddress);
-        // console.log("rentStartTimestamp: ", rentStartTimestamp);
-
-        return {
-          key: `${event.blockNumber}${nftAddress}${tokenId}`,
-          nftAddress,
-          tokenId,
-          rentFee,
-          feeTokenAddress,
-          rentFeeByToken,
-          isRentByToken,
-          rentDuration,
-          renterAddress,
-          renteeAddress,
-          serviceAddress,
-          rentStartTimestamp,
-        };
-      });
-
-      setRentEventArray(eventArray);
+    promiseGetLogs = provider.getLogs({
+      // https://mumbai.polygonscan.com/address/0xde55A9C006a2786BFC365D1Fbc7c769b907D6709
+      fromBlock: fromBlock,
+      toBlock: "latest",
+      address: rentMarketAddress,
+      topics: [topicHash],
     });
-  }, [inputRentMarket]);
+
+    const response = await promiseGetLogs;
+    // console.log("response: ", response);
+    const eventArray = response.map((event) => {
+      // data value
+      // 0x
+      // 00000000000000000000000000000000000000000000000000038d7ea4c68000
+      // 0000000000000000000000000000000000000000000000000000000000000000
+      // 0000000000000000000000000000000000000000000000000000000000000000
+      // 0000000000000000000000000000000000000000000000000000000000000000
+      // 0000000000000000000000000000000000000000000000000000000000000064
+      // 0000000000000000000000001e60cf7b8fb0b7ead221cf8d0e7d19c863ffbe40
+      // 00000000000000000000000070997970c51812dc3a010c7d01b50e0d17dc79c8
+      // 0000000000000000000000000000000000000000000000000000000001aa9e95
+      // console.log("event: ", event);
+      // data has 514 bytes with "0x"
+      const startIndex = 2;
+      const endIndex = 66;
+
+      // const nftAddress = Buffer.from(event.topics[0]).toString("hex");
+      const nftAddress = `0x${event.topics[1].slice(
+        startIndex + 24,
+        endIndex
+      )}`;
+      const tokenId = Number(event.topics[2]).toString();
+      const renteeAddress = `0x${event.topics[3].slice(
+        startIndex + 24,
+        endIndex
+      )}`;
+
+      const rentFee =
+        ethers.BigNumber.from(`0x${event.data.slice(startIndex, endIndex)}`) /
+        Math.pow(10, 18);
+      const feeTokenAddress = `0x${event.data.slice(
+        startIndex + 64 + 24,
+        endIndex + 64
+      )}`;
+      const rentFeeByToken =
+        ethers.BigNumber.from(
+          event.data.slice(startIndex + 128, endIndex + 128)
+        ) / Math.pow(10, 18);
+      const isRentByToken = new Boolean(
+        Number(`0x${event.data.slice(startIndex + 192, endIndex + 192)}`)
+      ).toString();
+      const rentDuration = Number(
+        `0x${event.data.slice(startIndex + 256, endIndex + 256)}`
+      );
+      // address is 40 bytes, so add 24 (total is 64 bbytes)
+      const renterAddress = `0x${event.data.slice(
+        startIndex + 320 + 24,
+        endIndex + 320
+      )}`;
+      const serviceAddress = `0x${event.data.slice(
+        startIndex + 384 + 24,
+        endIndex + 384
+      )}`;
+      const rentStartTimestamp = Number(
+        `0x${event.data.slice(startIndex + 448, endIndex + 448)}`
+      );
+
+      // console.log("nftAddress: ", nftAddress);
+      // console.log("tokenId: ", tokenId);
+      // console.log("rentFee: ", rentFee);
+      // console.log("feeTokenAddress: ", feeTokenAddress);
+      // console.log("rentFeeByToken: ", rentFeeByToken);
+      // console.log("isRentByToken: ", isRentByToken);
+      // console.log("rentDuration: ", rentDuration);
+      // console.log("renterAddress: ", renterAddress);
+      // console.log("renteeAddress: ", renteeAddress);
+      // console.log("serviceAddress: ", serviceAddress);
+      // console.log("rentStartTimestamp: ", rentStartTimestamp);
+
+      return {
+        nftAddress,
+        tokenId,
+        rentFee,
+        feeTokenAddress,
+        rentFeeByToken,
+        isRentByToken,
+        rentDuration,
+        renterAddress,
+        renteeAddress,
+        serviceAddress,
+        rentStartTimestamp,
+      };
+    });
+
+    setRentEventArray((prevState) => eventArray);
+  }
+
+  // * Init function.
+  React.useEffect(() => {
+    window.Buffer = window.Buffer || Buffer;
+    async function initialize() {
+      initializeRentMarket();
+      initializeGetLogs();
+    }
+    initialize();
+  }, [
+    inputRentMarket,
+    inputRentMarket.rentMarketContract,
+    rentMarketAddress,
+    inputBlockchainNetwork,
+  ]);
 
   return (
     <div>
