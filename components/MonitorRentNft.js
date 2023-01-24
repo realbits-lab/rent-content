@@ -317,22 +317,22 @@ const MonitorRentNft = ({
               // * Get remain timestamp.
               const currentTimestamp = Math.round(new Date().getTime() / 1000);
               const remainTimestamp =
-                data.rentStartTimestamp - currentTimestamp;
+                data.rentStartTimestamp.add(data.rentDuration).toNumber() -
+                currentTimestamp;
               let remainTimestampDisplay;
+              // console.log("remainTimestamp: ", remainTimestamp);
 
               // Make settle button.
-              let disabledSettle = true;
+              let showSettleButton = true;
               if (remainTimestamp < 0) {
-                // Make settle button enable.
-                disabledSettle = false;
+                showSettleButton = true;
                 remainTimestampDisplay = moment
                   .unix(
                     data.rentStartTimestamp.add(data.rentDuration).toNumber()
                   )
                   .fromNow();
               } else {
-                // Make settle button disable.
-                disabledSettle = true;
+                showSettleButton = false;
                 remainTimestampDisplay = moment
                   .unix(
                     data.rentStartTimestamp.add(data.rentDuration).toNumber()
@@ -343,7 +343,6 @@ const MonitorRentNft = ({
               const settleButton = (
                 <Button
                   variant="outlined"
-                  disabled={disabledSettle}
                   onClick={async () => {
                     try {
                       // console.log("data.nftAddress: ", data.nftAddress);
@@ -411,7 +410,9 @@ const MonitorRentNft = ({
                     {rentStartTimestampDisplay}
                   </TableCell>
                   <TableCell align="center">{remainTimestampDisplay}</TableCell>
-                  <TableCell align="center">{settleButton}</TableCell>
+                  <TableCell align="center">
+                    {showSettleButton && settleButton}
+                  </TableCell>
                 </TableRow>
               );
             })}
