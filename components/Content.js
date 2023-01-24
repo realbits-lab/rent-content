@@ -173,8 +173,6 @@ const Content = ({
     inputBlockchainNetwork,
     inputMyRegisteredNFTArray,
     inputMyUnregisteredNFTArray,
-    page,
-    rowsPerPage,
   ]);
 
   function TablePaginationActions(props) {
