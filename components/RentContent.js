@@ -52,6 +52,7 @@ const Main = styled("main", {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   flexGrow: 1,
+  overflow: "scroll",
   padding: theme.spacing(1),
   marginLeft: `-${RENT_CONTENT_COMPONENT_DRAWER_WIDTH}px`,
   transition: theme.transitions.create("margin", {
