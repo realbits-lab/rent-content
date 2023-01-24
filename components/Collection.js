@@ -228,7 +228,10 @@ const Collection = ({
                     {element.name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {shortenAddress(element.collectionAddress, 4)}
+                    {shortenAddress({
+                      address: element.collectionAddress,
+                      number: 4,
+                    })}
                   </Typography>
                 </CardContent>
                 <CardActions>
