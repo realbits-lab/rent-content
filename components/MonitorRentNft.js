@@ -247,6 +247,9 @@ const MonitorRentNft = ({
             width: "max-content",
           }}
         >
+          {/* // * ----------------------------------------------------------*/}
+          {/* // * Current rent data table head.                                               */}
+          {/* // * ----------------------------------------------------------*/}
           <TableHead>
             <TableRow
               sx={{
@@ -270,9 +273,12 @@ const MonitorRentNft = ({
             </TableRow>
           </TableHead>
 
+          {/* // * ----------------------------------------------------------*/}
+          {/* // * Current rent data table body.                                               */}
+          {/* // * ----------------------------------------------------------*/}
           <TableBody>
-            {rentArray.map((row) => {
-              // console.log("row: ", row);
+            {rentArray.map((data) => {
+              // console.log("data: ", data);
               // struct rentData {
               //     address nftAddress;
               //     uint256 tokenId;
@@ -289,16 +295,17 @@ const MonitorRentNft = ({
 
               // * Get display timestamp string.
               const durationTimestampDisplay = `${moment
-                .unix(row.rentDuration.toNumber())
+                .unix(data.rentDuration.toNumber())
                 .diff(0, "days", true)} day`;
               // * https://momentjs.com/docs/#/displaying/format/
               const rentStartTimestampDisplay = moment
-                .unix(row.rentStartTimestamp.toNumber())
+                .unix(data.rentStartTimestamp.toNumber())
                 .format("YYYY/MM/DD-kk:mm:ss");
 
               // * Get remain timestamp.
               const currentTimestamp = Math.round(new Date().getTime() / 1000);
-              const remainTimestamp = row.rentStartTimestamp - currentTimestamp;
+              const remainTimestamp =
+                data.rentStartTimestamp - currentTimestamp;
               let remainTimestampDisplay;
 
               // Make settle button.
@@ -307,13 +314,17 @@ const MonitorRentNft = ({
                 // Make settle button enable.
                 disabledSettle = false;
                 remainTimestampDisplay = moment
-                  .unix(row.rentStartTimestamp.add(row.rentDuration).toNumber())
+                  .unix(
+                    data.rentStartTimestamp.add(data.rentDuration).toNumber()
+                  )
                   .fromNow();
               } else {
                 // Make settle button disable.
                 disabledSettle = true;
                 remainTimestampDisplay = moment
-                  .unix(row.rentStartTimestamp.add(row.rentDuration).toNumber())
+                  .unix(
+                    data.rentStartTimestamp.add(data.rentDuration).toNumber()
+                  )
                   .toNow();
               }
 
@@ -323,11 +334,11 @@ const MonitorRentNft = ({
                   disabled={disabledSettle}
                   onClick={async () => {
                     try {
-                      // console.log("row.nftAddress: ", row.nftAddress);
-                      // console.log("row.tokenId: ", row.tokenId);
+                      // console.log("data.nftAddress: ", data.nftAddress);
+                      // console.log("data.tokenId: ", data.tokenId);
                       await rentMarketRef.current.settleRentData(
-                        row.nftAddress,
-                        row.tokenId
+                        data.nftAddress,
+                        data.tokenId
                       );
                     } catch (error) {
                       console.error(error);
@@ -356,23 +367,30 @@ const MonitorRentNft = ({
                   }}
                 >
                   <TableCell align="center">
-                    {shortenAddress({ address: row.nftAddress, number: 2 })}
-                  </TableCell>
-                  <TableCell align="center">{row.tokenId.toNumber()}</TableCell>
-                  <TableCell align="center">
-                    {row.rentFee / Math.pow(10, 18)}
-                  </TableCell>
-                  <TableCell align="center">
                     {shortenAddress({
-                      address: row.feeTokenAddress,
+                      address: data.nftAddress,
                       number: 2,
+                      withLink: "scan",
                     })}
                   </TableCell>
                   <TableCell align="center">
-                    {row.rentFeeByToken.toNumber()}
+                    {data.tokenId.toNumber()}
                   </TableCell>
                   <TableCell align="center">
-                    {row.isRentByToken.toString()}
+                    {data.rentFee / Math.pow(10, 18)}
+                  </TableCell>
+                  <TableCell align="center">
+                    {shortenAddress({
+                      address: data.feeTokenAddress,
+                      number: 2,
+                      withLink: "scan",
+                    })}
+                  </TableCell>
+                  <TableCell align="center">
+                    {data.rentFeeByToken.toNumber()}
+                  </TableCell>
+                  <TableCell align="center">
+                    {data.isRentByToken.toString()}
                   </TableCell>
                   <TableCell align="center">
                     {durationTimestampDisplay}
@@ -403,6 +421,9 @@ const MonitorRentNft = ({
             width: "max-content",
           }}
         >
+          {/* // * ----------------------------------------------------------*/}
+          {/* // * Rent event history table head.                                               */}
+          {/* // * ----------------------------------------------------------*/}
           <TableHead>
             <TableRow
               sx={{
@@ -425,15 +446,29 @@ const MonitorRentNft = ({
               <TableCell align="right">Renter Address</TableCell>
               <TableCell align="right">Rentee Address</TableCell>
               <TableCell align="right">Service Address</TableCell>
-              <TableCell align="right">rentStartTimestamp</TableCell>
+              <TableCell align="right">Rent Start Timestamp</TableCell>
             </TableRow>
           </TableHead>
+
+          {/* // * ----------------------------------------------------------*/}
+          {/* // * Rent event history table body.                                               */}
+          {/* // * ----------------------------------------------------------*/}
           <TableBody>
-            {rentEventArray.map((row) => {
-              // console.log("row: ", row);
+            {rentEventArray.map((event) => {
+              console.log("event: ", event);
+
+              // * Get display timestamp string.
+              const durationTimestampDisplay = `${moment
+                .unix(event.rentDuration)
+                .diff(0, "days", true)} day`;
+              // * https://momentjs.com/docs/#/displaying/format/
+              const rentStartTimestampDisplay = moment
+                .unix(event.rentStartTimestamp)
+                .format("YYYY/MM/DD-kk:mm:ss");
+
               return (
                 <TableRow
-                  key={row.key}
+                  key={getUniqueKey()}
                   sx={{
                     "&:last-child td, &:last-child th": { border: 0 },
                     // backgroundColor: "yellow",
@@ -444,31 +479,50 @@ const MonitorRentNft = ({
                     },
                   }}
                 >
-                  <TableCell align="right">
-                    {shortenAddress({ address: row.nftAddress, number: 2 })}
-                  </TableCell>
-                  <TableCell align="right">{row.tokenId}</TableCell>
-                  <TableCell align="right">{row.rentFee}</TableCell>
-                  <TableCell align="right">
+                  <TableCell align="center">
                     {shortenAddress({
-                      address: row.feeTokenAddress,
+                      address: event.nftAddress,
                       number: 2,
+                      withLink: "scan",
                     })}
                   </TableCell>
-                  <TableCell align="right">{row.rentFeeByToken}</TableCell>
-                  <TableCell align="right">{row.isRentByToken}</TableCell>
-                  <TableCell align="right">{row.rentDuration}</TableCell>
-                  <TableCell align="right">
-                    {shortenAddress({ address: row.renterAddress, number: 2 })}
+                  <TableCell align="center">{event.tokenId}</TableCell>
+                  <TableCell align="center">{event.rentFee}</TableCell>
+                  <TableCell align="center">
+                    {shortenAddress({
+                      address: event.feeTokenAddress,
+                      number: 2,
+                      withLink: "scan",
+                    })}
                   </TableCell>
-                  <TableCell align="right">
-                    {shortenAddress({ address: row.renteeAddress, number: 2 })}
+                  <TableCell align="center">{event.rentFeeByToken}</TableCell>
+                  <TableCell align="center">{event.isRentByToken}</TableCell>
+                  <TableCell align="center">
+                    {durationTimestampDisplay}
                   </TableCell>
-                  <TableCell align="right">
-                    {shortenAddress({ address: row.serviceAddress, number: 2 })}
+                  <TableCell align="center">
+                    {shortenAddress({
+                      address: event.renterAddress,
+                      number: 2,
+                      withLink: "scan",
+                    })}
                   </TableCell>
-                  <TableCell align="right">
-                    {row.rentStartTimestamp.toString()}
+                  <TableCell align="center">
+                    {shortenAddress({
+                      address: event.renteeAddress,
+                      number: 2,
+                      withLink: "scan",
+                    })}
+                  </TableCell>
+                  <TableCell align="center">
+                    {shortenAddress({
+                      address: event.serviceAddress,
+                      number: 2,
+                      withLink: "scan",
+                    })}
+                  </TableCell>
+                  <TableCell align="center">
+                    {rentStartTimestampDisplay}
                   </TableCell>
                 </TableRow>
               );
