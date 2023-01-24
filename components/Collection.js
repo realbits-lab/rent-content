@@ -134,7 +134,7 @@ const Collection = ({
         <Chip label="Metamask" />
       </Divider>
       <p />
-      <Metamask blockchainNetwork={blockchainNetwork} />
+      <Metamask inputBlockchainNetwork={blockchainNetwork} />
 
       {/*--------------------------------------------------------------------*/}
       {/* 2. Show request register collection. */}

@@ -1,18 +1,16 @@
 import React from "react";
-import { Network, Alchemy } from "alchemy-sdk";
 import { Buffer } from "buffer";
-import moment from "moment";
+import { userAgent } from "next/server";
 import Divider from "@mui/material/Divider";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import { useRecoilStateLoadable } from "recoil";
+import { Metamask } from "rent-market";
 import {
   shortenAddress,
   getUniqueKey,
@@ -27,33 +25,19 @@ const MonitorAccountBalance = ({
   rentMarketAddress,
   inputBlockchainNetwork,
 }) => {
-  //----------------------------------------------------------------------------
-  // Define constant varialbe.
-  //----------------------------------------------------------------------------
-  const TABLE_MIN_WIDTH = 400;
-
-  //----------------------------------------------------------------------------
-  // Define rent market class.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Define rent market class.
+  // * -------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
   const [accountBalanceArray, setAccountBalanceArray] = React.useState([]);
 
-  //----------------------------------------------------------------------------
-  // Define alchemy configuration.
-  //----------------------------------------------------------------------------
-  const settings = {
-    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
-    network: Network.MATIC_MUMBAI,
-  };
-  const alchemy = new Alchemy(settings);
-
-  //----------------------------------------------------------------------------
-  // Handle toast message.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Handle toast message.
+  // * -------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
-  const writeToastMessage = React.useMemo(() => {
-    return writeToastMessageLoadable?.state === "hasValue"
+  const writeToastMessage =
+    writeToastMessageLoadable?.state === "hasValue"
       ? writeToastMessageLoadable.contents
       : {
           snackbarSeverity: AlertSeverity.info,
@@ -61,46 +45,57 @@ const MonitorAccountBalance = ({
           snackbarTime: new Date(),
           snackbarOpen: true,
         };
-  });
 
-  React.useEffect(() => {
-    // struct accountBalance {
-    //     address accountAddress;
-    //     address tokenAddress;
-    //     uint256 amount;
-    // }
-    window.Buffer = window.Buffer || Buffer;
-
+  async function initializeRentMarket() {
     // console.log("inputRentMarket: ", inputRentMarket);
     if (
       inputRentMarket !== undefined &&
       inputRentMarket?.rentMarketContract !== undefined
     ) {
       // console.log("inputRentMarket: ", inputRentMarket);
+
       rentMarketRef.current = inputRentMarket;
-      rentMarketRef.current.getAllAccountBalance().then(
-        (resultAccountBalanceArray) =>
-          setAccountBalanceArray(resultAccountBalanceArray),
-        (error) => {
-          // console.log("getAllAccountBalance error: ", error);
-          setWriteToastMessage({
-            snackbarSeverity: AlertSeverity.error,
-            snackbarMessage: error?.message,
-            snackbarTime: new Date(),
-            snackbarOpen: true,
-          });
-        }
-      );
+      // struct accountBalance {
+      //     address accountAddress;
+      //     address tokenAddress;
+      //     uint256 amount;
+      // }
+
+      try {
+        const resultAccountBalanceArray =
+          await rentMarketRef.current.getAllAccountBalance();
+        setAccountBalanceArray((prevState) => resultAccountBalanceArray);
+      } catch (error) {
+        // console.log("getAllAccountBalance error: ", error);
+        setWriteToastMessage({
+          snackbarSeverity: AlertSeverity.error,
+          snackbarMessage: error?.message,
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        });
+      }
     } else {
-      const chainName = getChainName({ chainId: inputBlockchainNetwork });
       setWriteToastMessage({
-        snackbarSeverity: AlertSeverity.error,
-        snackbarMessage: `Metamask is not connect or not connected to ${chainName}.`,
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage: "Getting rent market contract.",
         snackbarTime: new Date(),
         snackbarOpen: true,
       });
     }
-  }, [inputRentMarket]);
+  }
+
+  React.useEffect(() => {
+    window.Buffer = window.Buffer || Buffer;
+    async function initialize() {
+      initializeRentMarket();
+    }
+    initialize();
+  }, [
+    inputRentMarket,
+    inputRentMarket.rentMarketContract,
+    rentMarketAddress,
+    inputBlockchainNetwork,
+  ]);
 
   function buildWithdrawButton({ recipient, tokenAddress }) {
     return (
@@ -135,6 +130,14 @@ const MonitorAccountBalance = ({
   // TODO: Add account address search or filter.
   return (
     <div>
+      {/* // * --------------------------------------------------------------*/}
+      {/* // * Show metamask component.                                       *}
+      {/* // * --------------------------------------------------------------*/}
+      <Divider sx={{ margin: "5px" }}>
+        <Chip label="Metamask" />
+      </Divider>
+      <Metamask inputBlockchainNetwork={inputBlockchainNetwork} />
+
       {/* // * --------------------------------------------------------------*/}
       {/* // * Show current all account balance data.                        */}
       {/* // * --------------------------------------------------------------*/}
