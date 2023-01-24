@@ -3,19 +3,17 @@ import { BigNumber, ethers } from "ethers";
 import { Network, Alchemy } from "alchemy-sdk";
 import keccak256 from "keccak256";
 import { Buffer } from "buffer";
-import {
-  Divider,
-  Button,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-} from "@mui/material";
+import Divider from "@mui/material/Divider";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
 import { useRecoilStateLoadable } from "recoil";
 import {
   getUniqueKey,
@@ -33,31 +31,22 @@ const MonitorRentNft = ({
   rentMarketAddress,
   inputBlockchainNetwork,
 }) => {
-  //----------------------------------------------------------------------------
-  // Define constant varialbe.
-  //----------------------------------------------------------------------------
+  // * Define constant varialbe.
   const TABLE_MIN_WIDTH = 400;
 
-  //----------------------------------------------------------------------------
-  // Define rent market class.
-  //----------------------------------------------------------------------------
+  // * Define rent market class.
   const rentMarketRef = React.useRef();
-  const [currentBlockNumber, setCurrentBlockNumber] = React.useState(0);
   const [rentArray, setRentArray] = React.useState([]);
   const [rentEventArray, setRentEventArray] = React.useState([]);
 
-  //----------------------------------------------------------------------------
-  // Define alchemy configuration.
-  //----------------------------------------------------------------------------
+  // * Define alchemy configuration.
   const settings = {
     apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
     network: Network.MATIC_MUMBAI,
   };
   const alchemy = new Alchemy(settings);
 
-  //----------------------------------------------------------------------------
-  // Handle toast message.
-  //----------------------------------------------------------------------------
+  // * Handle toast message.
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
   const writeToastMessage = React.useMemo(() => {
@@ -71,9 +60,7 @@ const MonitorRentNft = ({
         };
   });
 
-  //----------------------------------------------------------------------------
-  // Init function.
-  //----------------------------------------------------------------------------
+  // * Init function.
   React.useEffect(() => {
     window.Buffer = window.Buffer || Buffer;
 
@@ -106,15 +93,6 @@ const MonitorRentNft = ({
 
     // Get and set the latest block number.
     const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-    provider.getBlockNumber().then((blockNumber) => {
-      // console.log("local chain blockNumber: ", blockNumber);
-      setCurrentBlockNumber(blockNumber);
-    });
-
-    provider.on("block", (blockNumber) => {
-      // console.log("new block number: ", blockNumber);
-      setCurrentBlockNumber(blockNumber);
-    });
 
     const eventHash = keccak256(
       "RentNFT(address,uint256,uint256,address,uint256,bool,uint256,address,address,address,uint256)"
@@ -254,21 +232,9 @@ const MonitorRentNft = ({
 
   return (
     <div>
-      {/*--------------------------------------------------------------------*/}
-      {/* 1. Show current block number. */}
-      {/*--------------------------------------------------------------------*/}
-
-      <p />
-      <Divider>
-        <Chip label="Current Block Number" />
-      </Divider>
-      <p />
-
-      <Typography>{currentBlockNumber}</Typography>
-
-      {/*--------------------------------------------------------------------*/}
-      {/* 2. Show current all rent data. */}
-      {/*--------------------------------------------------------------------*/}
+      {/* // * --------------------------------------------------------------*/}
+      {/* // * Show current all rent data.                                   */}
+      {/* // * --------------------------------------------------------------*/}
 
       <p />
       <Divider>
@@ -307,7 +273,7 @@ const MonitorRentNft = ({
           </TableHead>
           <TableBody>
             {rentArray.map((row) => {
-              // console.log("row: ", row);
+              console.log("row: ", row);
               // struct rentData {
               //     address nftAddress;
               //     uint256 tokenId;
@@ -335,7 +301,6 @@ const MonitorRentNft = ({
               // console.log("currentTimeInSecond: ", currentTimeInSecond);
               const remainBlock = row.rentStartTimestamp
                 .add(row.rentDuration)
-                // .sub(BigNumber.from(currentBlockNumber))
                 .sub(BigNumber.from(currentTimeInSecond))
                 .toNumber();
               // console.log("remainBlock: ", remainBlock);
@@ -394,7 +359,7 @@ const MonitorRentNft = ({
                   <TableCell align="right">
                     {shortenAddress({ address: row.nftAddress, number: 2 })}
                   </TableCell>
-                  <TableCell align="right">{row.tokenId}</TableCell>
+                  <TableCell align="right">{row.tokenId.toNumber()}</TableCell>
                   <TableCell align="right">
                     {row.rentFee / Math.pow(10, 18)}
                   </TableCell>
@@ -404,11 +369,15 @@ const MonitorRentNft = ({
                       number: 2,
                     })}
                   </TableCell>
-                  <TableCell align="right">{row.rentFeeByToken}</TableCell>
+                  <TableCell align="right">
+                    {row.rentFeeByToken.toNumber()}
+                  </TableCell>
                   <TableCell align="right">
                     {row.isRentByToken.toString()}
                   </TableCell>
-                  <TableCell align="right">{row.rentDuration}</TableCell>
+                  <TableCell align="right">
+                    {row.rentDuration.toNumber()}
+                  </TableCell>
                   <TableCell align="right">
                     {row.rentStartTimestamp.toString()}
                   </TableCell>
@@ -459,6 +428,7 @@ const MonitorRentNft = ({
           </TableHead>
           <TableBody>
             {rentEventArray.map((row) => {
+              console.log("row: ", row);
               return (
                 <TableRow
                   key={row.key}
