@@ -455,7 +455,7 @@ const MonitorRentNft = ({
           {/* // * ----------------------------------------------------------*/}
           <TableBody>
             {rentEventArray.map((event) => {
-              console.log("event: ", event);
+              // console.log("event: ", event);
 
               // * Get display timestamp string.
               const durationTimestampDisplay = `${moment
