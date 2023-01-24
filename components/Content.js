@@ -1,9 +1,7 @@
 import React from "react";
-import { ethers } from "ethers";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import Container from "@mui/material/Container";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -25,11 +23,8 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
-import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import { useTheme } from "@mui/material/styles";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
@@ -144,6 +139,10 @@ const Content = ({
     setMyRegisteredUniqueNFTAddressArray([...uniqueRegisterNFTAddressSet]);
     setMyUnregisteredUniqueNFTAddressArray([...uniqueUnregisterNFTAddressSet]);
 
+    // * Initialize page and rowsPerPage array.
+    page.splice(0, page.length);
+    rowsPerPage.splice(0, rowsPerPage.length);
+
     // * Add each register and unregister page and rowsPerPage per nft contract address.
     for (const nftAddress of uniqueRegisterNFTAddressSet) {
       page.push({
@@ -174,6 +173,8 @@ const Content = ({
     inputBlockchainNetwork,
     inputMyRegisteredNFTArray,
     inputMyUnregisteredNFTArray,
+    page,
+    rowsPerPage,
   ]);
 
   function TablePaginationActions(props) {

@@ -379,10 +379,6 @@ const Market = ({
             <TableCell align="center">Avatar</TableCell>
             <TableCell align="center">Name</TableCell>
             <TableCell align="center">Fee</TableCell>
-            {/* <TableCell align="center">
-              Duration
-              <br /> (blocks)
-            </TableCell> */}
             <TableCell align="center">Rent</TableCell>
           </TableRow>
         </TableHead>

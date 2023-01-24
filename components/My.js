@@ -5,6 +5,7 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
+import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -12,10 +13,16 @@ import ListItemButton from "@mui/material/ListItemButton";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
+import TablePagination from "@mui/material/TablePagination";
 import Avatar from "@mui/material/Avatar";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import TableFooter from "@mui/material/TableFooter";
 import { useTheme } from "@mui/material/styles";
+import LastPageIcon from "@mui/icons-material/LastPage";
+import FirstPageIcon from "@mui/icons-material/FirstPage";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import {
   changeIPFSToGateway,
   MyMenu,
@@ -85,6 +92,12 @@ const My = ({
     snackbarValue;
 
   // * -------------------------------------------------------------------------
+  // * Table pagination data.
+  // * -------------------------------------------------------------------------
+  const [page, setPage] = React.useState([]);
+  const [rowsPerPage, setRowsPerPage] = React.useState([]);
+
+  // * -------------------------------------------------------------------------
   // * Initialize data.
   // * -------------------------------------------------------------------------
   React.useEffect(() => {
@@ -122,6 +135,27 @@ const My = ({
     ) {
       setBlockchainNetwork(inputBlockchainNetwork);
     }
+
+    // * Initialize page and rowsPerPage array.
+    page.splice(0, page.length);
+    rowsPerPage.splice(0, rowsPerPage.length);
+
+    page.push({
+      mode: MyMenu.own,
+      page: 0,
+    });
+    page.push({
+      mode: MyMenu.rent,
+      page: 0,
+    });
+    rowsPerPage.push({
+      mode: MyMenu.own,
+      rowsPerPage: 5,
+    });
+    rowsPerPage.push({
+      mode: MyMenu.rent,
+      rowsPerPage: 5,
+    });
   }, [
     selectAvatarFunc,
     inputRentMarket,
@@ -130,97 +164,113 @@ const My = ({
     inputMyRegisteredNFTArray,
     inputMyRentNFTArray,
     inputBlockchainNetwork,
+    page,
+    rowsPerPage,
   ]);
 
-  function buildNFTTableRowBody({ elementArray, type }) {
+  function buildNftTableRowBody({ elementArray, type }) {
+    // console.log("call buildNftTableRowBody()");
+
+    const tablePage = page.find((e) => e.mode === myNftStatus.myNftType).page;
+    const tableRowsPerPage = rowsPerPage.find(
+      (e) => e.mode === myNftStatus.myNftType
+    ).rowsPerPage;
+    // console.log("tablePagae: ", tablePage);
+    // console.log("tableRowsPerPage: ", tableRowsPerPage);
+
     return (
       <TableBody key={getUniqueKey()}>
-        {elementArray.map((element) => {
-          const rentStartTimestamp = element.rentStartTimestamp
-            ? element.rentStartTimestamp.toNumber()
-            : 0;
+        {elementArray
+          .slice(
+            tablePage * tableRowsPerPage,
+            tablePage * tableRowsPerPage + tableRowsPerPage
+          )
+          .map((element) => {
+            const rentStartTimestamp = element.rentStartTimestamp
+              ? element.rentStartTimestamp.toNumber()
+              : 0;
 
-          // * Get rent duration display string for own case.
-          const durationTimestampDisplay = `${moment
-            .unix(element.rentDuration.toNumber())
-            .diff(0, "days", true)} day`;
-          // console.log("durationTimestampDisplay: ", durationTimestampDisplay);
+            // * Get rent duration display string for own case.
+            const durationTimestampDisplay = `${moment
+              .unix(element.rentDuration.toNumber())
+              .diff(0, "days", true)} day`;
+            // console.log("durationTimestampDisplay: ", durationTimestampDisplay);
 
-          // * Get end rent time display string for rent case.
-          const endRentTimestamp =
-            rentStartTimestamp + element.rentDuration.toNumber();
-          // console.log("endRentTimestamp: ", endRentTimestamp);
-          const currentTimestamp = new Date().getTime() / 1000;
-          let endRentTimestampDisplay;
-          if (currentTimestamp >= endRentTimestamp) {
-            endRentTimestampDisplay = "finished";
-          } else {
-            endRentTimestampDisplay = moment
-              .unix(endRentTimestamp)
-              .fromNow(true);
-          }
-          // console.log("currentTimestamp: ", currentTimestamp);
-          // console.log("endRentTimestampDisplay: ", endRentTimestampDisplay);
+            // * Get end rent time display string for rent case.
+            const endRentTimestamp =
+              rentStartTimestamp + element.rentDuration.toNumber();
+            // console.log("endRentTimestamp: ", endRentTimestamp);
+            const currentTimestamp = new Date().getTime() / 1000;
+            let endRentTimestampDisplay;
+            if (currentTimestamp >= endRentTimestamp) {
+              endRentTimestampDisplay = "finished";
+            } else {
+              endRentTimestampDisplay = moment
+                .unix(endRentTimestamp)
+                .fromNow(true);
+            }
+            // console.log("currentTimestamp: ", currentTimestamp);
+            // console.log("endRentTimestampDisplay: ", endRentTimestampDisplay);
 
-          return (
-            <TableRow
-              key={getUniqueKey()}
-              onClick={(event) => {
-                if (selectAvatarFunc) {
-                  selectAvatarFunc(element);
-                }
-
-                setSnackbarValue({
-                  snackbarSeverity: AlertSeverity.info,
-                  snackbarMessage: `You select ${
-                    element.metadata ? element.metadata.name : "..."
-                  } avatar.`,
-                  snackbarTime: new Date(),
-                  snackbarOpen: true,
-                });
-              }}
-              sx={{
-                "&:hover": {
-                  backgroundColor: theme.palette.success.light,
-                },
-                "&:hover .MuiTableCell-root": {
-                  color: "white",
-                },
-              }}
-              style={{
-                cursor: "pointer",
-              }}
-            >
-              <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                <Avatar
-                  alt="image"
-                  src={
-                    element.metadata
-                      ? changeIPFSToGateway(element.metadata.image)
-                      : ""
+            return (
+              <TableRow
+                key={getUniqueKey()}
+                onClick={(event) => {
+                  if (selectAvatarFunc) {
+                    selectAvatarFunc(element);
                   }
-                  sx={{ width: RBSize.big, height: RBSize.big }}
-                />
-              </TableCell>
-              <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                {element.metadata ? element.metadata.name : "N/A"}
-              </TableCell>
-              <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                {element.rentFee / Math.pow(10, 18)}
-              </TableCell>
-              <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                {type === MyMenu.own
-                  ? durationTimestampDisplay
-                  : endRentTimestampDisplay}
-              </TableCell>
-            </TableRow>
-          );
-        })}
+
+                  setSnackbarValue({
+                    snackbarSeverity: AlertSeverity.info,
+                    snackbarMessage: `You select ${
+                      element.metadata ? element.metadata.name : "..."
+                    } avatar.`,
+                    snackbarTime: new Date(),
+                    snackbarOpen: true,
+                  });
+                }}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: theme.palette.success.light,
+                  },
+                  "&:hover .MuiTableCell-root": {
+                    color: "white",
+                  },
+                }}
+                style={{
+                  cursor: "pointer",
+                }}
+              >
+                <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
+                  <Avatar
+                    alt="image"
+                    src={
+                      element.metadata
+                        ? changeIPFSToGateway(element.metadata.image)
+                        : ""
+                    }
+                    sx={{ width: RBSize.big, height: RBSize.big }}
+                  />
+                </TableCell>
+                <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
+                  {element.metadata ? element.metadata.name : "N/A"}
+                </TableCell>
+                <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
+                  {element.rentFee / Math.pow(10, 18)}
+                </TableCell>
+                <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
+                  {type === MyMenu.own
+                    ? durationTimestampDisplay
+                    : endRentTimestampDisplay}
+                </TableCell>
+              </TableRow>
+            );
+          })}
       </TableBody>
     );
   }
 
-  function buildNFTTableRowHead({ collection, type }) {
+  function buildNftTableRowHead({ collection, type }) {
     return (
       <TableHead>
         <TableRow key={getUniqueKey()}>
@@ -233,20 +283,154 @@ const My = ({
     );
   }
 
+  function TablePaginationActions(props) {
+    const theme = useTheme();
+    const { count, page, rowsPerPage, onPageChange } = props;
+
+    const handleFirstPageButtonClick = (event) => {
+      onPageChange(event, 0);
+    };
+
+    const handleBackButtonClick = (event) => {
+      onPageChange(event, page - 1);
+    };
+
+    const handleNextButtonClick = (event) => {
+      onPageChange(event, page + 1);
+    };
+
+    const handleLastPageButtonClick = (event) => {
+      onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+    };
+
+    return (
+      <Box spacing={0} sx={{ display: "flex", flexDirection: "row" }}>
+        <IconButton
+          onClick={handleFirstPageButtonClick}
+          disabled={page === 0}
+          aria-label="first page"
+        >
+          {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
+        </IconButton>
+        <IconButton
+          onClick={handleBackButtonClick}
+          disabled={page === 0}
+          aria-label="previous page"
+        >
+          {theme.direction === "rtl" ? (
+            <KeyboardArrowRight />
+          ) : (
+            <KeyboardArrowLeft />
+          )}
+        </IconButton>
+        <IconButton
+          onClick={handleNextButtonClick}
+          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+          aria-label="next page"
+        >
+          {theme.direction === "rtl" ? (
+            <KeyboardArrowLeft />
+          ) : (
+            <KeyboardArrowRight />
+          )}
+        </IconButton>
+        <IconButton
+          onClick={handleLastPageButtonClick}
+          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+          aria-label="last page"
+        >
+          {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
+        </IconButton>
+      </Box>
+    );
+  }
+
   function buildNFTTableRow({ collection, elementArray, type }) {
+    // console.log("call buildNFTTableRow()");
+    // console.log("page: ", page);
+    // console.log("rowsPerPage: ", rowsPerPage);
+
+    const tablePage = page.find((e) => e.mode === myNftStatus.myNftType).page;
+    const tableRowsPerPage = rowsPerPage.find(
+      (e) => e.mode === myNftStatus.myNftType
+    ).rowsPerPage;
+    // console.log("tablePagae: ", tablePage);
+    // console.log("tableRowsPerPage: ", tableRowsPerPage);
+
     return (
       <TableRow key={getUniqueKey()}>
         <TableCell
           style={{
-            paddingBottom: 0,
-            paddingTop: 0,
-            borderBottom: 0,
+            padding: 0,
           }}
-          colSpan={5}
         >
           <Table size="small">
-            {buildNFTTableRowHead({ collection, type })}
-            {buildNFTTableRowBody({ elementArray, type })}
+            {buildNftTableRowHead({ collection, type })}
+            {buildNftTableRowBody({ elementArray, type })}
+            <TableFooter>
+              <TableRow>
+                <TablePagination
+                  key={getUniqueKey()}
+                  rowsPerPageOptions={[5, 10, 20]}
+                  count={elementArray.length}
+                  page={tablePage}
+                  rowsPerPage={tableRowsPerPage}
+                  labelRowsPerPage={""}
+                  SelectProps={{
+                    inputProps: {
+                      "aria-label": "rows per page",
+                    },
+                    native: true,
+                  }}
+                  onPageChange={(event, newPage) => {
+                    // * Discern own and rent case.
+                    setPage((prevState) => {
+                      const newState = prevState.map((e) => {
+                        if (e.mode === myNftStatus.myNftType) {
+                          return {
+                            mode: e.mode,
+                            page: newPage,
+                          };
+                        } else {
+                          return e;
+                        }
+                      });
+                      return newState;
+                    });
+                  }}
+                  onRowsPerPageChange={(event) => {
+                    // * Discern own and rent case.
+                    setRowsPerPage((prevState) => {
+                      const newState = prevState.map((e) => {
+                        if (e.mode === myNftStatus.myNftType) {
+                          return {
+                            mode: e.mode,
+                            rowsPerPage: parseInt(event.target.value, 10),
+                          };
+                        } else {
+                          return e;
+                        }
+                      });
+                      return newState;
+                    });
+                    setPage((prevState) => {
+                      const newState = prevState.map((e) => {
+                        if (e.mode === myNftStatus.myNftType) {
+                          return {
+                            mode: e.mode,
+                            page: 0,
+                          };
+                        } else {
+                          return e;
+                        }
+                      });
+                      return newState;
+                    });
+                  }}
+                  ActionsComponent={TablePaginationActions}
+                />
+              </TableRow>
+            </TableFooter>
           </Table>
         </TableCell>
       </TableRow>
