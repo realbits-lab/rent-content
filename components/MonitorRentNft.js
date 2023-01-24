@@ -236,7 +236,6 @@ const MonitorRentNft = ({
       {/* // * --------------------------------------------------------------*/}
       {/* // * Show current all rent data.                                   */}
       {/* // * --------------------------------------------------------------*/}
-
       <Divider sx={{ margin: "5px" }}>
         <Chip label="Current Rent Data" />
       </Divider>

@@ -1,21 +1,17 @@
 import React from "react";
-import { ethers } from "ethers";
 import { Network, Alchemy } from "alchemy-sdk";
-import keccak256 from "keccak256";
 import { Buffer } from "buffer";
 import moment from "moment";
-import {
-  Divider,
-  Chip,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-} from "@mui/material";
+import Divider from "@mui/material/Divider";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
 import { useRecoilStateLoadable } from "recoil";
 import {
   shortenAddress,
@@ -109,7 +105,7 @@ const MonitorAccountBalance = ({
   function buildWithdrawButton({ recipient, tokenAddress }) {
     return (
       <Button
-        variant="contained"
+        variant="outlined"
         onClick={async () => {
           try {
             // console.log("rentMarketRef.current: ", rentMarketRef.current);
@@ -136,74 +132,76 @@ const MonitorAccountBalance = ({
     );
   }
 
+  // TODO: Add account address search or filter.
   return (
     <div>
-      {/*--------------------------------------------------------------------*/}
-      {/* 1. Show current all account balance data. */}
-      {/*--------------------------------------------------------------------*/}
-
-      <p />
-      <Divider>
+      {/* // * --------------------------------------------------------------*/}
+      {/* // * Show current all account balance data.                        */}
+      {/* // * --------------------------------------------------------------*/}
+      <Divider sx={{ margin: "5px" }}>
         <Chip label="Account Balance Data" />
       </Divider>
-      <p />
 
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: TABLE_MIN_WIDTH }} aria-label="simple table">
-          <TableHead>
-            <TableRow
-              sx={{
-                backgroundColor: "grey",
-                borderBottom: "2px solid black",
-                "& td": {
-                  fontSize: "0.8rem",
-                  color: "rgba(96, 96, 96)",
-                },
-              }}
-            >
-              <TableCell align="right">Account Address</TableCell>
-              <TableCell align="right">Token Address</TableCell>
-              <TableCell align="right">Amount</TableCell>
-              <TableCell align="right">Withdraw</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {accountBalanceArray.map((row) => {
-              // console.log("row: ", row);
-              return (
-                <TableRow
-                  key={getUniqueKey()}
-                  sx={{
-                    "&:last-child td, &:last-child th": { border: 0 },
-                    // backgroundColor: "yellow",
-                    // borderBottom: "2px solid black",
-                    "& td": {
-                      fontSize: "0.7rem",
-                      color: "rgba(96, 96, 96)",
-                    },
-                  }}
-                >
-                  <TableCell align="right">
-                    {shortenAddress({ address: row.accountAddress, number: 4 })}
-                  </TableCell>
-                  <TableCell align="right">
-                    {shortenAddress({ address: row.tokenAddress, number: 4 })}
-                  </TableCell>
-                  <TableCell align="right">
-                    {row.amount / Math.pow(10, 18)}
-                  </TableCell>
-                  <TableCell align="center">
-                    {buildWithdrawButton({
-                      recipient: row.accountAddress,
-                      tokenAddress: row.tokenAddress,
-                    })}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Table
+        sx={{
+          width: "max-content",
+        }}
+      >
+        <TableHead>
+          <TableRow
+            sx={{
+              backgroundColor: "lightgrey",
+              borderBottom: "2px solid black",
+              "& td": {
+                fontSize: "10px",
+              },
+            }}
+          >
+            <TableCell align="center">Account Address</TableCell>
+            <TableCell align="center">Token Address</TableCell>
+            <TableCell align="center">Amount</TableCell>
+            <TableCell align="center">Withdraw</TableCell>
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          {accountBalanceArray.map((row) => {
+            // console.log("row: ", row);
+            return (
+              <TableRow
+                key={getUniqueKey()}
+                sx={{
+                  "&:last-child td, &:last-child th": { border: 0 },
+                }}
+              >
+                <TableCell align="center">
+                  {shortenAddress({
+                    address: row.accountAddress,
+                    number: 5,
+                    withLink: "scan",
+                  })}
+                </TableCell>
+                <TableCell align="center">
+                  {shortenAddress({
+                    address: row.tokenAddress,
+                    number: 5,
+                    withLink: "scan",
+                  })}
+                </TableCell>
+                <TableCell align="center">
+                  {row.amount / Math.pow(10, 18)}
+                </TableCell>
+                <TableCell align="center">
+                  {buildWithdrawButton({
+                    recipient: row.accountAddress,
+                    tokenAddress: row.tokenAddress,
+                  })}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
     </div>
   );
 };

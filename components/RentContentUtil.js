@@ -219,13 +219,26 @@ export const shortenAddress = ({ address, number = 4, withLink = "" }) => {
   // console.log("address: ", address);
   // console.log("withLink: ", withLink);
 
-  const POLYGON_SCAN_URL = "https://mumbai.polygonscan.com/address/";
+  const POLYGON_MATICMUM_SCAN_URL = "https://mumbai.polygonscan.com/address/";
+  const POLYGON_MATIC_SCAN_URL = "https://polygonscan.com/address/";
   const OPENSEA_MATIC_URL = "https://opensea.io/assets?search[query]=";
   const OPENSEA_MATICMUM_URL =
     "https://testnets.opensea.io/assets?search[query]=";
-  const polygonScanUrl = `${POLYGON_SCAN_URL}${address}`;
   let stringLength = 0;
   let middleString = "";
+
+  let openseaUrl;
+  let polygonScanUrl;
+  if (process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK === "matic") {
+    openseaUrl = OPENSEA_MATIC_URL;
+    polygonScanUrl = `${POLYGON_MATIC_SCAN_URL}${address}`;
+  } else if (process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK === "maticmum") {
+    openseaUrl = OPENSEA_MATICMUM_URL;
+    polygonScanUrl = `${POLYGON_MATICMUM_SCAN_URL}${address}`;
+  } else {
+    openseaUrl = "";
+    polygonScanUrl = "";
+  }
 
   // Check number maximum.
   if (number > 19 || number < 1) {
@@ -242,6 +255,7 @@ export const shortenAddress = ({ address, number = 4, withLink = "" }) => {
   ) {
     switch (withLink) {
       case "maticscan":
+      case "scan":
         return (
           <Link href={polygonScanUrl} target="_blank">
             {`${address.substring(
@@ -252,18 +266,10 @@ export const shortenAddress = ({ address, number = 4, withLink = "" }) => {
         );
 
       case "opensea_matic":
-        return (
-          <Link href={`${OPENSEA_MATIC_URL}${address}`} target="_blank">
-            {`${address.substring(
-              0,
-              number + 2
-            )}${middleString}${address.substring(address.length - number)}`}
-          </Link>
-        );
-
       case "opensea_maticmum":
+      case "opensea":
         return (
-          <Link href={`${OPENSEA_MATICMUM_URL}${address}`} target="_blank">
+          <Link href={`${openseaUrl}${address}`} target="_blank">
             {`${address.substring(
               0,
               number + 2
