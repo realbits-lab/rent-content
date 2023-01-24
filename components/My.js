@@ -1,7 +1,6 @@
 import React from "react";
-import { ethers } from "ethers";
+import moment from "moment";
 import Grid from "@mui/material/Grid";
-import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
@@ -15,7 +14,6 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import Avatar from "@mui/material/Avatar";
 import TableHead from "@mui/material/TableHead";
-import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -134,15 +132,14 @@ const My = ({
     inputBlockchainNetwork,
   ]);
 
-  const [openRow, setOpenRow] = React.useState(false);
-
-  const buildNFTTableRowBody = ({ elementArray, type }) => {
+  function buildNFTTableRowBody({ elementArray, type }) {
     return (
       <TableBody key={getUniqueKey()}>
         {elementArray.map((element) => {
           const rentStartTimestamp = element.rentStartTimestamp
             ? element.rentStartTimestamp.toNumber()
             : 0;
+          // TODO: Fix timestamp calcultation.
           // console.log("currentBlockNumber: ", currentBlockNumber);
           // console.log(
           //   "element.rentStartTimestamp: ",
@@ -157,7 +154,6 @@ const My = ({
           const remainTimestamp =
             rentStartTimestamp +
             parseInt(element.rentDuration) -
-            // currentBlockNumber;
             currentTimeInSecond;
 
           return (
@@ -216,30 +212,24 @@ const My = ({
         })}
       </TableBody>
     );
-  };
+  }
 
-  const buildNFTTableRowHead = ({ collection, type }) => {
+  function buildNFTTableRowHead({ collection, type }) {
     return (
       <TableHead>
         <TableRow key={getUniqueKey()}>
           <TableCell align="center">Avatar</TableCell>
           <TableCell align="center">Name</TableCell>
-          <TableCell align="center">
-            Fee
-            <br />
-            (matic)
-          </TableCell>
+          <TableCell align="center">Fee</TableCell>
           <TableCell align="center">
             {type === MyMenu.own ? "Duration" : "Remain"}
-            <br />
-            (block)
           </TableCell>
         </TableRow>
       </TableHead>
     );
-  };
+  }
 
-  const buildNFTTableRow = ({ collection, elementArray, type }) => {
+  function buildNFTTableRow({ collection, elementArray, type }) {
     return (
       <TableRow key={getUniqueKey()}>
         <TableCell
@@ -250,21 +240,16 @@ const My = ({
           }}
           colSpan={5}
         >
-          {/* TODO: Handle collapse later. */}
-          {/* <Collapse in={openRow} timeout="auto" unmountOnExit>
-          <Box> */}
-          <Table size="small" aria-label="purchases">
+          <Table size="small">
             {buildNFTTableRowHead({ collection, type })}
             {buildNFTTableRowBody({ elementArray, type })}
           </Table>
-          {/* </Box>
-          </Collapse> */}
         </TableCell>
       </TableRow>
     );
-  };
+  }
 
-  const buildCollectionTableRow = ({ collection }) => {
+  function buildCollectionTableRow({ collection }) {
     return (
       <TableRow
         sx={{
@@ -315,10 +300,10 @@ const My = ({
         </TableCell>
       </TableRow>
     );
-  };
+  }
 
-  const buildCollapseMyTable = ({ collection, elementArray, type }) => {
-    // 1. Check element length, if 0, don't show table.
+  function buildCollapseMyTable({ collection, elementArray, type }) {
+    // * Check element length, if 0, don't show table.
     if (elementArray.length == 0) {
       return (
         <TableBody key={getUniqueKey()}>
@@ -342,42 +327,40 @@ const My = ({
         {buildNFTTableRow({ collection, elementArray, type })}
       </TableBody>
     );
-  };
+  }
 
-  const buildNFTTable = () => {
+  function buildNFTTable() {
     return (
-      <TableContainer>
-        <Table aria-label="collapsible table">
-          {collectionArray.map((element) => {
-            let elementArray = [];
-            let type = MyMenu.own;
+      <Table>
+        {collectionArray.map((element) => {
+          let elementArray = [];
+          let type = MyMenu.own;
 
-            if (selectedItem === MyMenu.own) {
-              elementArray = inputMyRegisteredNFTArray.filter(
-                (nftElement) =>
-                  nftElement.nftAddress === element.collectionAddress
-              );
-              type = MyMenu.own;
-            } else {
-              elementArray = myRentNFTArray.filter(
-                (nftElement) =>
-                  nftElement.nftAddress === element.collectionAddress
-              );
-              type = MyMenu.rent;
-            }
+          if (selectedItem === MyMenu.own) {
+            elementArray = inputMyRegisteredNFTArray.filter(
+              (nftElement) =>
+                nftElement.nftAddress === element.collectionAddress
+            );
+            type = MyMenu.own;
+          } else {
+            elementArray = myRentNFTArray.filter(
+              (nftElement) =>
+                nftElement.nftAddress === element.collectionAddress
+            );
+            type = MyMenu.rent;
+          }
 
-            return buildCollapseMyTable({
-              collection: element,
-              elementArray: elementArray,
-              type: type,
-            });
-          })}
-        </Table>
-      </TableContainer>
+          return buildCollapseMyTable({
+            collection: element,
+            elementArray: elementArray,
+            type: type,
+          });
+        })}
+      </Table>
     );
-  };
+  }
 
-  const buildLeftMenu = () => {
+  function buildLeftMenu() {
     return (
       <List
         sx={{
@@ -402,6 +385,8 @@ const My = ({
               color: "yellow",
             },
           },
+          display: "flex",
+          flexDirection: "row",
         }}
       >
         <ListItem key="own" disablePadding>
@@ -426,7 +411,7 @@ const My = ({
         </ListItem>
       </List>
     );
-  };
+  }
 
   return (
     <div>
