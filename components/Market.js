@@ -413,14 +413,10 @@ const Market = ({
         display="flex"
         direction="column"
         justifyContent="flex-start"
-        alignItems="center"
+        alignItems="flex-start"
       >
-        <Grid item xs={1} sm={1} md={1} lg={1} xl={1}>
-          {buildCollectionMetadataCard()}
-        </Grid>
-        <Grid item xs={11} sm={11} md={11} lg={11} xl={11}>
-          {buildNFTDataTable()}
-        </Grid>
+        <Grid item>{buildCollectionMetadataCard()}</Grid>
+        <Grid item>{buildNFTDataTable()}</Grid>
       </Grid>
     );
   }
@@ -474,12 +470,8 @@ const Market = ({
         justifyContent="flex-start"
         alignItems="flex-start"
       >
-        <Grid item xs={2} sm={2} md={2} lg={2} xl={2}>
-          {buildCollectionList()}
-        </Grid>
-        <Grid item xs={10} sm={10} md={10} lg={10} xl={10}>
-          {buildCollectionDataTable()}
-        </Grid>
+        <Grid item>{buildCollectionList()}</Grid>
+        <Grid item>{buildCollectionDataTable()}</Grid>
       </Grid>
     );
   }
