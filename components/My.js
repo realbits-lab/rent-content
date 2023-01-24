@@ -31,6 +31,7 @@ import {
   RBSize,
   shortenAddress,
   getUniqueKey,
+  getChainName,
 } from "./RentContentUtil";
 
 const My = ({
@@ -438,6 +439,17 @@ const My = ({
   }
 
   function buildCollectionTableRow({ collection }) {
+    let openseaMode;
+    if (getChainName({ chainId: inputBlockchainNetwork }) === "matic") {
+      openseaMode = "opensea_matic";
+    } else if (
+      getChainName({ chainId: inputBlockchainNetwork }) === "maticmum"
+    ) {
+      openseaMode = "opensea_maticmum";
+    } else {
+      openseaMode = "";
+    }
+
     return (
       <TableRow
         sx={{
@@ -477,9 +489,23 @@ const My = ({
                   color="text.secondary"
                   component="div"
                 >
+                  OpenSea:{" "}
                   {shortenAddress({
                     address: collection.collectionAddress,
                     number: 5,
+                    withLink: openseaMode,
+                  })}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  component="div"
+                >
+                  PolygonScan :{" "}
+                  {shortenAddress({
+                    address: collection.collectionAddress,
+                    number: 5,
+                    withLink: "maticscan",
                   })}
                 </Typography>
               </CardContent>

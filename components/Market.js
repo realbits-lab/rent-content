@@ -249,26 +249,43 @@ const Market = ({
   function buildCollectionMetadataCard() {
     if (collectionArray.length === 0) {
       return (
-        <Card sx={{ display: "flex" }}>
-          <Skeleton
-            variant="rounded"
-            width={RBSize.double}
-            height={RBSize.double}
-          />
-          <CardContent>
-            <Typography component="div" variant="h6">
-              <Skeleton variant="rounded" width={200} height={10} />
-            </Typography>
-            <p />
-            <Typography>
-              <Skeleton variant="rounded" width={200} height={10} />
-            </Typography>
-            <p />
-            <Typography>
-              <Skeleton variant="rounded" width={200} height={10} />
-            </Typography>
-          </CardContent>
-        </Card>
+        <TableRow
+          sx={{
+            "& > *": { borderBottom: "unset" },
+          }}
+          key={getUniqueKey()}
+        >
+          <TableCell
+            style={{
+              paddingBottom: 0,
+              paddingTop: 0,
+              paddingRight: 0,
+              paddingLeft: 0,
+              borderBottom: 0,
+            }}
+          >
+            <Card sx={{ display: "flex" }}>
+              <Skeleton
+                variant="rounded"
+                width={RBSize.double}
+                height={RBSize.double}
+              />
+              <CardContent>
+                <Typography component="div" variant="h6">
+                  <Skeleton variant="rounded" width={200} height={10} />
+                </Typography>
+                <br />
+                <Typography>
+                  <Skeleton variant="rounded" width={200} height={10} />
+                </Typography>
+                <br />
+                <Typography>
+                  <Skeleton variant="rounded" width={200} height={10} />
+                </Typography>
+              </CardContent>
+            </Card>
+          </TableCell>
+        </TableRow>
       );
     }
 
@@ -287,35 +304,68 @@ const Market = ({
     }
 
     return (
-      <Card sx={{ display: "flex" }}>
-        <CardMedia component="img" sx={{ width: RBSize.double }} image={url} />
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <CardContent sx={{ flex: "1 0 auto" }}>
-            <Typography component="div" variant="h6">
-              {collectionName}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {collectionDescription}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              OpenSea:{" "}
-              {shortenAddress({
-                address: collectionAddress,
-                number: 5,
-                withLink: openseaMode,
-              })}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              PolygonScan :{" "}
-              {shortenAddress({
-                address: collectionAddress,
-                number: 5,
-                withLink: "maticscan",
-              })}
-            </Typography>
-          </CardContent>
-        </Box>
-      </Card>
+      <TableRow
+        sx={{
+          "& > *": { borderBottom: "unset" },
+        }}
+        key={getUniqueKey()}
+      >
+        <TableCell
+          style={{
+            paddingBottom: 0,
+            paddingTop: 0,
+            paddingRight: 0,
+            paddingLeft: 0,
+            borderBottom: 0,
+          }}
+        >
+          <Card sx={{ display: "flex" }}>
+            <CardMedia
+              component="img"
+              sx={{ width: RBSize.double }}
+              image={url}
+            />
+            <Box sx={{ display: "flex", flexDirection: "column" }}>
+              <CardContent sx={{ flex: "1 0 auto" }}>
+                <Typography component="div" variant="h6">
+                  {collectionName}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  component="div"
+                >
+                  {collectionDescription}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  component="div"
+                >
+                  OpenSea:{" "}
+                  {shortenAddress({
+                    address: collectionAddress,
+                    number: 5,
+                    withLink: openseaMode,
+                  })}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  component="div"
+                >
+                  PolygonScan :{" "}
+                  {shortenAddress({
+                    address: collectionAddress,
+                    number: 5,
+                    withLink: "maticscan",
+                  })}
+                </Typography>
+              </CardContent>
+            </Box>
+          </Card>
+        </TableCell>
+      </TableRow>
     );
   }
 
@@ -373,26 +423,9 @@ const Market = ({
     );
 
     return (
-      <Table spacing={0} size="small">
-        <TableBody key={getUniqueKey()} spacing={0}>
-          <TableRow
-            sx={{
-              "& > *": { borderBottom: "unset" },
-            }}
-            key={getUniqueKey()}
-          >
-            <TableCell
-              style={{
-                paddingBottom: 0,
-                paddingTop: 0,
-                paddingRight: 0,
-                paddingLeft: 0,
-                borderBottom: 0,
-              }}
-            >
-              {buildCollectionMetadataCard()}
-            </TableCell>
-          </TableRow>
+      <Table>
+        <TableBody key={getUniqueKey()}>
+          {buildCollectionMetadataCard()}
 
           <TableRow key={getUniqueKey()}>
             <TableCell
@@ -410,14 +443,16 @@ const Market = ({
                   </TableRow>
                 </TableHead>
 
-                {selectedRegisterNFTArray
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((element) => {
-                    // console.log("element: ", element);
-                    return buildRowList({
-                      element,
-                    });
-                  })}
+                <TableBody>
+                  {selectedRegisterNFTArray
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((element) => {
+                      // console.log("element: ", element);
+                      return buildRowList({
+                        element,
+                      });
+                    })}
+                </TableBody>
                 <TableFooter>
                   <TableRow>
                     <TablePageComponent
@@ -456,7 +491,6 @@ const Market = ({
                     />
                   </Tooltip>
                 </ListItemButton>
-                <p />
               </ListItem>
             );
           })
@@ -480,7 +514,6 @@ const Market = ({
         display="flex"
         direction="column"
         justifyContent="flex-start"
-        alignItems="flex-start"
       >
         <Grid item>{buildCollectionList()}</Grid>
         <Grid item>{buildNFTDataTable()}</Grid>
