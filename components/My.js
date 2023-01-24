@@ -306,8 +306,9 @@ const My = ({
     );
   }
 
-  function buildCollapseMyTable({ collection, elementArray, type }) {
+  function buildMyTable({ collection, elementArray, type }) {
     // * Check element length, if 0, don't show table.
+    // TODO: Discern loading or nothing.
     if (elementArray.length == 0) {
       return (
         <TableBody key={getUniqueKey()}>
@@ -333,7 +334,7 @@ const My = ({
     );
   }
 
-  function buildNFTTable() {
+  function buildNftTable() {
     return (
       <Table>
         {collectionArray.map((element) => {
@@ -354,7 +355,7 @@ const My = ({
             type = MyMenu.rent;
           }
 
-          return buildCollapseMyTable({
+          return buildMyTable({
             collection: element,
             elementArray: elementArray,
             type: type,
@@ -364,7 +365,7 @@ const My = ({
     );
   }
 
-  function buildLeftMenu() {
+  function buildTopMenu() {
     return (
       <List
         sx={{
@@ -424,8 +425,8 @@ const My = ({
         spacing={2}
         sx={{ display: "flex", flexDirection: "column" }}
       >
-        <Grid item>{buildLeftMenu()}</Grid>
-        <Grid item>{buildNFTTable()}</Grid>
+        <Grid item>{buildTopMenu()}</Grid>
+        <Grid item>{buildNftTable()}</Grid>
       </Grid>
 
       <RBSnackbar
