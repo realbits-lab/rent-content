@@ -427,12 +427,17 @@ const Content = ({
     return (
       <Table size="small" padding="none">
         <TableHead>
-          <TableRow key={getUniqueKey()}>
-            <TableCell
-              sx={{ fontSize: "12px" }}
-              align="center"
-              padding="normal"
-            >
+          <TableRow
+            key={getUniqueKey()}
+            sx={{
+              backgroundColor: "lightgrey",
+              borderBottom: "2px solid black",
+              "& th": {
+                fontSize: "12px",
+              },
+            }}
+          >
+            <TableCell align="center" padding="normal">
               image
             </TableCell>
             <TableCell align="center" padding="normal">

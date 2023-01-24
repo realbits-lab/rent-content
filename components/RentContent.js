@@ -51,7 +51,6 @@ const RENT_CONTENT_COMPONENT_DRAWER_WIDTH = 180;
 const Main = styled("main", {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
-  backgroundColor: "white",
   flexGrow: 1,
   padding: theme.spacing(1),
   marginLeft: `-${RENT_CONTENT_COMPONENT_DRAWER_WIDTH}px`,
@@ -399,11 +398,9 @@ const RentContent = ({
           {/* // * Market menu.                                             */}
           {/* // * ----------------------------------------------------------*/}
 
-          <p />
-          <Divider>
+          <Divider sx={{ margin: "5px" }}>
             <Chip label="User" />
           </Divider>
-          <p />
 
           {
             <ListItem key="Market" disablePadding>
@@ -438,11 +435,9 @@ const RentContent = ({
           {/* // * Content menu.                                             */}
           {/* // * ----------------------------------------------------------*/}
 
-          <p />
-          <Divider>
+          <Divider sx={{ margin: "5px" }}>
             <Chip label="Content" />
           </Divider>
-          <p />
 
           {
             <ListItem key="Content" disablePadding>
@@ -464,11 +459,9 @@ const RentContent = ({
           {/* // * Market menu.                                              */}
           {/* // * ----------------------------------------------------------*/}
 
-          <p />
-          <Divider>
+          <Divider sx={{ margin: "5px" }}>
             <Chip label="Market" />
           </Divider>
-          <p />
 
           {
             <ListItem key="Collection" disablePadding>
@@ -518,13 +511,11 @@ const RentContent = ({
           {/* // * Monitor menu.                                             */}
           {/* // * ----------------------------------------------------------*/}
 
-          <p />
-          <Divider>
+          <Divider sx={{ margin: "5px" }}>
             <Chip label="Monitor" />
           </Divider>
-          <p />
 
-          {
+          {/* {
             <ListItem key="Monitor-Token" disablePadding>
               <ListItemButton
                 selected={selectedIndex === MONITOR_TOKEN_MENU_INDEX}
@@ -538,7 +529,7 @@ const RentContent = ({
                 <ListItemText primary="Token" />
               </ListItemButton>
             </ListItem>
-          }
+          } */}
           {
             <ListItem key="Monitor-AccountBalance" disablePadding>
               <ListItemButton

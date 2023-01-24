@@ -236,44 +236,38 @@ const MonitorRentNft = ({
       {/* // * Show current all rent data.                                   */}
       {/* // * --------------------------------------------------------------*/}
 
-      <p />
-      <Divider>
+      <Divider sx={{ margin: "5px" }}>
         <Chip label="Current Rent Data" />
       </Divider>
-      <p />
 
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <Table size="small" sx={{ minWidth: 850 }}>
           <TableHead>
             <TableRow
               sx={{
-                backgroundColor: "grey",
+                backgroundColor: "lightgrey",
                 borderBottom: "2px solid black",
                 "& th": {
-                  fontSize: "0.8rem",
-                  color: "rgba(96, 96, 96)",
+                  fontSize: "10px",
                 },
               }}
             >
-              <TableCell align="right">NFT Address</TableCell>
-              <TableCell align="right">Token ID</TableCell>
-              <TableCell align="right">Rent Fee</TableCell>
-              <TableCell align="right">Fee Token Address</TableCell>
-              <TableCell align="right">Rent Fee by Token</TableCell>
-              <TableCell align="right">Is rent by Token</TableCell>
-              <TableCell align="right">Rent Duration</TableCell>
-              <TableCell align="right">Rent Start Block</TableCell>
-              <TableCell align="right">
-                Rent Remain Block
-                <br />
-                (start+duration-current)
-              </TableCell>
+              <TableCell align="center">NFT Address</TableCell>
+              <TableCell align="center">Token ID</TableCell>
+              <TableCell align="center">Rent Fee</TableCell>
+              <TableCell align="center">Fee Token Address</TableCell>
+              <TableCell align="center">Rent Fee by Token</TableCell>
+              <TableCell align="center">Is rent by Token</TableCell>
+              <TableCell align="center">Rent Duration</TableCell>
+              <TableCell align="center">Rent Start Timestamp</TableCell>
+              <TableCell align="center">Rent Remain Timestamp</TableCell>
               <TableCell align="right">Settle</TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
+
+          {/* <TableBody>
             {rentArray.map((row) => {
-              console.log("row: ", row);
+              // console.log("row: ", row);
               // struct rentData {
               //     address nftAddress;
               //     uint256 tokenId;
@@ -292,21 +286,12 @@ const MonitorRentNft = ({
               const currentTimeInSecond = Math.round(
                 new Date().getTime() / 1000
               );
-              // console.log("row.rentStartTimestamp: ", row.rentStartTimestamp);
-              // console.log(
-              //   "row.rentStartTimestamp.toNumber(): ",
-              //   row.rentStartTimestamp.toNumber()
-              // );
-              // console.log("row.rentDuration: ", row.rentDuration);
-              // console.log("currentTimeInSecond: ", currentTimeInSecond);
               const remainBlock = row.rentStartTimestamp
                 .add(row.rentDuration)
                 .sub(BigNumber.from(currentTimeInSecond))
                 .toNumber();
-              // console.log("remainBlock: ", remainBlock);
 
               // Make settle button.
-
               let disabledSettle = true;
               if (remainBlock < 0) {
                 // Make settle button enable.
@@ -348,8 +333,6 @@ const MonitorRentNft = ({
                   key={getUniqueKey()}
                   sx={{
                     "&:last-child td, &:last-child th": { border: 0 },
-                    // backgroundColor: "yellow",
-                    // borderBottom: "2px solid black",
                     "& td": {
                       fontSize: "0.7rem",
                       color: "rgba(96, 96, 96)",
@@ -386,94 +369,87 @@ const MonitorRentNft = ({
                 </TableRow>
               );
             })}
-          </TableBody>
+          </TableBody> */}
         </Table>
       </TableContainer>
 
-      {/*--------------------------------------------------------------------*/}
-      {/* 3. Show all rent event. */}
-      {/*--------------------------------------------------------------------*/}
-
-      <p />
-      <Divider>
+      {/* // * --------------------------------------------------------------*/}
+      {/* // * Show all rent event history.                                  */}
+      {/* // * --------------------------------------------------------------*/}
+      {/* <Divider sx={{ margin: "5px" }}>
         <Chip label="Rent Event History" />
       </Divider>
-      <p />
 
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: TABLE_MIN_WIDTH }} aria-label="simple table">
-          <TableHead>
-            <TableRow
-              sx={{
-                backgroundColor: "grey",
-                borderBottom: "2px solid black",
-                "& td": {
-                  fontSize: "0.8rem",
-                  color: "rgba(96, 96, 96)",
-                },
-              }}
-            >
-              <TableCell align="right">NFT Address</TableCell>
-              <TableCell align="right">Token ID</TableCell>
-              <TableCell align="right">Rent Fee</TableCell>
-              <TableCell align="right">Fee Token Address</TableCell>
-              <TableCell align="right">Rent Fee by Token</TableCell>
-              <TableCell align="right">Is rent by Token</TableCell>
-              <TableCell align="right">Rent Duration</TableCell>
-              <TableCell align="right">Renter Address</TableCell>
-              <TableCell align="right">Rentee Address</TableCell>
-              <TableCell align="right">Service Address</TableCell>
-              <TableCell align="right">rentStartTimestamp</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rentEventArray.map((row) => {
-              console.log("row: ", row);
-              return (
-                <TableRow
-                  key={row.key}
-                  sx={{
-                    "&:last-child td, &:last-child th": { border: 0 },
-                    // backgroundColor: "yellow",
-                    // borderBottom: "2px solid black",
-                    "& td": {
-                      fontSize: "0.7rem",
-                      color: "rgba(96, 96, 96)",
-                    },
-                  }}
-                >
-                  <TableCell align="right">
-                    {shortenAddress({ address: row.nftAddress, number: 2 })}
-                  </TableCell>
-                  <TableCell align="right">{row.tokenId}</TableCell>
-                  <TableCell align="right">{row.rentFee}</TableCell>
-                  <TableCell align="right">
-                    {shortenAddress({
-                      address: row.feeTokenAddress,
-                      number: 2,
-                    })}
-                  </TableCell>
-                  <TableCell align="right">{row.rentFeeByToken}</TableCell>
-                  <TableCell align="right">{row.isRentByToken}</TableCell>
-                  <TableCell align="right">{row.rentDuration}</TableCell>
-                  <TableCell align="right">
-                    {shortenAddress({ address: row.renterAddress, number: 2 })}
-                  </TableCell>
-                  <TableCell align="right">
-                    {shortenAddress({ address: row.renteeAddress, number: 2 })}
-                  </TableCell>
-                  <TableCell align="right">
-                    {shortenAddress({ address: row.serviceAddress, number: 2 })}
-                  </TableCell>
-                  <TableCell align="right">
-                    {row.rentStartTimestamp.toString()}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Table>
+        <TableHead>
+          <TableRow
+            sx={{
+              backgroundColor: "lightgrey",
+              borderBottom: "2px solid black",
+            }}
+          >
+            <TableCell align="right" fontSize="10pt">
+              NFT Address
+            </TableCell>
+            <TableCell align="right">Token ID</TableCell>
+            <TableCell align="right">Rent Fee</TableCell>
+            <TableCell align="right">Fee Token Address</TableCell>
+            <TableCell align="right">Rent Fee by Token</TableCell>
+            <TableCell align="right">Is rent by Token</TableCell>
+            <TableCell align="right">Rent Duration</TableCell>
+            <TableCell align="right">Renter Address</TableCell>
+            <TableCell align="right">Rentee Address</TableCell>
+            <TableCell align="right">Service Address</TableCell>
+            <TableCell align="right">rentStartTimestamp</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rentEventArray.map((row) => {
+            // console.log("row: ", row);
+            return (
+              <TableRow
+                key={row.key}
+                sx={{
+                  "&:last-child td, &:last-child th": { border: 0 },
+                  // backgroundColor: "yellow",
+                  // borderBottom: "2px solid black",
+                  "& td": {
+                    fontSize: "0.7rem",
+                    color: "rgba(96, 96, 96)",
+                  },
+                }}
+              >
+                <TableCell align="right">
+                  {shortenAddress({ address: row.nftAddress, number: 2 })}
+                </TableCell>
+                <TableCell align="right">{row.tokenId}</TableCell>
+                <TableCell align="right">{row.rentFee}</TableCell>
+                <TableCell align="right">
+                  {shortenAddress({
+                    address: row.feeTokenAddress,
+                    number: 2,
+                  })}
+                </TableCell>
+                <TableCell align="right">{row.rentFeeByToken}</TableCell>
+                <TableCell align="right">{row.isRentByToken}</TableCell>
+                <TableCell align="right">{row.rentDuration}</TableCell>
+                <TableCell align="right">
+                  {shortenAddress({ address: row.renterAddress, number: 2 })}
+                </TableCell>
+                <TableCell align="right">
+                  {shortenAddress({ address: row.renteeAddress, number: 2 })}
+                </TableCell>
+                <TableCell align="right">
+                  {shortenAddress({ address: row.serviceAddress, number: 2 })}
+                </TableCell>
+                <TableCell align="right">
+                  {row.rentStartTimestamp.toString()}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table> */}
     </div>
   );
 };
