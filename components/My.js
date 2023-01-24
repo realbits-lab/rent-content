@@ -139,22 +139,28 @@ const My = ({
           const rentStartTimestamp = element.rentStartTimestamp
             ? element.rentStartTimestamp.toNumber()
             : 0;
-          // TODO: Fix timestamp calcultation.
-          // console.log("currentBlockNumber: ", currentBlockNumber);
-          // console.log(
-          //   "element.rentStartTimestamp: ",
-          //   element.rentStartTimestamp
-          // );
-          // console.log("rentStartTimestamp: ", rentStartTimestamp);
-          // console.log(
-          //   "element.rentDuration: ",
-          //   element.rentDuration
-          // );
-          const currentTimeInSecond = new Date().getTime() / 1000;
-          const remainTimestamp =
-            rentStartTimestamp +
-            parseInt(element.rentDuration) -
-            currentTimeInSecond;
+
+          // * Get rent duration display string for own case.
+          const durationTimestampDisplay = `${moment
+            .unix(element.rentDuration.toNumber())
+            .diff(0, "days", true)} day`;
+          // console.log("durationTimestampDisplay: ", durationTimestampDisplay);
+
+          // * Get end rent time display string for rent case.
+          const endRentTimestamp =
+            rentStartTimestamp + element.rentDuration.toNumber();
+          // console.log("endRentTimestamp: ", endRentTimestamp);
+          const currentTimestamp = new Date().getTime() / 1000;
+          let endRentTimestampDisplay;
+          if (currentTimestamp >= endRentTimestamp) {
+            endRentTimestampDisplay = "finished";
+          } else {
+            endRentTimestampDisplay = moment
+              .unix(endRentTimestamp)
+              .fromNow(true);
+          }
+          // console.log("currentTimestamp: ", currentTimestamp);
+          // console.log("endRentTimestampDisplay: ", endRentTimestampDisplay);
 
           return (
             <TableRow
@@ -204,8 +210,8 @@ const My = ({
               </TableCell>
               <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
                 {type === MyMenu.own
-                  ? element.rentDuration.toNumber()
-                  : remainTimestamp}
+                  ? durationTimestampDisplay
+                  : endRentTimestampDisplay}
               </TableCell>
             </TableRow>
           );
@@ -221,9 +227,7 @@ const My = ({
           <TableCell align="center">Avatar</TableCell>
           <TableCell align="center">Name</TableCell>
           <TableCell align="center">Fee</TableCell>
-          <TableCell align="center">
-            {type === MyMenu.own ? "Duration" : "Remain"}
-          </TableCell>
+          <TableCell align="center">Duration</TableCell>
         </TableRow>
       </TableHead>
     );
