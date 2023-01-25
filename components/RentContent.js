@@ -144,14 +144,13 @@ const RentContent = ({
 
   // * -------------------------------------------------------------------------
   // * Data list.
+  // * Undefined varialbe means loading status.
   // * -------------------------------------------------------------------------
-  const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState([]);
-  const [myUnregisteredNFTArray, setMyUnregisteredNFTArray] = React.useState(
-    []
-  );
-  const [collectionArray, setCollectionArray] = React.useState([]);
-  const [serviceArray, setServiceArray] = React.useState([]);
-  const [tokenArray, setTokenArray] = React.useState([]);
+  const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState();
+  const [myUnregisteredNFTArray, setMyUnregisteredNFTArray] = React.useState();
+  const [collectionArray, setCollectionArray] = React.useState();
+  const [serviceArray, setServiceArray] = React.useState();
+  const [tokenArray, setTokenArray] = React.useState();
   const [inputRentMarket, setInputRentMarket] = React.useState();
   const isMobileRef = React.useRef(false);
 

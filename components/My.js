@@ -11,6 +11,7 @@ import Typography from "@mui/material/Typography";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
+import CircularProgress from "@mui/material/CircularProgress";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -539,25 +540,6 @@ const My = ({
     // console.log("collection: ", collection);
     // console.log("elementArray: ", elementArray);
 
-    // * Check element length, if 0, don't show table.
-    // TODO: Discern loading or nothing.
-    if (elementArray.length == 0) {
-      return (
-        <TableBody key={getUniqueKey()}>
-          <TableRow
-            sx={{ "& > *": { borderBottom: "unset" } }}
-            key={getUniqueKey()}
-          >
-            <TableCell sx={{ borderBottom: 0 }}>
-              <Typography component="div" variant="body1">
-                You do not have any contents.
-              </Typography>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      );
-    }
-
     return (
       <TableBody key={getUniqueKey()}>
         {buildCollectionTableRow({ collection })}
@@ -569,20 +551,55 @@ const My = ({
   function buildNftTable() {
     // console.log("call buildNftTable()");
     // console.log("collectionArray: ", collectionArray);
-
-    // TODO: Change loading process bar later.
+    // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
+    // console.log("myRentNFTArray: ", myRentNFTArray);
     // console.log("selectedChain: ", selectedChain);
     // console.log("selectedChain.network: ", selectedChain.network);
     // console.log(
     //   "getChainName({ chainId: inputBlockchainNetwork }): ",
     //   getChainName({ chainId: inputBlockchainNetwork })
     // );
+
     if (
       selectedChain.network ===
-        getChainName({ chainId: inputBlockchainNetwork }) &&
-      collectionArray.length === 0
+      getChainName({ chainId: inputBlockchainNetwork })
     ) {
-      return <Typography>loading...</Typography>;
+      if (
+        selectedItem === MyMenu.own &&
+        inputMyRegisteredNFTArray === undefined
+      ) {
+        console.log("own loading...");
+        return (
+          <Box
+            sx={{
+              marginTop: "20px",
+              display: "flex",
+              width: "100vw",
+              height: "100vh",
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        );
+      } else if (selectedItem === MyMenu.rent && myRentNFTArray === undefined) {
+        console.log("rent loading...");
+        return (
+          <Box
+            sx={{
+              marginTop: "20px",
+              display: "flex",
+              width: "100vw",
+              height: "100vh",
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        );
+      }
     }
 
     return (
