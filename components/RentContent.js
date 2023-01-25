@@ -195,8 +195,8 @@ const RentContent = ({
   const readToastMessageLoadable = useRecoilValueLoadable(
     readToastMessageState
   );
-  const readToastMessage = React.useMemo(() => {
-    return readToastMessageLoadable?.state === "hasValue"
+  const readToastMessage =
+    readToastMessageLoadable?.state === "hasValue"
       ? readToastMessageLoadable.contents
       : {
           snackbarSeverity: AlertSeverity.info,
@@ -204,7 +204,6 @@ const RentContent = ({
           snackbarTime: new Date(),
           snackbarOpen: true,
         };
-  });
 
   // * Initialize data.
   React.useEffect(() => {
