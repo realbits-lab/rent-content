@@ -1,5 +1,6 @@
 import React from "react";
 import WalletConnectProvider from "@walletconnect/web3-provider";
+import { isMobile, getUA } from "react-device-detect";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -769,13 +770,16 @@ const Content = ({
                 // console.log("inputRentDuration: ", inputRentDuration);
 
                 //  * Create WalletConnect Provider
-                const provider = new WalletConnectProvider({
-                  // * Required.
-                  infuraId: "27e484dcd9e3efcfd25a83a78777cdf1",
-                });
+                let provider;
+                if (isMobile && getUA.includes("MetaMaskMobile") === false) {
+                  provider = new WalletConnectProvider({
+                    // * Required.
+                    infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
+                  });
 
-                //  * Enable session (triggers QR Code modal)
-                await provider.enable();
+                  //  * Enable session (triggers QR Code modal)
+                  await provider.enable();
+                }
 
                 // * rent fee and rent fee by token should be an ether unit expression.
                 await rentMarketRef.current.changeNFT({
