@@ -1,7 +1,30 @@
 import React from "react";
 import moment from "moment";
+import {
+  browserName,
+  isBrowser,
+  isDesktop,
+  isMobile,
+  osVersion,
+  osName,
+  mobileVendor,
+  mobileModel,
+  engineName,
+  engineVersion,
+  getUA,
+} from "react-device-detect";
+import {
+  EthereumClient,
+  modalConnectors,
+  walletConnectProvider,
+} from "@web3modal/ethereum";
+import { Web3Modal } from "@web3modal/react";
+import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { polygon, polygonMumbai } from "wagmi/chains";
 import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
@@ -44,6 +67,8 @@ const My = ({
   inputBlockchainNetwork,
 }) => {
   const theme = useTheme();
+  const METAMASK_DAPP_URL =
+    "https://metamask.app.link/dapp/e499-182-222-13-78.jp.ngrok.io";
 
   // * -------------------------------------------------------------------------
   // * Define copied local varialbe from input data.
@@ -523,6 +548,9 @@ const My = ({
   }
 
   function buildMyTable({ collection, elementArray, type }) {
+    // console.log("call buildNftTable()");
+    // console.log("elementArray: ", elementArray);
+
     // * Check element length, if 0, don't show table.
     // TODO: Discern loading or nothing.
     if (elementArray.length == 0) {
@@ -551,6 +579,24 @@ const My = ({
   }
 
   function buildNftTable() {
+    // console.log("call buildNftTable()");
+    // console.log("collectionArray: ", collectionArray);
+    // console.log("getUA: ", getUA);
+
+    // * Show connect mobile metamask message button.
+    if (isMobile && getUA.includes("MetaMaskMobile") === false) {
+      return (
+        <Button>
+          <Link href={METAMASK_DAPP_URL}>Connect metamask wallet</Link>
+        </Button>
+      );
+    }
+
+    // TODO: Change loading process bar later.
+    if (collectionArray.length === 0) {
+      return <Typography>loading...</Typography>;
+    }
+
     return (
       <Table>
         {collectionArray.map((element) => {
@@ -634,8 +680,29 @@ const My = ({
     );
   }
 
+  const chains = [polygon, polygonMumbai];
+
+  // * Wagmi client
+  const { provider } = configureChains(chains, [
+    walletConnectProvider({
+      projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
+    }),
+  ]);
+  const wagmiClient = createClient({
+    autoConnect: true,
+    connectors: modalConnectors({ appName: "web3Modal", chains }),
+    provider,
+  });
+
+  // * Web3Modal Ethereum Client
+  const ethereumClient = new EthereumClient(wagmiClient, chains);
+
   return (
     <div>
+      <Web3Modal
+        projectId={process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID}
+        ethereumClient={ethereumClient}
+      />
       <Grid
         container
         spacing={2}
@@ -644,7 +711,6 @@ const My = ({
         <Grid item>{buildTopMenu()}</Grid>
         <Grid item>{buildNftTable()}</Grid>
       </Grid>
-
       <RBSnackbar
         open={snackbarOpen}
         message={snackbarMessage}
