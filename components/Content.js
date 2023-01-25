@@ -1,13 +1,6 @@
 import React from "react";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import {
-  useContract,
-  useProvider,
-  useSigner,
-  useContractWrite,
-  usePrepareContractWrite,
-} from "wagmi";
-import Web3Modal from "web3modal";
+import { useProvider, useSigner } from "wagmi";
 import { isMobile, getUA } from "react-device-detect";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
