@@ -1,28 +1,22 @@
 import React from "react";
-import { ethers } from "ethers";
-import { Network, Alchemy } from "alchemy-sdk";
-import keccak256 from "keccak256";
 import { Buffer } from "buffer";
-import moment from "moment";
-import {
-  Divider,
-  Chip,
-  Link,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-} from "@mui/material";
+import Divider from "@mui/material/Divider";
+import Chip from "@mui/material/Chip";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useRecoilStateLoadable } from "recoil";
 import {
   shortenAddress,
   getUniqueKey,
   AlertSeverity,
   writeToastMessageState,
-  getChainName,
 } from "./RentContentUtil";
 
 // https://docs.alchemy.com/docs/deep-dive-into-eth_getlogs
@@ -31,33 +25,17 @@ const MonitorPendingRentFee = ({
   rentMarketAddress,
   inputBlockchainNetwork,
 }) => {
-  //----------------------------------------------------------------------------
-  // Define constant varialbe.
-  //----------------------------------------------------------------------------
-  const TABLE_MIN_WIDTH = 400;
-
-  //----------------------------------------------------------------------------
-  // Define rent market class.
-  //----------------------------------------------------------------------------
+  // * Define rent market class.
   const rentMarket = React.useRef();
-  const [pendingRentFeeArray, setPendingRentFeeArray] = React.useState([]);
-
-  //----------------------------------------------------------------------------
-  // Define alchemy configuration.
-  //----------------------------------------------------------------------------
-  const settings = {
-    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
-    network: Network.MATIC_MUMBAI,
-  };
-  const alchemy = new Alchemy(settings);
+  const [pendingRentFeeArray, setPendingRentFeeArray] = React.useState();
 
   //----------------------------------------------------------------------------
   // Handle toast message.
   //----------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
-  const writeToastMessage = React.useMemo(() => {
-    return writeToastMessageLoadable?.state === "hasValue"
+  const writeToastMessage =
+    writeToastMessageLoadable?.state === "hasValue"
       ? writeToastMessageLoadable.contents
       : {
           snackbarSeverity: AlertSeverity.info,
@@ -65,65 +43,102 @@ const MonitorPendingRentFee = ({
           snackbarTime: new Date(),
           snackbarOpen: true,
         };
-  });
 
-  React.useEffect(() => {
-    // struct pendingRentFee {
-    //     address renterAddress;
-    //     address serviceAddress;
-    //     address feeTokenAddress;
-    //     uint256 amount;
-    // }
-    window.Buffer = window.Buffer || Buffer;
-
+  async function initializeRentMarket() {
     if (
       inputRentMarket !== undefined &&
       inputRentMarket.rentMarketContract !== undefined
     ) {
       // console.log("inputRentMarket: ", inputRentMarket);
       rentMarket.current = inputRentMarket;
-      rentMarket.current.getAllPendingRentFee().then(
-        (resultPendingRentFeeArray) =>
-          setPendingRentFeeArray(resultPendingRentFeeArray),
-        (error) => {
-          // console.log("getAllAccountBalance error: ", error);
-          setWriteToastMessage({
-            snackbarSeverity: AlertSeverity.error,
-            snackbarMessage: error?.message,
-            snackbarTime: new Date(),
-            snackbarOpen: true,
-          });
-        }
-      );
+
+      // struct pendingRentFee {
+      //     address renterAddress;
+      //     address serviceAddress;
+      //     address feeTokenAddress;
+      //     uint256 amount;
+      // }
+      try {
+        const resultPendingRentFeeArray =
+          await rentMarket.current.getAllPendingRentFee();
+        setPendingRentFeeArray((prevState) => resultPendingRentFeeArray);
+      } catch (error) {
+        setWriteToastMessage({
+          snackbarSeverity: AlertSeverity.error,
+          snackbarMessage: error?.message,
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        });
+      }
     } else {
-      const chainName = getChainName({ chainId: inputBlockchainNetwork });
       setWriteToastMessage({
-        snackbarSeverity: AlertSeverity.error,
-        snackbarMessage: `Metamask is not connect or not connected to ${chainName}.`,
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage: "Getting rent market contract.",
         snackbarTime: new Date(),
         snackbarOpen: true,
       });
     }
-  }, [inputRentMarket]);
+  }
+
+  React.useEffect(() => {
+    window.Buffer = window.Buffer || Buffer;
+    async function initialize() {
+      initializeRentMarket();
+    }
+    initialize();
+  }, [
+    inputRentMarket,
+    inputRentMarket.rentMarketContract,
+    rentMarketAddress,
+    inputBlockchainNetwork,
+  ]);
+
+  if (pendingRentFeeArray === undefined) {
+    return (
+      <div>
+        <Divider sx={{ margin: "5px" }}>
+          <Chip label="Pending Rent Fee Data" />
+        </Divider>
+
+        <Box
+          sx={{
+            marginTop: "20px",
+            display: "flex",
+            width: "100vw",
+            height: "100vh",
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      </div>
+    );
+  }
 
   return (
     <div>
-      {/*--------------------------------------------------------------------*/}
-      {/* 1. Show current all pending rent fee data. */}
-      {/*--------------------------------------------------------------------*/}
-
-      <p />
-      <Divider>
+      {/* // * --------------------------------------------------------------*/}
+      {/* // * Show current all pending rent fee data.                       */}
+      {/* // * --------------------------------------------------------------*/}
+      <Divider sx={{ margin: "5px" }}>
         <Chip label="Pending Rent Fee Data" />
       </Divider>
-      <p />
 
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: TABLE_MIN_WIDTH }} aria-label="simple table">
+        <Table
+          size="small"
+          sx={{
+            width: "max-content",
+          }}
+        >
+          {/* // * ----------------------------------------------------------*/}
+          {/* // * Current pending data table head.                          */}
+          {/* // * ----------------------------------------------------------*/}
           <TableHead>
             <TableRow
               sx={{
-                backgroundColor: "grey",
+                backgroundColor: "lightgrey",
                 borderBottom: "2px solid black",
                 "& td": {
                   fontSize: "0.8rem",
@@ -137,36 +152,44 @@ const MonitorPendingRentFee = ({
               <TableCell align="right">Amount</TableCell>
             </TableRow>
           </TableHead>
+
+          {/* // * ----------------------------------------------------------*/}
+          {/* // * Current pending data table body.                          */}
+          {/* // * ----------------------------------------------------------*/}
           <TableBody>
-            {pendingRentFeeArray.map((row) => {
-              // console.log("row: ", row);
+            {pendingRentFeeArray.map((data) => {
+              // console.log("data: ", data);
+
               return (
                 <TableRow
                   key={getUniqueKey()}
                   sx={{
                     "&:last-child td, &:last-child th": { border: 0 },
-                    // backgroundColor: "yellow",
-                    // borderBottom: "2px solid black",
-                    "& td": {
-                      fontSize: "0.7rem",
-                      color: "rgba(96, 96, 96)",
-                    },
                   }}
                 >
-                  <TableCell align="right">
-                    {shortenAddress({ address: row.renterAddress, number: 4 })}
-                  </TableCell>
-                  <TableCell align="right">
-                    {shortenAddress({ address: row.serviceAddress, number: 4 })}
-                  </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="center">
                     {shortenAddress({
-                      address: row.feeTokenAddress,
+                      address: data.renterAddress,
                       number: 4,
+                      withLink: "scan",
                     })}
                   </TableCell>
-                  <TableCell align="right">
-                    {row.amount / Math.pow(10, 18)}
+                  <TableCell align="center">
+                    {shortenAddress({
+                      address: data.serviceAddress,
+                      number: 4,
+                      withLink: "scan",
+                    })}
+                  </TableCell>
+                  <TableCell align="center">
+                    {shortenAddress({
+                      address: data.feeTokenAddress,
+                      number: 4,
+                      withLink: "scan",
+                    })}
+                  </TableCell>
+                  <TableCell align="center">
+                    {data.amount / Math.pow(10, 18)}
                   </TableCell>
                 </TableRow>
               );

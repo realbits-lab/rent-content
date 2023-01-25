@@ -1,7 +1,10 @@
 import React from "react";
+import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
+import { useAccount, useEnsName } from "wagmi";
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
@@ -106,10 +109,17 @@ const RentContent = ({
   blockchainNetwork,
   serviceAddress,
 }) => {
+  const { address, isConnected } = useAccount();
+  // console.log("address: ", address);
+  // console.log("isConnected: ", isConnected);
+
+  // const { data: ensName } = useEnsName({ address });
+  // console.log("ensName: ", ensName);
+
   // * -------------------------------------------------------------------------
   // * Define each menu index.
   // * -------------------------------------------------------------------------
-  const DEFAULT_MENU_INDEX = 9;
+  const DEFAULT_MENU_INDEX = 2;
 
   const CONTENT_MENU_INDEX = 0;
   const MY_MENU_INDEX = 1;
@@ -134,14 +144,13 @@ const RentContent = ({
 
   // * -------------------------------------------------------------------------
   // * Data list.
+  // * Undefined varialbe means loading status.
   // * -------------------------------------------------------------------------
-  const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState([]);
-  const [myUnregisteredNFTArray, setMyUnregisteredNFTArray] = React.useState(
-    []
-  );
-  const [collectionArray, setCollectionArray] = React.useState([]);
-  const [serviceArray, setServiceArray] = React.useState([]);
-  const [tokenArray, setTokenArray] = React.useState([]);
+  const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState();
+  const [myUnregisteredNFTArray, setMyUnregisteredNFTArray] = React.useState();
+  const [collectionArray, setCollectionArray] = React.useState();
+  const [serviceArray, setServiceArray] = React.useState();
+  const [tokenArray, setTokenArray] = React.useState();
   const [inputRentMarket, setInputRentMarket] = React.useState();
   const isMobileRef = React.useRef(false);
 
@@ -181,8 +190,8 @@ const RentContent = ({
   // * -------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
-  const writeToastMessage = React.useMemo(() => {
-    return writeToastMessageLoadable?.state === "hasValue"
+  const writeToastMessage =
+    writeToastMessageLoadable?.state === "hasValue"
       ? writeToastMessageLoadable.contents
       : {
           snackbarSeverity: AlertSeverity.info,
@@ -190,13 +199,12 @@ const RentContent = ({
           snackbarTime: new Date(),
           snackbarOpen: true,
         };
-  });
 
   const readToastMessageLoadable = useRecoilValueLoadable(
     readToastMessageState
   );
-  const readToastMessage = React.useMemo(() => {
-    return readToastMessageLoadable?.state === "hasValue"
+  const readToastMessage =
+    readToastMessageLoadable?.state === "hasValue"
       ? readToastMessageLoadable.contents
       : {
           snackbarSeverity: AlertSeverity.info,
@@ -204,11 +212,10 @@ const RentContent = ({
           snackbarTime: new Date(),
           snackbarOpen: true,
         };
-  });
 
   // * Initialize data.
   React.useEffect(() => {
-    // console.log("call React.useEffect()");
+    // console.log("call useEffect()");
     // console.log("rentMarketAddress: ", rentMarketAddress);
     // console.log("testNftAddress: ", testNftAddress);
     // console.log("blockchainNetwork: ", blockchainNetwork);
@@ -218,6 +225,7 @@ const RentContent = ({
       // console.log("call initRentMarket()");
 
       rentMarketClassRef.current = new RentMarket({
+        accountAddress: address,
         rentMarketAddress,
         testNftAddress,
         blockchainNetwork,
@@ -225,6 +233,11 @@ const RentContent = ({
         onErrorFunc,
       });
       // console.log("rentMarketClassRef.current: ", rentMarketClassRef.current);
+
+      // * Set inputRentMarket for updating component which uses rentMarket.
+      // * For calling function of rentMarket contract.
+      // console.log("call setInputRentMarket()");
+      setInputRentMarket(rentMarketClassRef.current);
 
       // console.log("call rentMarketClassRef.current.initializeAll()");
       try {
@@ -239,11 +252,6 @@ const RentContent = ({
           snackbarOpen: true,
         });
       }
-
-      // * Set inputRentMarket for updating component which uses rentMarket.
-      // * For calling function of rentMarket contract.
-      // console.log("call setInputRentMarket()");
-      setInputRentMarket(rentMarketClassRef.current);
 
       // * Close drawer in mobile browser.
       isMobileRef.current = checkMobile();
@@ -260,9 +268,7 @@ const RentContent = ({
     initRentMarket().catch(console.error);
   }, [rentMarketAddress, testNftAddress, blockchainNetwork, serviceAddress]);
 
-  function onErrorFunc(
-    { severity, message } = { severity: AlertSeverity.error, message: "" }
-  ) {
+  function onErrorFunc({ severity = AlertSeverity.error, message = "" }) {
     setWriteToastMessage({
       snackbarSeverity: severity,
       snackbarMessage: message,
@@ -588,6 +594,14 @@ const RentContent = ({
       {/* // * --------------------------------------------------------------*/}
       <Main open={openDrawer}>
         <DrawerHeader />
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <Web3Button />
+          </Grid>
+          <Grid item xs={6}>
+            <Web3NetworkSwitch />
+          </Grid>
+        </Grid>
         {selectedIndex === MARKET_MENU_INDEX ? (
           inputRentMarket && (
             <Market

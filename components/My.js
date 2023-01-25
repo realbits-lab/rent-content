@@ -1,5 +1,6 @@
 import React from "react";
 import moment from "moment";
+import { useWeb3ModalNetwork } from "@web3modal/react";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -10,6 +11,7 @@ import Typography from "@mui/material/Typography";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
+import CircularProgress from "@mui/material/CircularProgress";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -23,15 +25,16 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import { useRecoilStateLoadable } from "recoil";
 import {
   changeIPFSToGateway,
   MyMenu,
   AlertSeverity,
-  RBSnackbar,
   RBSize,
   shortenAddress,
   getUniqueKey,
   getChainName,
+  writeToastMessageState,
 } from "./RentContentUtil";
 
 const My = ({
@@ -43,7 +46,12 @@ const My = ({
   inputMyRentNFTArray,
   inputBlockchainNetwork,
 }) => {
+  // * -------------------------------------------------------------------------
+  // * Hook variables.
+  // * -------------------------------------------------------------------------
   const theme = useTheme();
+  const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
+  // console.log("selectedChain: ", selectedChain);
 
   // * -------------------------------------------------------------------------
   // * Define copied local varialbe from input data.
@@ -83,14 +91,17 @@ const My = ({
   // * -------------------------------------------------------------------------
   // * Handle toast mesage.
   // * -------------------------------------------------------------------------
-  const [snackbarValue, setSnackbarValue] = React.useState({
-    snackbarSeverity: AlertSeverity.info,
-    snackbarMessage: "",
-    snackbarTime: new Date(),
-    snackbarOpen: true,
-  });
-  const { snackbarSeverity, snackbarMessage, snackbarTime, snackbarOpen } =
-    snackbarValue;
+  const [writeToastMessageLoadable, setWriteToastMessage] =
+    useRecoilStateLoadable(writeToastMessageState);
+  const writeToastMessage =
+    writeToastMessageLoadable?.state === "hasValue"
+      ? writeToastMessageLoadable.contents
+      : {
+          snackbarSeverity: AlertSeverity.info,
+          snackbarMessage: "",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        };
 
   // * -------------------------------------------------------------------------
   // * Table pagination data.
@@ -102,7 +113,7 @@ const My = ({
   // * Initialize data.
   // * -------------------------------------------------------------------------
   React.useEffect(() => {
-    // console.log("call React.useEffect() with condition");
+    // console.log("call React.useEffect()");
     // console.log("inputRentMarket: ", inputRentMarket);
     // console.log("inputCollectionArray: ", inputCollectionArray);
     // console.log("inputServiceAddress: ", inputServiceAddress);
@@ -114,22 +125,27 @@ const My = ({
       setMyRentNFTArray(inputMyRentNFTArray);
       rentMarketRef.current = inputRentMarket;
     }
+
     if (Array.isArray(inputCollectionArray) === true) {
       // TODO: Handle the collection.metadata undefined case.
       setCollectionArray(inputCollectionArray);
     }
+
     if (
       typeof inputServiceAddress === "string" ||
       inputServiceAddress instanceof String
     ) {
       setServiceAddress(inputServiceAddress);
     }
+
     if (Array.isArray(inputMyRegisteredNFTArray) === true) {
       setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
     }
+
     if (Array.isArray(inputMyRentNFTArray) === true) {
       setMyRentNFTArray(inputMyRentNFTArray);
     }
+
     if (
       typeof inputBlockchainNetwork === "string" ||
       inputBlockchainNetwork instanceof String
@@ -160,14 +176,14 @@ const My = ({
   }, [
     selectAvatarFunc,
     inputRentMarket,
+    inputRentMarket.rentMarketContract,
     inputCollectionArray,
     inputServiceAddress,
     inputMyRegisteredNFTArray,
     inputMyRentNFTArray,
     inputBlockchainNetwork,
+    selectedChain,
   ]);
-
-  function initializePagination() {}
 
   function buildNftTableRowBody({ elementArray, type }) {
     // console.log("call buildNftTableRowBody()");
@@ -221,7 +237,7 @@ const My = ({
                     selectAvatarFunc(element);
                   }
 
-                  setSnackbarValue({
+                  setWriteToastMessage({
                     snackbarSeverity: AlertSeverity.info,
                     snackbarMessage: `You select ${
                       element.metadata ? element.metadata.name : "..."
@@ -439,6 +455,9 @@ const My = ({
   }
 
   function buildCollectionTableRow({ collection }) {
+    // console.log("call buildCollectionTableRow()");
+    // console.log("collection: ", collection);
+
     let openseaMode;
     if (getChainName({ chainId: inputBlockchainNetwork }) === "matic") {
       openseaMode = "opensea_matic";
@@ -517,24 +536,9 @@ const My = ({
   }
 
   function buildMyTable({ collection, elementArray, type }) {
-    // * Check element length, if 0, don't show table.
-    // TODO: Discern loading or nothing.
-    if (elementArray.length == 0) {
-      return (
-        <TableBody key={getUniqueKey()}>
-          <TableRow
-            sx={{ "& > *": { borderBottom: "unset" } }}
-            key={getUniqueKey()}
-          >
-            <TableCell sx={{ borderBottom: 0 }}>
-              <Typography component="div" variant="body1">
-                You do not have any contents.
-              </Typography>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      );
-    }
+    // console.log("call buildNftTable()");
+    // console.log("collection: ", collection);
+    // console.log("elementArray: ", elementArray);
 
     return (
       <TableBody key={getUniqueKey()}>
@@ -545,6 +549,59 @@ const My = ({
   }
 
   function buildNftTable() {
+    // console.log("call buildNftTable()");
+    // console.log("collectionArray: ", collectionArray);
+    // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
+    // console.log("myRentNFTArray: ", myRentNFTArray);
+    // console.log("selectedChain: ", selectedChain);
+    // console.log("selectedChain.network: ", selectedChain.network);
+    // console.log(
+    //   "getChainName({ chainId: inputBlockchainNetwork }): ",
+    //   getChainName({ chainId: inputBlockchainNetwork })
+    // );
+
+    if (
+      selectedChain.network ===
+      getChainName({ chainId: inputBlockchainNetwork })
+    ) {
+      if (
+        selectedItem === MyMenu.own &&
+        inputMyRegisteredNFTArray === undefined
+      ) {
+        console.log("own loading...");
+        return (
+          <Box
+            sx={{
+              marginTop: "20px",
+              display: "flex",
+              width: "100vw",
+              height: "100vh",
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        );
+      } else if (selectedItem === MyMenu.rent && myRentNFTArray === undefined) {
+        console.log("rent loading...");
+        return (
+          <Box
+            sx={{
+              marginTop: "20px",
+              display: "flex",
+              width: "100vw",
+              height: "100vh",
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        );
+      }
+    }
+
     return (
       <Table>
         {collectionArray.map((element) => {
@@ -638,13 +695,6 @@ const My = ({
         <Grid item>{buildTopMenu()}</Grid>
         <Grid item>{buildNftTable()}</Grid>
       </Grid>
-
-      <RBSnackbar
-        open={snackbarOpen}
-        message={snackbarMessage}
-        severity={snackbarSeverity}
-        currentTime={snackbarTime}
-      />
     </div>
   );
 };

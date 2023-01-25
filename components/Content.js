@@ -1,7 +1,10 @@
 import React from "react";
+import WalletConnectProvider from "@walletconnect/web3-provider";
+import { isMobile } from "react-device-detect";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
+import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -31,15 +34,16 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
+import { useRecoilStateLoadable } from "recoil";
 import {
   changeIPFSToGateway,
-  AlertSeverity,
-  RBSnackbar,
   RBSize,
   getUniqueKey,
   getChainName,
-} from "rent-market";
-import { shortenAddress } from "./RentContentUtil";
+  AlertSeverity,
+  shortenAddress,
+  writeToastMessageState,
+} from "./RentContentUtil";
 
 const Content = ({
   inputRentMarket,
@@ -51,10 +55,8 @@ const Content = ({
   // * Define input copied variables.
   // * -------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
-  const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState([]);
-  const [myUnregisteredNFTArray, setMyUnregisteredNFTArray] = React.useState(
-    []
-  );
+  const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState();
+  const [myUnregisteredNFTArray, setMyUnregisteredNFTArray] = React.useState();
 
   // * -------------------------------------------------------------------------
   // * Set unique variables for table collapse.
@@ -62,11 +64,11 @@ const Content = ({
   const [
     myRegisteredUniqueNFTAddressArray,
     setMyRegisteredUniqueNFTAddressArray,
-  ] = React.useState([]);
+  ] = React.useState();
   const [
     myUnregisteredUniqueNFTAddressArray,
     setMyUnregisteredUniqueNFTAddressArray,
-  ] = React.useState([]);
+  ] = React.useState();
 
   // * -------------------------------------------------------------------------
   // * Nft list data.
@@ -77,14 +79,17 @@ const Content = ({
   // * -------------------------------------------------------------------------
   // * Handle toast message.
   // * -------------------------------------------------------------------------
-  const [snackbarValue, setSnackbarValue] = React.useState({
-    snackbarSeverity: AlertSeverity.info,
-    snackbarMessage: "",
-    snackbarTime: new Date(),
-    snackbarOpen: true,
-  });
-  const { snackbarSeverity, snackbarMessage, snackbarTime, snackbarOpen } =
-    snackbarValue;
+  const [writeToastMessageLoadable, setWriteToastMessage] =
+    useRecoilStateLoadable(writeToastMessageState);
+  const writeToastMessage =
+    writeToastMessageLoadable?.state === "hasValue"
+      ? writeToastMessageLoadable.contents
+      : {
+          snackbarSeverity: AlertSeverity.info,
+          snackbarMessage: "",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        };
 
   // * -------------------------------------------------------------------------
   // * Handle text input change.
@@ -130,46 +135,61 @@ const Content = ({
     setMyUnregisteredNFTArray(inputMyUnregisteredNFTArray);
 
     // Set unique data.
-    const uniqueRegisterNFTAddressSet = new Set(
-      inputMyRegisteredNFTArray.map((element) => element.nftAddress)
-    );
-    const uniqueUnregisterNFTAddressSet = new Set(
-      inputMyUnregisteredNFTArray.map((element) => element.nftAddress)
-    );
-    setMyRegisteredUniqueNFTAddressArray([...uniqueRegisterNFTAddressSet]);
-    setMyUnregisteredUniqueNFTAddressArray([...uniqueUnregisterNFTAddressSet]);
+    let uniqueRegisterNFTAddressSet;
+    if (inputMyRegisteredNFTArray) {
+      uniqueRegisterNFTAddressSet = new Set(
+        inputMyRegisteredNFTArray.map((element) => element.nftAddress)
+      );
+      setMyRegisteredUniqueNFTAddressArray([...uniqueRegisterNFTAddressSet]);
+    }
+
+    let uniqueUnregisterNFTAddressSet;
+    if (inputMyUnregisteredNFTArray) {
+      uniqueUnregisterNFTAddressSet = new Set(
+        inputMyUnregisteredNFTArray.map((element) => element.nftAddress)
+      );
+      setMyUnregisteredUniqueNFTAddressArray([
+        ...uniqueUnregisterNFTAddressSet,
+      ]);
+    }
 
     // * Initialize page and rowsPerPage array.
     page.splice(0, page.length);
     rowsPerPage.splice(0, rowsPerPage.length);
 
     // * Add each register and unregister page and rowsPerPage per nft contract address.
-    for (const nftAddress of uniqueRegisterNFTAddressSet) {
-      page.push({
-        address: nftAddress,
-        mode: "register",
-        page: 0,
-      });
-      rowsPerPage.push({
-        address: nftAddress,
-        mode: "register",
-        rowsPerPage: 5,
-      });
+    if (uniqueRegisterNFTAddressSet) {
+      for (const nftAddress of uniqueRegisterNFTAddressSet) {
+        page.push({
+          address: nftAddress,
+          mode: "register",
+          page: 0,
+        });
+        rowsPerPage.push({
+          address: nftAddress,
+          mode: "register",
+          rowsPerPage: 5,
+        });
+      }
     }
-    for (const nftAddress of uniqueUnregisterNFTAddressSet) {
-      page.push({
-        address: nftAddress,
-        mode: "unregister",
-        page: 0,
-      });
-      rowsPerPage.push({
-        address: nftAddress,
-        mode: "unregister",
-        rowsPerPage: 5,
-      });
+
+    if (uniqueUnregisterNFTAddressSet) {
+      for (const nftAddress of uniqueUnregisterNFTAddressSet) {
+        page.push({
+          address: nftAddress,
+          mode: "unregister",
+          page: 0,
+        });
+        rowsPerPage.push({
+          address: nftAddress,
+          mode: "unregister",
+          rowsPerPage: 5,
+        });
+      }
     }
   }, [
     inputRentMarket,
+    inputRentMarket.rentMarketContract,
     inputBlockchainNetwork,
     inputMyRegisteredNFTArray,
     inputMyUnregisteredNFTArray,
@@ -392,11 +412,30 @@ const Content = ({
           <Button
             size="small"
             onClick={async () => {
+              // * Create WalletConnect Provider.
+              let provider;
+              if (isMobile === true) {
+                provider = new WalletConnectProvider({
+                  rpc: {
+                    137: "https://rpc-mainnet.maticvigil.com",
+                    80001: "https://rpc-mumbai.maticvigil.com/",
+                  },
+                  infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
+                });
+
+                // * Enable session (triggers QR Code modal).
+                await provider.enable();
+                // console.log("provider: ", provider);
+              }
+
               try {
-                await rentMarketRef.current.unregisterNFT(element);
+                await rentMarketRef.current.unregisterNFT({
+                  provider: provider,
+                  element: element,
+                });
               } catch (error) {
                 console.error(error);
-                setSnackbarValue({
+                setWriteToastMessage({
                   snackbarSeverity: AlertSeverity.error,
                   snackbarMessage: error.reason,
                   snackbarTime: new Date(),
@@ -481,6 +520,12 @@ const Content = ({
   }
 
   function showMyRegisteredNFTElementTable() {
+    console.log("call showMyRegisteredNFTElementTable()");
+    console.log(
+      "myRegisteredUniqueNFTAddressArray: ",
+      myRegisteredUniqueNFTAddressArray
+    );
+
     let openseaMode;
 
     if (getChainName({ chainId: inputBlockchainNetwork }) === "matic") {
@@ -491,6 +536,23 @@ const Content = ({
       openseaMode = "opensea_maticmum";
     } else {
       openseaMode = "";
+    }
+
+    if (myRegisteredUniqueNFTAddressArray === undefined) {
+      return (
+        <Box
+          sx={{
+            marginTop: "20px",
+            display: "flex",
+            width: "100vw",
+            height: "10vh",
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      );
     }
 
     return (
@@ -562,7 +624,7 @@ const Content = ({
                 await rentMarketRef.current.registerNFT(element);
               } catch (error) {
                 console.error(error);
-                setSnackbarValue({
+                setWriteToastMessage({
                   snackbarSeverity: AlertSeverity.error,
                   snackbarMessage: error.reason,
                   snackbarTime: new Date(),
@@ -639,6 +701,24 @@ const Content = ({
     // console.log("call showMyUnregisteredNFTElementTable()");
     // https://mui.com/material-ui/react-table/
     // https://medium.com/@freshmilkdev/reactjs-render-optimization-for-collapsible-material-ui-long-list-with-checkboxes-231b36892e20
+
+    if (myUnregisteredUniqueNFTAddressArray === undefined) {
+      return (
+        <Box
+          sx={{
+            marginTop: "20px",
+            display: "flex",
+            width: "100vw",
+            height: "100vh",
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      );
+    }
+
     return (
       <List>
         {myUnregisteredUniqueNFTAddressArray.map((nftContractAddress) => {
@@ -671,7 +751,7 @@ const Content = ({
       {/* // * --------------------------------------------------------------*/}
       {/* // * Show registered NFT with change and unregister button.        */}
       {/* // * --------------------------------------------------------------*/}
-      <Divider sx={{ marginBottom: "5px" }}>
+      <Divider sx={{ margin: "5px" }}>
         <Chip label="My Registered NFT" />
       </Divider>
       {showMyRegisteredNFTElementTable()}
@@ -679,7 +759,7 @@ const Content = ({
       {/* // * --------------------------------------------------------------*/}
       {/* // * Show my unregistered NFT with request register button.        */}
       {/* // * --------------------------------------------------------------*/}
-      <Divider sx={{ marginTop: "5px", marginBottom: "5px" }}>
+      <Divider sx={{ margin: "5px" }}>
         <Chip label="My Unregistered NFT" />
       </Divider>
       {showMyUnregisteredNFTElementTable()}
@@ -765,17 +845,35 @@ const Content = ({
                 // console.log("inputFeeTokenAddress: ", inputFeeTokenAddress);
                 // console.log("inputRentFeeByToken: ", inputRentFeeByToken);
                 // console.log("inputRentDuration: ", inputRentDuration);
+
+                // * Create WalletConnect Provider.
+                let provider;
+                if (isMobile === true) {
+                  provider = new WalletConnectProvider({
+                    rpc: {
+                      137: "https://rpc-mainnet.maticvigil.com",
+                      80001: "https://rpc-mumbai.maticvigil.com/",
+                    },
+                    infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
+                  });
+
+                  // * Enable session (triggers QR Code modal).
+                  await provider.enable();
+                  // console.log("provider: ", provider);
+                }
+
                 // * rent fee and rent fee by token should be an ether unit expression.
-                await rentMarketRef.current.changeNFT(
-                  changeElement,
-                  inputRentFee.toString(),
-                  inputFeeTokenAddress,
-                  inputRentFeeByToken.toString(),
-                  inputRentDuration
-                );
+                await rentMarketRef.current.changeNFT({
+                  provider: provider,
+                  element: changeElement,
+                  rentFee: inputRentFee.toString(),
+                  feeTokenAddress: inputFeeTokenAddress,
+                  rentFeeByToken: inputRentFeeByToken.toString(),
+                  rentDuration: inputRentDuration,
+                });
               } catch (error) {
                 console.error(error);
-                setSnackbarValue({
+                setWriteToastMessage({
                   snackbarSeverity: AlertSeverity.error,
                   snackbarMessage: error.reason,
                   snackbarTime: new Date(),
@@ -798,14 +896,6 @@ const Content = ({
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Toast message. */}
-      <RBSnackbar
-        open={snackbarOpen}
-        message={snackbarMessage}
-        severity={snackbarSeverity}
-        currentTime={snackbarTime}
-      />
     </div>
   );
 };
