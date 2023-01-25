@@ -14,7 +14,6 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Metamask } from "rent-market";
 import { useRecoilStateLoadable } from "recoil";
 import {
   getUniqueKey,
@@ -246,14 +245,6 @@ const MonitorRentNft = ({
 
   return (
     <div>
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Show metamask component.                                       *}
-      {/* // * --------------------------------------------------------------*/}
-      <Divider sx={{ margin: "5px" }}>
-        <Chip label="Metamask" />
-      </Divider>
-      <Metamask inputBlockchainNetwork={inputBlockchainNetwork} />
-
       {/* // * --------------------------------------------------------------*/}
       {/* // * Show current all rent data.                                   */}
       {/* // * --------------------------------------------------------------*/}
