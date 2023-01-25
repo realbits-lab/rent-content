@@ -1,6 +1,5 @@
 import React from "react";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { useProvider, useSigner } from "wagmi";
 import { isMobile } from "react-device-detect";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -56,12 +55,6 @@ const Content = ({
   // * Define input copied variables.
   // * -------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
-
-  const provider = useProvider();
-  // console.log("provider: ", provider);
-  const signer = useSigner();
-  // console.log("signer: ", signer);
-
   const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState();
   const [myUnregisteredNFTArray, setMyUnregisteredNFTArray] = React.useState();
 

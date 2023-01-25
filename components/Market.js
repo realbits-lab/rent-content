@@ -1,4 +1,6 @@
 import * as React from "react";
+import WalletConnectProvider from "@walletconnect/web3-provider";
+import { isMobile } from "react-device-detect";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -184,17 +186,34 @@ const Market = ({
             color="primary"
             variant="contained"
             onClick={async () => {
-              // console.log("call onClick()");
+              console.log("call onClick()");
               // console.log(
               //   "rentMarketClassRef.current: ",
               //   rentMarketClassRef.current
               // );
-              // console.log("serviceAddress: ", serviceAddress);
+              console.log("serviceAddress: ", serviceAddress);
+              // * Create WalletConnect Provider.
+              let provider;
+              if (isMobile === true) {
+                provider = new WalletConnectProvider({
+                  rpc: {
+                    137: "https://rpc-mainnet.maticvigil.com",
+                    80001: "https://rpc-mumbai.maticvigil.com/",
+                  },
+                  infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
+                });
+
+                // * Enable session (triggers QR Code modal).
+                await provider.enable();
+                // console.log("provider: ", provider);
+              }
+
               try {
-                await rentMarketClassRef.current.rentNFT(
+                await rentMarketClassRef.current.rentNFT({
+                  provider,
                   element,
-                  serviceAddress
-                );
+                  serviceAddress,
+                });
               } catch (error) {
                 // console.log("error: ", error);
 
