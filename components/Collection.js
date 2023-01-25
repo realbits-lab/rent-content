@@ -11,7 +11,12 @@ import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import { AlertSeverity, shortenAddress, RBSnackbar } from "rent-market";
+import { useRecoilStateLoadable } from "recoil";
+import {
+  AlertSeverity,
+  writeToastMessageState,
+  shortenAddress,
+} from "./RentContentUtil";
 
 const Collection = ({
   inputCollectionArray,
@@ -40,14 +45,17 @@ const Collection = ({
   // * -------------------------------------------------------------------------
   // * Handle toast mesage.
   // * -------------------------------------------------------------------------
-  const [snackbarValue, setSnackbarValue] = React.useState({
-    snackbarSeverity: AlertSeverity.info,
-    snackbarMessage: "",
-    snackbarTime: new Date(),
-    snackbarOpen: true,
-  });
-  const { snackbarSeverity, snackbarMessage, snackbarTime, snackbarOpen } =
-    snackbarValue;
+  const [writeToastMessageLoadable, setWriteToastMessage] =
+    useRecoilStateLoadable(writeToastMessageState);
+  const writeToastMessage =
+    writeToastMessageLoadable?.state === "hasValue"
+      ? writeToastMessageLoadable.contents
+      : {
+          snackbarSeverity: AlertSeverity.info,
+          snackbarMessage: "",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        };
 
   // * -------------------------------------------------------------------------
   // * Define rent market class.
@@ -143,7 +151,7 @@ const Collection = ({
               );
             } catch (error) {
               console.error(error);
-              setSnackbarValue({
+              setWriteToastMessage({
                 snackbarSeverity: AlertSeverity.error,
                 snackbarMessage: error.reason,
                 snackbarTime: new Date(),
@@ -152,7 +160,7 @@ const Collection = ({
             }
 
             // TODO: Show a success toast message.
-            // setSnackbarValue({
+            // setWriteToastMessage({
             //   snackbarSeverity: AlertSeverity.info,
             //   snackbarMessage: "Make transaction for registering collection.",
             //   snackbarTime: new Date(),
@@ -205,7 +213,7 @@ const Collection = ({
                         );
                       } catch (error) {
                         console.error(error);
-                        setSnackbarValue({
+                        setWriteToastMessage({
                           snackbarSeverity: AlertSeverity.error,
                           snackbarMessage: error.reason,
                           snackbarTime: new Date(),
@@ -213,7 +221,7 @@ const Collection = ({
                         });
                       }
 
-                      setSnackbarValue({
+                      setWriteToastMessage({
                         snackbarSeverity: AlertSeverity.info,
                         snackbarMessage:
                           "Make transaction for unregistering collection.",
@@ -230,13 +238,6 @@ const Collection = ({
           );
         })}
       </Grid>
-
-      <RBSnackbar
-        open={snackbarOpen}
-        message={snackbarMessage}
-        severity={snackbarSeverity}
-        currentTime={snackbarTime}
-      />
     </div>
   );
 };

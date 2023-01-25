@@ -24,15 +24,16 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import { useRecoilStateLoadable } from "recoil";
 import {
   changeIPFSToGateway,
   MyMenu,
   AlertSeverity,
-  RBSnackbar,
   RBSize,
   shortenAddress,
   getUniqueKey,
   getChainName,
+  writeToastMessageState,
 } from "./RentContentUtil";
 
 const My = ({
@@ -45,7 +46,7 @@ const My = ({
   inputBlockchainNetwork,
 }) => {
   // * -------------------------------------------------------------------------
-	// * Hook variables.
+  // * Hook variables.
   // * -------------------------------------------------------------------------
   const theme = useTheme();
   const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
@@ -89,14 +90,17 @@ const My = ({
   // * -------------------------------------------------------------------------
   // * Handle toast mesage.
   // * -------------------------------------------------------------------------
-  const [snackbarValue, setSnackbarValue] = React.useState({
-    snackbarSeverity: AlertSeverity.info,
-    snackbarMessage: "",
-    snackbarTime: new Date(),
-    snackbarOpen: true,
-  });
-  const { snackbarSeverity, snackbarMessage, snackbarTime, snackbarOpen } =
-    snackbarValue;
+  const [writeToastMessageLoadable, setWriteToastMessage] =
+    useRecoilStateLoadable(writeToastMessageState);
+  const writeToastMessage =
+    writeToastMessageLoadable?.state === "hasValue"
+      ? writeToastMessageLoadable.contents
+      : {
+          snackbarSeverity: AlertSeverity.info,
+          snackbarMessage: "",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        };
 
   // * -------------------------------------------------------------------------
   // * Table pagination data.
@@ -232,7 +236,7 @@ const My = ({
                     selectAvatarFunc(element);
                   }
 
-                  setSnackbarValue({
+                  setWriteToastMessage({
                     snackbarSeverity: AlertSeverity.info,
                     snackbarMessage: `You select ${
                       element.metadata ? element.metadata.name : "..."
@@ -674,13 +678,6 @@ const My = ({
         <Grid item>{buildTopMenu()}</Grid>
         <Grid item>{buildNftTable()}</Grid>
       </Grid>
-
-      <RBSnackbar
-        open={snackbarOpen}
-        message={snackbarMessage}
-        severity={snackbarSeverity}
-        currentTime={snackbarTime}
-      />
     </div>
   );
 };

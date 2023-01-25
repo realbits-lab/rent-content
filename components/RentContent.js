@@ -214,7 +214,7 @@ const RentContent = ({
 
   // * Initialize data.
   React.useEffect(() => {
-    // console.log("call React.useEffect()");
+    // console.log("call useEffect()");
     // console.log("rentMarketAddress: ", rentMarketAddress);
     // console.log("testNftAddress: ", testNftAddress);
     // console.log("blockchainNetwork: ", blockchainNetwork);

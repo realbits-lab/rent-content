@@ -1,7 +1,7 @@
 import React from "react";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { useProvider, useSigner } from "wagmi";
-import { isMobile, getUA } from "react-device-detect";
+import { isMobile } from "react-device-detect";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -34,16 +34,16 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
+import { useRecoilStateLoadable } from "recoil";
 import {
   changeIPFSToGateway,
-  AlertSeverity,
-  RBSnackbar,
   RBSize,
   getUniqueKey,
   getChainName,
-} from "rent-market";
-import { shortenAddress } from "./RentContentUtil";
-import rentMarketABI from "./rentMarket.json";
+  AlertSeverity,
+  shortenAddress,
+  writeToastMessageState,
+} from "./RentContentUtil";
 
 const Content = ({
   inputRentMarket,
@@ -57,9 +57,9 @@ const Content = ({
   const rentMarketRef = React.useRef();
 
   const provider = useProvider();
-  console.log("provider: ", provider);
+  // console.log("provider: ", provider);
   const signer = useSigner();
-  console.log("signer: ", signer);
+  // console.log("signer: ", signer);
 
   const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState([]);
   const [myUnregisteredNFTArray, setMyUnregisteredNFTArray] = React.useState(
@@ -87,14 +87,17 @@ const Content = ({
   // * -------------------------------------------------------------------------
   // * Handle toast message.
   // * -------------------------------------------------------------------------
-  const [snackbarValue, setSnackbarValue] = React.useState({
-    snackbarSeverity: AlertSeverity.info,
-    snackbarMessage: "",
-    snackbarTime: new Date(),
-    snackbarOpen: true,
-  });
-  const { snackbarSeverity, snackbarMessage, snackbarTime, snackbarOpen } =
-    snackbarValue;
+  const [writeToastMessageLoadable, setWriteToastMessage] =
+    useRecoilStateLoadable(writeToastMessageState);
+  const writeToastMessage =
+    writeToastMessageLoadable?.state === "hasValue"
+      ? writeToastMessageLoadable.contents
+      : {
+          snackbarSeverity: AlertSeverity.info,
+          snackbarMessage: "",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        };
 
   // * -------------------------------------------------------------------------
   // * Handle text input change.
@@ -407,7 +410,7 @@ const Content = ({
                 await rentMarketRef.current.unregisterNFT(element);
               } catch (error) {
                 console.error(error);
-                setSnackbarValue({
+                setWriteToastMessage({
                   snackbarSeverity: AlertSeverity.error,
                   snackbarMessage: error.reason,
                   snackbarTime: new Date(),
@@ -573,7 +576,7 @@ const Content = ({
                 await rentMarketRef.current.registerNFT(element);
               } catch (error) {
                 console.error(error);
-                setSnackbarValue({
+                setWriteToastMessage({
                   snackbarSeverity: AlertSeverity.error,
                   snackbarMessage: error.reason,
                   snackbarTime: new Date(),
@@ -790,7 +793,7 @@ const Content = ({
 
                   // * Enable session (triggers QR Code modal).
                   await provider.enable();
-                  console.log("provider: ", provider);
+                  // console.log("provider: ", provider);
                 }
 
                 // * rent fee and rent fee by token should be an ether unit expression.
@@ -804,7 +807,7 @@ const Content = ({
                 });
               } catch (error) {
                 console.error(error);
-                setSnackbarValue({
+                setWriteToastMessage({
                   snackbarSeverity: AlertSeverity.error,
                   snackbarMessage: error.reason,
                   snackbarTime: new Date(),
@@ -827,14 +830,6 @@ const Content = ({
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Toast message. */}
-      <RBSnackbar
-        open={snackbarOpen}
-        message={snackbarMessage}
-        severity={snackbarSeverity}
-        currentTime={snackbarTime}
-      />
     </div>
   );
 };

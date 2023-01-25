@@ -15,7 +15,6 @@ import {
   getUniqueKey,
   AlertSeverity,
   writeToastMessageState,
-  getChainName,
 } from "./RentContentUtil";
 
 // https://docs.alchemy.com/docs/deep-dive-into-eth_getlogs

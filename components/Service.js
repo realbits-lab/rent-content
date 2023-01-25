@@ -11,7 +11,13 @@ import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import { RBSnackbar, AlertSeverity, shortenAddress } from "rent-market";
+import { useRecoilStateLoadable } from "recoil";
+import {
+  RBSnackbar,
+  AlertSeverity,
+  shortenAddress,
+  writeToastMessageState,
+} from "./RentContentUtil";
 
 const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
   // * -------------------------------------------------------------------------
@@ -46,14 +52,17 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
   // * -------------------------------------------------------------------------
   // * Handle toast mesage.
   // * -------------------------------------------------------------------------
-  const [snackbarValue, setSnackbarValue] = React.useState({
-    snackbarSeverity: AlertSeverity.info,
-    snackbarMessage: "",
-    snackbarTime: new Date(),
-    snackbarOpen: true,
-  });
-  const { snackbarSeverity, snackbarMessage, snackbarTime, snackbarOpen } =
-    snackbarValue;
+  const [writeToastMessageLoadable, setWriteToastMessage] =
+    useRecoilStateLoadable(writeToastMessageState);
+  const writeToastMessage =
+    writeToastMessageLoadable?.state === "hasValue"
+      ? writeToastMessageLoadable.contents
+      : {
+          snackbarSeverity: AlertSeverity.info,
+          snackbarMessage: "",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        };
 
   // * -------------------------------------------------------------------------
   // * Initialize data.
@@ -135,7 +144,7 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
               );
             } catch (error) {
               console.error(error);
-              setSnackbarValue({
+              setWriteToastMessage({
                 snackbarSeverity: AlertSeverity.error,
                 snackbarMessage: error.reason,
                 snackbarTime: new Date(),
@@ -184,7 +193,7 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
                         await rentMarketRef.current.unregisterService(element);
                       } catch (error) {
                         console.error(error);
-                        setSnackbarValue({
+                        setWriteToastMessage({
                           snackbarSeverity: AlertSeverity.error,
                           snackbarMessage: error.reason,
                           snackbarTime: new Date(),
@@ -201,12 +210,6 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
           );
         })}
       </Grid>
-      <RBSnackbar
-        open={snackbarOpen}
-        message={snackbarMessage}
-        severity={snackbarSeverity}
-        currentTime={snackbarTime}
-      />
     </div>
   );
 };

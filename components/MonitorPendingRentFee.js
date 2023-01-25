@@ -1,11 +1,7 @@
 import React from "react";
-import { ethers } from "ethers";
 import { Network, Alchemy } from "alchemy-sdk";
-import keccak256 from "keccak256";
 import { Buffer } from "buffer";
-import moment from "moment";
 import Divider from "@mui/material/Divider";
-import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -20,7 +16,6 @@ import {
   getUniqueKey,
   AlertSeverity,
   writeToastMessageState,
-  getChainName,
 } from "./RentContentUtil";
 
 // https://docs.alchemy.com/docs/deep-dive-into-eth_getlogs

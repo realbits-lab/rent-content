@@ -25,15 +25,16 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import { useRecoilStateLoadable } from "recoil";
 import {
   changeIPFSToGateway,
   AlertSeverity,
-  RBSnackbar,
   RBSize,
   shortenAddress,
   getUniqueKey,
   getErrorDescription,
   getChainName,
+  writeToastMessageState,
 } from "./RentContentUtil";
 
 const Market = ({
@@ -83,14 +84,17 @@ const Market = ({
   // * -------------------------------------------------------------------------
   // * Define toast data.
   // * -------------------------------------------------------------------------
-  const [snackbarValue, setSnackbarValue] = React.useState({
-    snackbarSeverity: AlertSeverity.info,
-    snackbarMessage: "",
-    snackbarTime: new Date(),
-    snackbarOpen: true,
-  });
-  const { snackbarSeverity, snackbarMessage, snackbarTime, snackbarOpen } =
-    snackbarValue;
+  const [writeToastMessageLoadable, setWriteToastMessage] =
+    useRecoilStateLoadable(writeToastMessageState);
+  const writeToastMessage =
+    writeToastMessageLoadable?.state === "hasValue"
+      ? writeToastMessageLoadable.contents
+      : {
+          snackbarSeverity: AlertSeverity.info,
+          snackbarMessage: "",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        };
 
   // * -------------------------------------------------------------------------
   // * Define pagination data.
@@ -229,7 +233,7 @@ const Market = ({
                 }
 
                 // console.error(error);
-                setSnackbarValue({
+                setWriteToastMessage({
                   snackbarSeverity: AlertSeverity.error,
                   snackbarMessage: message,
                   snackbarTime: new Date(),
@@ -626,16 +630,6 @@ const Market = ({
       {/* // * Show collection array data.                                   */}
       {/* // * --------------------------------------------------------------*/}
       {buildAllCollectionTable()}
-
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Show toast message.                                           */}
-      {/* // * --------------------------------------------------------------*/}
-      <RBSnackbar
-        open={snackbarOpen}
-        message={snackbarMessage}
-        severity={snackbarSeverity}
-        currentTime={snackbarTime}
-      />
     </>
   );
 };
