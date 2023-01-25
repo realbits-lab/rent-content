@@ -4,6 +4,7 @@ import { useAccount, useEnsName } from "wagmi";
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
@@ -109,9 +110,10 @@ const RentContent = ({
   serviceAddress,
 }) => {
   const { address, isConnected } = useAccount();
-  const { data: ensName } = useEnsName({ address });
   // console.log("address: ", address);
   // console.log("isConnected: ", isConnected);
+
+  // const { data: ensName } = useEnsName({ address });
   // console.log("ensName: ", ensName);
 
   // * -------------------------------------------------------------------------
@@ -370,8 +372,6 @@ const RentContent = ({
               ? "Monitor - Rent NFT"
               : "Rent Market"}
           </Typography>
-          <Web3Button />
-          <Web3NetworkSwitch />
         </Toolbar>
       </AppBar>
 
@@ -595,6 +595,14 @@ const RentContent = ({
       {/* // * --------------------------------------------------------------*/}
       <Main open={openDrawer}>
         <DrawerHeader />
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <Web3Button />
+          </Grid>
+          <Grid item xs={6}>
+            <Web3NetworkSwitch />
+          </Grid>
+        </Grid>
         {selectedIndex === MARKET_MENU_INDEX ? (
           inputRentMarket && (
             <Market
