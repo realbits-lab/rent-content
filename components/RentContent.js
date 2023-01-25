@@ -1,5 +1,6 @@
 import React from "react";
 import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
+import { useAccount, useConnect, useEnsName } from "wagmi";
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -107,6 +108,12 @@ const RentContent = ({
   blockchainNetwork,
   serviceAddress,
 }) => {
+  const { address, isConnected } = useAccount();
+  const { data: ensName } = useEnsName({ address });
+  // console.log("address: ", address);
+  // console.log("isConnected: ", isConnected);
+  // console.log("ensName: ", ensName);
+
   // * -------------------------------------------------------------------------
   // * Define each menu index.
   // * -------------------------------------------------------------------------
@@ -218,6 +225,7 @@ const RentContent = ({
       // console.log("call initRentMarket()");
 
       rentMarketClassRef.current = new RentMarket({
+        accountAddress: address,
         rentMarketAddress,
         testNftAddress,
         blockchainNetwork,

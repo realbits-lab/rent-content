@@ -50,6 +50,7 @@ const My = ({
   const theme = useTheme();
   const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
   // console.log("selectedChain: ", selectedChain);
+
   const METAMASK_DAPP_URL =
     "https://metamask.app.link/dapp/e499-182-222-13-78.jp.ngrok.io";
 
@@ -110,12 +111,12 @@ const My = ({
   // * Initialize data.
   // * -------------------------------------------------------------------------
   React.useEffect(() => {
-    // console.log("call React.useEffect()");
+    console.log("call React.useEffect()");
     // console.log("inputRentMarket: ", inputRentMarket);
     // console.log("inputCollectionArray: ", inputCollectionArray);
     // console.log("inputServiceAddress: ", inputServiceAddress);
-    // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
-    // console.log("inputMyRentNFTArray: ", inputMyRentNFTArray);
+    console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
+    console.log("inputMyRentNFTArray: ", inputMyRentNFTArray);
     // console.log("inputBlockchainNetwork: ", inputBlockchainNetwork);
 
     if (inputRentMarket) {
@@ -565,14 +566,14 @@ const My = ({
     // console.log("collectionArray: ", collectionArray);
     // console.log("getUA: ", getUA);
 
-    // * Show connect mobile metamask message button.
-    if (isMobile && getUA.includes("MetaMaskMobile") === false) {
-      return (
-        <Button>
-          <Link href={METAMASK_DAPP_URL}>Connect metamask wallet</Link>
-        </Button>
-      );
-    }
+    // // * Show connect mobile metamask message button.
+    // if (isMobile && getUA.includes("MetaMaskMobile") === false) {
+    //   return (
+    //     <Button>
+    //       <Link href={METAMASK_DAPP_URL}>Connect metamask wallet</Link>
+    //     </Button>
+    //   );
+    // }
 
     // TODO: Change loading process bar later.
     // console.log("selectedChain: ", selectedChain);
