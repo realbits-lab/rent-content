@@ -170,6 +170,7 @@ const Content = ({
     }
   }, [
     inputRentMarket,
+    inputRentMarket.rentMarketContract,
     inputBlockchainNetwork,
     inputMyRegisteredNFTArray,
     inputMyUnregisteredNFTArray,

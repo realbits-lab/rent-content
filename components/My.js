@@ -102,11 +102,11 @@ const My = ({
   // * Initialize data.
   // * -------------------------------------------------------------------------
   React.useEffect(() => {
-    // console.log("call React.useEffect() with condition");
+    console.log("call React.useEffect()");
     // console.log("inputRentMarket: ", inputRentMarket);
     // console.log("inputCollectionArray: ", inputCollectionArray);
     // console.log("inputServiceAddress: ", inputServiceAddress);
-    // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
+    console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
     // console.log("inputMyRentNFTArray: ", inputMyRentNFTArray);
     // console.log("inputBlockchainNetwork: ", inputBlockchainNetwork);
 
@@ -114,22 +114,27 @@ const My = ({
       setMyRentNFTArray(inputMyRentNFTArray);
       rentMarketRef.current = inputRentMarket;
     }
+
     if (Array.isArray(inputCollectionArray) === true) {
       // TODO: Handle the collection.metadata undefined case.
       setCollectionArray(inputCollectionArray);
     }
+
     if (
       typeof inputServiceAddress === "string" ||
       inputServiceAddress instanceof String
     ) {
       setServiceAddress(inputServiceAddress);
     }
+
     if (Array.isArray(inputMyRegisteredNFTArray) === true) {
       setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
     }
+
     if (Array.isArray(inputMyRentNFTArray) === true) {
       setMyRentNFTArray(inputMyRentNFTArray);
     }
+
     if (
       typeof inputBlockchainNetwork === "string" ||
       inputBlockchainNetwork instanceof String
@@ -160,6 +165,7 @@ const My = ({
   }, [
     selectAvatarFunc,
     inputRentMarket,
+    inputRentMarket.rentMarketContract,
     inputCollectionArray,
     inputServiceAddress,
     inputMyRegisteredNFTArray,
