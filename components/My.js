@@ -182,8 +182,6 @@ const My = ({
     selectedChain,
   ]);
 
-  function initializePagination() {}
-
   function buildNftTableRowBody({ elementArray, type }) {
     // console.log("call buildNftTableRowBody()");
 
