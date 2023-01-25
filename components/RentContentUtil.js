@@ -498,7 +498,6 @@ export const writeToastMessageState = atom({
   key: "writeToastMessageState",
   snackbarSeverity: AlertSeverity.info,
   snackbarMessage: "",
-  // snackbarTime: new Date(),
   snackbarTime: "time",
   snackbarOpen: true,
 });
@@ -510,5 +509,3 @@ export const readToastMessageState = selector({
     return toastMessageState;
   },
 });
-
-export const LOCAL_CHAIN_ID = "0x539";

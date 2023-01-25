@@ -44,12 +44,12 @@ const My = ({
   inputMyRentNFTArray,
   inputBlockchainNetwork,
 }) => {
+  // * -------------------------------------------------------------------------
+	// * Hook variables.
+  // * -------------------------------------------------------------------------
   const theme = useTheme();
   const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
   // console.log("selectedChain: ", selectedChain);
-
-  const METAMASK_DAPP_URL =
-    "https://metamask.app.link/dapp/e499-182-222-13-78.jp.ngrok.io";
 
   // * -------------------------------------------------------------------------
   // * Define copied local varialbe from input data.

@@ -1,6 +1,6 @@
 import React from "react";
 import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
-import { useAccount, useConnect, useEnsName } from "wagmi";
+import { useAccount, useEnsName } from "wagmi";
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -189,8 +189,8 @@ const RentContent = ({
   // * -------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
-  const writeToastMessage = React.useMemo(() => {
-    return writeToastMessageLoadable?.state === "hasValue"
+  const writeToastMessage =
+    writeToastMessageLoadable?.state === "hasValue"
       ? writeToastMessageLoadable.contents
       : {
           snackbarSeverity: AlertSeverity.info,
@@ -198,7 +198,6 @@ const RentContent = ({
           snackbarTime: new Date(),
           snackbarOpen: true,
         };
-  });
 
   const readToastMessageLoadable = useRecoilValueLoadable(
     readToastMessageState
