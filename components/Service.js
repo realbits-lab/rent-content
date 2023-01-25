@@ -1,31 +1,22 @@
 import React from "react";
 import axios from "axios";
-import {
-  Grid,
-  Card,
-  CardActions,
-  CardContent,
-  CardMedia,
-  Button,
-  Typography,
-  Divider,
-  Chip,
-  TextField,
-  Box,
-} from "@mui/material";
-import {
-  RentMarket,
-  Metamask,
-  ConnectStatus,
-  RBSnackbar,
-  AlertSeverity,
-  shortenAddress,
-} from "rent-market";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import Chip from "@mui/material/Chip";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import { RBSnackbar, AlertSeverity, shortenAddress } from "rent-market";
 
 const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
-  //----------------------------------------------------------------------------
-  // Handle text input change.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Handle text input change.
+  // * -------------------------------------------------------------------------
   const [formValue, setFormValue] = React.useState({
     serviceAddress: "",
     serviceUri: "",
@@ -42,19 +33,19 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
     });
   };
 
-  //----------------------------------------------------------------------------
-  // Define rent market class.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Define rent market class.
+  // * -------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
 
-  //----------------------------------------------------------------------------
-  // Data list.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Data list.
+  // * -------------------------------------------------------------------------
   const [serviceArray, setServiceArray] = React.useState([]);
 
-  //----------------------------------------------------------------------------
-  // Handle toast mesage.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Handle toast mesage.
+  // * -------------------------------------------------------------------------
   const [snackbarValue, setSnackbarValue] = React.useState({
     snackbarSeverity: AlertSeverity.info,
     snackbarMessage: "",
@@ -64,9 +55,9 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
   const { snackbarSeverity, snackbarMessage, snackbarTime, snackbarOpen } =
     snackbarValue;
 
-  //----------------------------------------------------------------------------
-  // Initialize data.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Initialize data.
+  // * -------------------------------------------------------------------------
   React.useEffect(() => {
     // console.log("React.useEffect");
     if (inputServiceArray && inputRentMarket) {
@@ -74,29 +65,8 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
       // setServiceArray(inputServiceArray);
       getServiceMetadata(inputServiceArray);
       rentMarketRef.current = inputRentMarket;
-    } else {
-      // TODO: Handle later.
-      // // console.log("Set from new class");
-      // const initRentMarket = async () => {
-      //   rentMarketRef.current = new RentMarket(
-      //     rentMarketAddress,
-      //     nftAddress,
-      //     blockchainNetwork,
-      //     onEventFunc
-      //   );
-      //   await rentMarketRef.current.initializeAll();
-      //   await onEventFunc();
-      // };
-      // // 1. Fetch token, service, request/register data, and rent data to interconnect them.
-      // initRentMarket().catch(console.error);
     }
   }, [inputServiceArray, inputRentMarket]);
-
-  const onEventFunc = async () => {
-    // Set data list.
-    // setServiceArray(rentMarketRef.current.serviceArray);
-    await getServiceMetadata(rentMarketRef.current.serviceArray);
-  };
 
   const getServiceMetadata = async (services) => {
     const serviceArray = await Promise.all(
@@ -120,31 +90,21 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
 
   return (
     <div>
-      {/*--------------------------------------------------------------------*/}
-      {/* 1. Show metamask. */}
-      {/*--------------------------------------------------------------------*/}
-      <p />
-      <Divider>
-        <Chip label="Metamask" />
-      </Divider>
-      <p />
-      <Metamask inputBlockchainNetwork={blockchainNetwork} />
-
-      {/*--------------------------------------------------------------------*/}
-      {/* 2. Show request register service. */}
-      {/*--------------------------------------------------------------------*/}
-      <p />
-      <Divider>
+      {/* // * --------------------------------------------------------------*/}
+      {/* // * Show request register service.                                */}
+      {/* // * --------------------------------------------------------------*/}
+      <Divider sx={{ margin: "5px" }}>
         <Chip label="Input" />
       </Divider>
-      <p />
+
       <Box
         sx={{
-          width: 500,
-          maxWidth: "100%",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <TextField
+          margin={"normal"}
           fullWidth
           required
           id="outlined"
@@ -153,8 +113,8 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
           value={serviceAddress}
           onChange={handleChange}
         />
-        <p />
         <TextField
+          margin={"normal"}
           fullWidth
           required
           id="outlined"
@@ -164,38 +124,37 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
           value={serviceUri}
           onChange={handleChange}
         />
+        <Button
+          margin={"normal"}
+          variant="contained"
+          onClick={async () => {
+            try {
+              await rentMarketRef.current.registerService(
+                serviceAddress,
+                serviceUri
+              );
+            } catch (error) {
+              console.error(error);
+              setSnackbarValue({
+                snackbarSeverity: AlertSeverity.error,
+                snackbarMessage: error.reason,
+                snackbarTime: new Date(),
+                snackbarOpen: true,
+              });
+            }
+          }}
+        >
+          Register
+        </Button>
       </Box>
-      <p />
-      <Button
-        variant="contained"
-        onClick={async () => {
-          try {
-            await rentMarketRef.current.registerService(
-              serviceAddress,
-              serviceUri
-            );
-          } catch (error) {
-            console.error(error);
-            setSnackbarValue({
-              snackbarSeverity: AlertSeverity.error,
-              snackbarMessage: error.reason,
-              snackbarTime: new Date(),
-              snackbarOpen: true,
-            });
-          }
-        }}
-      >
-        Register
-      </Button>
 
-      {/*--------------------------------------------------------------------*/}
-      {/* 3. Show serviceArray. */}
-      {/*--------------------------------------------------------------------*/}
-      <p />
-      <Divider>
+      {/* // * --------------------------------------------------------------*/}
+      {/* // * Show service array.                                           */}
+      {/* // * --------------------------------------------------------------*/}
+      <Divider sx={{ margin: "5px" }}>
         <Chip label="Service" />
       </Divider>
-      <p />
+
       <Grid container spacing={2}>
         {serviceArray.map(function (element) {
           // console.log("element: ", element);
