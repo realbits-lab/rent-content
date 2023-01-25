@@ -1,5 +1,7 @@
 import React from "react";
 import moment from "moment";
+import WalletConnectProvider from "@walletconnect/web3-provider";
+import { isMobile } from "react-device-detect";
 import { ethers } from "ethers";
 import { Network, Alchemy } from "alchemy-sdk";
 import keccak256 from "keccak256";
@@ -349,13 +351,30 @@ const MonitorRentNft = ({
                   <Button
                     variant="outlined"
                     onClick={async () => {
+                      // * Create WalletConnect Provider.
+                      let provider;
+                      if (isMobile === true) {
+                        provider = new WalletConnectProvider({
+                          rpc: {
+                            137: "https://rpc-mainnet.maticvigil.com",
+                            80001: "https://rpc-mumbai.maticvigil.com/",
+                          },
+                          infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
+                        });
+
+                        // * Enable session (triggers QR Code modal).
+                        await provider.enable();
+                        // console.log("provider: ", provider);
+                      }
+
                       try {
                         // console.log("data.nftAddress: ", data.nftAddress);
                         // console.log("data.tokenId: ", data.tokenId);
-                        await rentMarketRef.current.settleRentData(
-                          data.nftAddress,
-                          data.tokenId
-                        );
+                        await rentMarketRef.current.settleRentData({
+                          provider: provider,
+                          nftAddress: data.nftAddress,
+                          tokenId: data.tokenId,
+                        });
                       } catch (error) {
                         console.error(error);
                         setWriteToastMessage({

@@ -1,4 +1,6 @@
 import React from "react";
+import WalletConnectProvider from "@walletconnect/web3-provider";
+import { isMobile } from "react-device-detect";
 import { Buffer } from "buffer";
 import Divider from "@mui/material/Divider";
 import Button from "@mui/material/Button";
@@ -101,14 +103,31 @@ const MonitorAccountBalance = ({
       <Button
         variant="outlined"
         onClick={async () => {
+          // * Create WalletConnect Provider.
+          let provider;
+          if (isMobile === true) {
+            provider = new WalletConnectProvider({
+              rpc: {
+                137: "https://rpc-mainnet.maticvigil.com",
+                80001: "https://rpc-mumbai.maticvigil.com/",
+              },
+              infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
+            });
+
+            // * Enable session (triggers QR Code modal).
+            await provider.enable();
+            // console.log("provider: ", provider);
+          }
+
           try {
             // console.log("rentMarketRef.current: ", rentMarketRef.current);
             // console.log("recipient: ", recipient);
             // console.log("tokenAddress: ", tokenAddress);
-            await rentMarketRef.current.withdrawMyBalance(
-              recipient,
-              tokenAddress
-            );
+            await rentMarketRef.current.withdrawMyBalance({
+              provider: provider,
+              recipient: recipient,
+              tokenAddress: tokenAddress,
+            });
             // console.log("withdrawMyBalance done.");
           } catch (error) {
             console.error(error);
