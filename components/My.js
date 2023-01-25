@@ -453,6 +453,9 @@ const My = ({
   }
 
   function buildCollectionTableRow({ collection }) {
+    console.log("call buildCollectionTableRow()");
+    console.log("collection: ", collection);
+
     let openseaMode;
     if (getChainName({ chainId: inputBlockchainNetwork }) === "matic") {
       openseaMode = "opensea_matic";
@@ -531,8 +534,9 @@ const My = ({
   }
 
   function buildMyTable({ collection, elementArray, type }) {
-    // console.log("call buildNftTable()");
-    // console.log("elementArray: ", elementArray);
+    console.log("call buildNftTable()");
+    console.log("collection: ", collection);
+    console.log("elementArray: ", elementArray);
 
     // * Check element length, if 0, don't show table.
     // TODO: Discern loading or nothing.

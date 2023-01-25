@@ -1,4 +1,5 @@
 import React from "react";
+import WalletConnectProvider from "@walletconnect/web3-provider";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -766,14 +767,25 @@ const Content = ({
                 // console.log("inputFeeTokenAddress: ", inputFeeTokenAddress);
                 // console.log("inputRentFeeByToken: ", inputRentFeeByToken);
                 // console.log("inputRentDuration: ", inputRentDuration);
+
+                //  * Create WalletConnect Provider
+                const provider = new WalletConnectProvider({
+                  // * Required.
+                  infuraId: "27e484dcd9e3efcfd25a83a78777cdf1",
+                });
+
+                //  * Enable session (triggers QR Code modal)
+                await provider.enable();
+
                 // * rent fee and rent fee by token should be an ether unit expression.
-                await rentMarketRef.current.changeNFT(
-                  changeElement,
-                  inputRentFee.toString(),
-                  inputFeeTokenAddress,
-                  inputRentFeeByToken.toString(),
-                  inputRentDuration
-                );
+                await rentMarketRef.current.changeNFT({
+                  provider: provider,
+                  element: changeElement,
+                  rentFee: inputRentFee.toString(),
+                  feeTokenAddress: inputFeeTokenAddress,
+                  rentFeeByToken: inputRentFeeByToken.toString(),
+                  rentDuration: inputRentDuration,
+                });
               } catch (error) {
                 console.error(error);
                 setSnackbarValue({
