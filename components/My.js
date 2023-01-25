@@ -1,11 +1,8 @@
 import React from "react";
 import moment from "moment";
-import { isMobile, getUA } from "react-device-detect";
 import { useWeb3ModalNetwork } from "@web3modal/react";
 import Grid from "@mui/material/Grid";
-import Link from "@mui/material/Link";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
@@ -568,16 +565,6 @@ const My = ({
   function buildNftTable() {
     // console.log("call buildNftTable()");
     // console.log("collectionArray: ", collectionArray);
-    // console.log("getUA: ", getUA);
-
-    // // * Show connect mobile metamask message button.
-    // if (isMobile && getUA.includes("MetaMaskMobile") === false) {
-    //   return (
-    //     <Button>
-    //       <Link href={METAMASK_DAPP_URL}>Connect metamask wallet</Link>
-    //     </Button>
-    //   );
-    // }
 
     // TODO: Change loading process bar later.
     // console.log("selectedChain: ", selectedChain);
