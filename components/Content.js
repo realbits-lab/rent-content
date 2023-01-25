@@ -412,8 +412,27 @@ const Content = ({
           <Button
             size="small"
             onClick={async () => {
+              // * Create WalletConnect Provider.
+              let provider;
+              if (isMobile === true) {
+                provider = new WalletConnectProvider({
+                  rpc: {
+                    137: "https://rpc-mainnet.maticvigil.com",
+                    80001: "https://rpc-mumbai.maticvigil.com/",
+                  },
+                  infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
+                });
+
+                // * Enable session (triggers QR Code modal).
+                await provider.enable();
+                // console.log("provider: ", provider);
+              }
+
               try {
-                await rentMarketRef.current.unregisterNFT(element);
+                await rentMarketRef.current.unregisterNFT({
+                  provider: provider,
+                  element: element,
+                });
               } catch (error) {
                 console.error(error);
                 setWriteToastMessage({
