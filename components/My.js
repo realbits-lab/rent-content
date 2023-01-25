@@ -102,11 +102,11 @@ const My = ({
   // * Initialize data.
   // * -------------------------------------------------------------------------
   React.useEffect(() => {
-    console.log("call React.useEffect()");
+    // console.log("call React.useEffect()");
     // console.log("inputRentMarket: ", inputRentMarket);
     // console.log("inputCollectionArray: ", inputCollectionArray);
     // console.log("inputServiceAddress: ", inputServiceAddress);
-    console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
+    // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
     // console.log("inputMyRentNFTArray: ", inputMyRentNFTArray);
     // console.log("inputBlockchainNetwork: ", inputBlockchainNetwork);
 
