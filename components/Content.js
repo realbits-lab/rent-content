@@ -784,45 +784,21 @@ const Content = ({
                 // console.log("inputRentFeeByToken: ", inputRentFeeByToken);
                 // console.log("inputRentDuration: ", inputRentDuration);
 
-                // //  * Create WalletConnect Provider
-                // let provider;
-                // if (true || isMobile === true) {
-                //   const options = new WalletConnectProvider({
-                //     // * Required.
-                //     rpc: {
-                //       137: "https://matic-mainnet.chainstacklabs.com",
-                //     },
-                //     infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
-                //   });
-                //   const providerOptions = {
-                //     walletconnect: {
-                //       package: WalletConnectProvider, // required
-                //       options: options,
-                //     },
-                //   };
-                //   const web3Modal = new Web3Modal({
-                //     network: "mainnet",
-                //     cacheProvider: true,
-                //     providerOptions,
-                //   });
-                //   provider = await web3Modal.connect();
+                // * Create WalletConnect Provider.
+                let provider;
+                if (isMobile === true) {
+                  provider = new WalletConnectProvider({
+                    rpc: {
+                      137: "https://rpc-mainnet.maticvigil.com",
+                      80001: "https://rpc-mumbai.maticvigil.com/",
+                    },
+                    infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
+                  });
 
-                //   // * Enable session (triggers QR Code modal)
-                //   // await provider.enable();
-                // }
-
-                //  Create WalletConnect Provider
-                const provider = new WalletConnectProvider({
-                  rpc: {
-                    137: "https://rpc-mainnet.maticvigil.com",
-                    80001: "https://rpc-mumbai.maticvigil.com/",
-                  },
-                  infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
-                });
-
-                //  Enable session (triggers QR Code modal)
-                await provider.enable();
-                console.log("provider: ", provider);
+                  // * Enable session (triggers QR Code modal).
+                  await provider.enable();
+                  console.log("provider: ", provider);
+                }
 
                 // * rent fee and rent fee by token should be an ether unit expression.
                 await rentMarketRef.current.changeNFT({
