@@ -14,6 +14,8 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useRecoilStateLoadable } from "recoil";
 import {
   getUniqueKey,
@@ -32,8 +34,8 @@ const MonitorRentNft = ({
 }) => {
   // * Define rent market class.
   const rentMarketRef = React.useRef();
-  const [rentArray, setRentArray] = React.useState([]);
-  const [rentEventArray, setRentEventArray] = React.useState([]);
+  const [rentArray, setRentArray] = React.useState();
+  const [rentEventArray, setRentEventArray] = React.useState();
 
   // * Define alchemy configuration.
   const settings = {
@@ -252,173 +254,192 @@ const MonitorRentNft = ({
         <Chip label="Current Rent Data" />
       </Divider>
 
-      <TableContainer component={Paper}>
-        <Table
-          size="small"
+      {rentArray ? (
+        <TableContainer component={Paper}>
+          <Table
+            size="small"
+            sx={{
+              width: "max-content",
+            }}
+          >
+            {/* // * ----------------------------------------------------------*/}
+            {/* // * Current rent data table head.                                               */}
+            {/* // * ----------------------------------------------------------*/}
+            <TableHead>
+              <TableRow
+                sx={{
+                  backgroundColor: "lightgrey",
+                  borderBottom: "2px solid black",
+                  "& th": {
+                    fontSize: "10px",
+                  },
+                }}
+              >
+                <TableCell align="center">NFT Address</TableCell>
+                <TableCell align="center">Token ID</TableCell>
+                <TableCell align="center">Rent Fee</TableCell>
+                <TableCell align="center">Fee Token Address</TableCell>
+                <TableCell align="center">Rent Fee by Token</TableCell>
+                <TableCell align="center">Is rent by Token</TableCell>
+                <TableCell align="center">Rent Duration</TableCell>
+                <TableCell align="center">Rent Start Timestamp</TableCell>
+                <TableCell align="center">Rent Remain Timestamp</TableCell>
+                <TableCell align="center">Settle</TableCell>
+              </TableRow>
+            </TableHead>
+
+            {/* // * ----------------------------------------------------------*/}
+            {/* // * Current rent data table body.                                               */}
+            {/* // * ----------------------------------------------------------*/}
+            <TableBody>
+              {rentArray.map((data) => {
+                // console.log("data: ", data);
+                // struct rentData {
+                //     address nftAddress;
+                //     uint256 tokenId;
+                //     uint256 rentFee;
+                //     address feeTokenAddress;
+                //     uint256 rentFeeByToken;
+                //     bool isRentByToken;
+                //     uint256 rentDuration;
+                //     address renterAddress;
+                //     address renteeAddress;
+                //     address serviceAddress;
+                //     uint256 rentStartTimestamp;
+                // }
+
+                // * Get display timestamp string.
+                const durationTimestampDisplay = `${moment
+                  .unix(data.rentDuration.toNumber())
+                  .diff(0, "days", true)} day`;
+                // * https://momentjs.com/docs/#/displaying/format/
+                const rentStartTimestampDisplay = moment
+                  .unix(data.rentStartTimestamp.toNumber())
+                  .format("YYYY/MM/DD-kk:mm:ss");
+
+                // * Get remain timestamp.
+                const currentTimestamp = Math.round(
+                  new Date().getTime() / 1000
+                );
+                const remainTimestamp =
+                  data.rentStartTimestamp.add(data.rentDuration).toNumber() -
+                  currentTimestamp;
+                let remainTimestampDisplay;
+                // console.log("remainTimestamp: ", remainTimestamp);
+
+                // Make settle button.
+                let showSettleButton = true;
+                if (remainTimestamp < 0) {
+                  showSettleButton = true;
+                  remainTimestampDisplay = moment
+                    .unix(
+                      data.rentStartTimestamp.add(data.rentDuration).toNumber()
+                    )
+                    .fromNow();
+                } else {
+                  showSettleButton = false;
+                  remainTimestampDisplay = moment
+                    .unix(
+                      data.rentStartTimestamp.add(data.rentDuration).toNumber()
+                    )
+                    .toNow();
+                }
+
+                const settleButton = (
+                  <Button
+                    variant="outlined"
+                    onClick={async () => {
+                      try {
+                        // console.log("data.nftAddress: ", data.nftAddress);
+                        // console.log("data.tokenId: ", data.tokenId);
+                        await rentMarketRef.current.settleRentData(
+                          data.nftAddress,
+                          data.tokenId
+                        );
+                      } catch (error) {
+                        console.error(error);
+                        setWriteToastMessage({
+                          snackbarSeverity: AlertSeverity.error,
+                          snackbarMessage: error?.reason,
+                          snackbarTime: new Date(),
+                          snackbarOpen: true,
+                        });
+                      }
+                    }}
+                  >
+                    SETTLE
+                  </Button>
+                );
+
+                return (
+                  <TableRow
+                    key={getUniqueKey()}
+                    sx={{
+                      "&:last-child td, &:last-child th": { border: 0 },
+                      "& td": {
+                        fontSize: "0.7rem",
+                        color: "rgba(96, 96, 96)",
+                      },
+                    }}
+                  >
+                    <TableCell align="center">
+                      {shortenAddress({
+                        address: data.nftAddress,
+                        number: 2,
+                        withLink: "scan",
+                      })}
+                    </TableCell>
+                    <TableCell align="center">
+                      {data.tokenId.toNumber()}
+                    </TableCell>
+                    <TableCell align="center">
+                      {data.rentFee / Math.pow(10, 18)}
+                    </TableCell>
+                    <TableCell align="center">
+                      {shortenAddress({
+                        address: data.feeTokenAddress,
+                        number: 2,
+                        withLink: "scan",
+                      })}
+                    </TableCell>
+                    <TableCell align="center">
+                      {data.rentFeeByToken.toNumber()}
+                    </TableCell>
+                    <TableCell align="center">
+                      {data.isRentByToken.toString()}
+                    </TableCell>
+                    <TableCell align="center">
+                      {durationTimestampDisplay}
+                    </TableCell>
+                    <TableCell align="center">
+                      {rentStartTimestampDisplay}
+                    </TableCell>
+                    <TableCell align="center">
+                      {remainTimestampDisplay}
+                    </TableCell>
+                    <TableCell align="center">
+                      {showSettleButton && settleButton}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      ) : (
+        <Box
           sx={{
-            width: "max-content",
+            marginTop: "20px",
+            display: "flex",
+            width: "100vw",
+            height: "20vh",
+            flexDirection: "row",
+            justifyContent: "center",
           }}
         >
-          {/* // * ----------------------------------------------------------*/}
-          {/* // * Current rent data table head.                                               */}
-          {/* // * ----------------------------------------------------------*/}
-          <TableHead>
-            <TableRow
-              sx={{
-                backgroundColor: "lightgrey",
-                borderBottom: "2px solid black",
-                "& th": {
-                  fontSize: "10px",
-                },
-              }}
-            >
-              <TableCell align="center">NFT Address</TableCell>
-              <TableCell align="center">Token ID</TableCell>
-              <TableCell align="center">Rent Fee</TableCell>
-              <TableCell align="center">Fee Token Address</TableCell>
-              <TableCell align="center">Rent Fee by Token</TableCell>
-              <TableCell align="center">Is rent by Token</TableCell>
-              <TableCell align="center">Rent Duration</TableCell>
-              <TableCell align="center">Rent Start Timestamp</TableCell>
-              <TableCell align="center">Rent Remain Timestamp</TableCell>
-              <TableCell align="center">Settle</TableCell>
-            </TableRow>
-          </TableHead>
-
-          {/* // * ----------------------------------------------------------*/}
-          {/* // * Current rent data table body.                                               */}
-          {/* // * ----------------------------------------------------------*/}
-          <TableBody>
-            {rentArray.map((data) => {
-              // console.log("data: ", data);
-              // struct rentData {
-              //     address nftAddress;
-              //     uint256 tokenId;
-              //     uint256 rentFee;
-              //     address feeTokenAddress;
-              //     uint256 rentFeeByToken;
-              //     bool isRentByToken;
-              //     uint256 rentDuration;
-              //     address renterAddress;
-              //     address renteeAddress;
-              //     address serviceAddress;
-              //     uint256 rentStartTimestamp;
-              // }
-
-              // * Get display timestamp string.
-              const durationTimestampDisplay = `${moment
-                .unix(data.rentDuration.toNumber())
-                .diff(0, "days", true)} day`;
-              // * https://momentjs.com/docs/#/displaying/format/
-              const rentStartTimestampDisplay = moment
-                .unix(data.rentStartTimestamp.toNumber())
-                .format("YYYY/MM/DD-kk:mm:ss");
-
-              // * Get remain timestamp.
-              const currentTimestamp = Math.round(new Date().getTime() / 1000);
-              const remainTimestamp =
-                data.rentStartTimestamp.add(data.rentDuration).toNumber() -
-                currentTimestamp;
-              let remainTimestampDisplay;
-              // console.log("remainTimestamp: ", remainTimestamp);
-
-              // Make settle button.
-              let showSettleButton = true;
-              if (remainTimestamp < 0) {
-                showSettleButton = true;
-                remainTimestampDisplay = moment
-                  .unix(
-                    data.rentStartTimestamp.add(data.rentDuration).toNumber()
-                  )
-                  .fromNow();
-              } else {
-                showSettleButton = false;
-                remainTimestampDisplay = moment
-                  .unix(
-                    data.rentStartTimestamp.add(data.rentDuration).toNumber()
-                  )
-                  .toNow();
-              }
-
-              const settleButton = (
-                <Button
-                  variant="outlined"
-                  onClick={async () => {
-                    try {
-                      // console.log("data.nftAddress: ", data.nftAddress);
-                      // console.log("data.tokenId: ", data.tokenId);
-                      await rentMarketRef.current.settleRentData(
-                        data.nftAddress,
-                        data.tokenId
-                      );
-                    } catch (error) {
-                      console.error(error);
-                      setWriteToastMessage({
-                        snackbarSeverity: AlertSeverity.error,
-                        snackbarMessage: error?.reason,
-                        snackbarTime: new Date(),
-                        snackbarOpen: true,
-                      });
-                    }
-                  }}
-                >
-                  SETTLE
-                </Button>
-              );
-
-              return (
-                <TableRow
-                  key={getUniqueKey()}
-                  sx={{
-                    "&:last-child td, &:last-child th": { border: 0 },
-                    "& td": {
-                      fontSize: "0.7rem",
-                      color: "rgba(96, 96, 96)",
-                    },
-                  }}
-                >
-                  <TableCell align="center">
-                    {shortenAddress({
-                      address: data.nftAddress,
-                      number: 2,
-                      withLink: "scan",
-                    })}
-                  </TableCell>
-                  <TableCell align="center">
-                    {data.tokenId.toNumber()}
-                  </TableCell>
-                  <TableCell align="center">
-                    {data.rentFee / Math.pow(10, 18)}
-                  </TableCell>
-                  <TableCell align="center">
-                    {shortenAddress({
-                      address: data.feeTokenAddress,
-                      number: 2,
-                      withLink: "scan",
-                    })}
-                  </TableCell>
-                  <TableCell align="center">
-                    {data.rentFeeByToken.toNumber()}
-                  </TableCell>
-                  <TableCell align="center">
-                    {data.isRentByToken.toString()}
-                  </TableCell>
-                  <TableCell align="center">
-                    {durationTimestampDisplay}
-                  </TableCell>
-                  <TableCell align="center">
-                    {rentStartTimestampDisplay}
-                  </TableCell>
-                  <TableCell align="center">{remainTimestampDisplay}</TableCell>
-                  <TableCell align="center">
-                    {showSettleButton && settleButton}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          <CircularProgress />
+        </Box>
+      )}
 
       {/* // * --------------------------------------------------------------*/}
       {/* // * Show all rent event history.                                  */}
@@ -427,122 +448,137 @@ const MonitorRentNft = ({
         <Chip label="Rent Event History" />
       </Divider>
 
-      <TableContainer component={Paper}>
-        <Table
-          size="small"
+      {rentEventArray ? (
+        <TableContainer component={Paper}>
+          <Table
+            size="small"
+            sx={{
+              width: "max-content",
+            }}
+          >
+            {/* // * ----------------------------------------------------------*/}
+            {/* // * Rent event history table head.                                               */}
+            {/* // * ----------------------------------------------------------*/}
+            <TableHead>
+              <TableRow
+                sx={{
+                  backgroundColor: "lightgrey",
+                  borderBottom: "2px solid black",
+                  "& th": {
+                    fontSize: "10px",
+                  },
+                }}
+              >
+                <TableCell align="right" fontSize="10pt">
+                  NFT Address
+                </TableCell>
+                <TableCell align="right">Token ID</TableCell>
+                <TableCell align="right">Rent Fee</TableCell>
+                <TableCell align="right">Fee Token Address</TableCell>
+                <TableCell align="right">Rent Fee by Token</TableCell>
+                <TableCell align="right">Is rent by Token</TableCell>
+                <TableCell align="right">Rent Duration</TableCell>
+                <TableCell align="right">Renter Address</TableCell>
+                <TableCell align="right">Rentee Address</TableCell>
+                <TableCell align="right">Service Address</TableCell>
+                <TableCell align="right">Rent Start Timestamp</TableCell>
+              </TableRow>
+            </TableHead>
+
+            {/* // * ----------------------------------------------------------*/}
+            {/* // * Rent event history table body.                                               */}
+            {/* // * ----------------------------------------------------------*/}
+            <TableBody>
+              {rentEventArray.map((event) => {
+                // console.log("event: ", event);
+
+                // * Get display timestamp string.
+                const durationTimestampDisplay = `${moment
+                  .unix(event.rentDuration)
+                  .diff(0, "days", true)} day`;
+                // * https://momentjs.com/docs/#/displaying/format/
+                const rentStartTimestampDisplay = moment
+                  .unix(event.rentStartTimestamp)
+                  .format("YYYY/MM/DD-kk:mm:ss");
+
+                return (
+                  <TableRow
+                    key={getUniqueKey()}
+                    sx={{
+                      "&:last-child td, &:last-child th": { border: 0 },
+                      // backgroundColor: "yellow",
+                      // borderBottom: "2px solid black",
+                      "& td": {
+                        fontSize: "0.7rem",
+                        color: "rgba(96, 96, 96)",
+                      },
+                    }}
+                  >
+                    <TableCell align="center">
+                      {shortenAddress({
+                        address: event.nftAddress,
+                        number: 2,
+                        withLink: "scan",
+                      })}
+                    </TableCell>
+                    <TableCell align="center">{event.tokenId}</TableCell>
+                    <TableCell align="center">{event.rentFee}</TableCell>
+                    <TableCell align="center">
+                      {shortenAddress({
+                        address: event.feeTokenAddress,
+                        number: 2,
+                        withLink: "scan",
+                      })}
+                    </TableCell>
+                    <TableCell align="center">{event.rentFeeByToken}</TableCell>
+                    <TableCell align="center">{event.isRentByToken}</TableCell>
+                    <TableCell align="center">
+                      {durationTimestampDisplay}
+                    </TableCell>
+                    <TableCell align="center">
+                      {shortenAddress({
+                        address: event.renterAddress,
+                        number: 2,
+                        withLink: "scan",
+                      })}
+                    </TableCell>
+                    <TableCell align="center">
+                      {shortenAddress({
+                        address: event.renteeAddress,
+                        number: 2,
+                        withLink: "scan",
+                      })}
+                    </TableCell>
+                    <TableCell align="center">
+                      {shortenAddress({
+                        address: event.serviceAddress,
+                        number: 2,
+                        withLink: "scan",
+                      })}
+                    </TableCell>
+                    <TableCell align="center">
+                      {rentStartTimestampDisplay}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      ) : (
+        <Box
           sx={{
-            width: "max-content",
+            marginTop: "20px",
+            display: "flex",
+            width: "100vw",
+            height: "100vh",
+            flexDirection: "row",
+            justifyContent: "center",
           }}
         >
-          {/* // * ----------------------------------------------------------*/}
-          {/* // * Rent event history table head.                                               */}
-          {/* // * ----------------------------------------------------------*/}
-          <TableHead>
-            <TableRow
-              sx={{
-                backgroundColor: "lightgrey",
-                borderBottom: "2px solid black",
-                "& th": {
-                  fontSize: "10px",
-                },
-              }}
-            >
-              <TableCell align="right" fontSize="10pt">
-                NFT Address
-              </TableCell>
-              <TableCell align="right">Token ID</TableCell>
-              <TableCell align="right">Rent Fee</TableCell>
-              <TableCell align="right">Fee Token Address</TableCell>
-              <TableCell align="right">Rent Fee by Token</TableCell>
-              <TableCell align="right">Is rent by Token</TableCell>
-              <TableCell align="right">Rent Duration</TableCell>
-              <TableCell align="right">Renter Address</TableCell>
-              <TableCell align="right">Rentee Address</TableCell>
-              <TableCell align="right">Service Address</TableCell>
-              <TableCell align="right">Rent Start Timestamp</TableCell>
-            </TableRow>
-          </TableHead>
-
-          {/* // * ----------------------------------------------------------*/}
-          {/* // * Rent event history table body.                                               */}
-          {/* // * ----------------------------------------------------------*/}
-          <TableBody>
-            {rentEventArray.map((event) => {
-              // console.log("event: ", event);
-
-              // * Get display timestamp string.
-              const durationTimestampDisplay = `${moment
-                .unix(event.rentDuration)
-                .diff(0, "days", true)} day`;
-              // * https://momentjs.com/docs/#/displaying/format/
-              const rentStartTimestampDisplay = moment
-                .unix(event.rentStartTimestamp)
-                .format("YYYY/MM/DD-kk:mm:ss");
-
-              return (
-                <TableRow
-                  key={getUniqueKey()}
-                  sx={{
-                    "&:last-child td, &:last-child th": { border: 0 },
-                    // backgroundColor: "yellow",
-                    // borderBottom: "2px solid black",
-                    "& td": {
-                      fontSize: "0.7rem",
-                      color: "rgba(96, 96, 96)",
-                    },
-                  }}
-                >
-                  <TableCell align="center">
-                    {shortenAddress({
-                      address: event.nftAddress,
-                      number: 2,
-                      withLink: "scan",
-                    })}
-                  </TableCell>
-                  <TableCell align="center">{event.tokenId}</TableCell>
-                  <TableCell align="center">{event.rentFee}</TableCell>
-                  <TableCell align="center">
-                    {shortenAddress({
-                      address: event.feeTokenAddress,
-                      number: 2,
-                      withLink: "scan",
-                    })}
-                  </TableCell>
-                  <TableCell align="center">{event.rentFeeByToken}</TableCell>
-                  <TableCell align="center">{event.isRentByToken}</TableCell>
-                  <TableCell align="center">
-                    {durationTimestampDisplay}
-                  </TableCell>
-                  <TableCell align="center">
-                    {shortenAddress({
-                      address: event.renterAddress,
-                      number: 2,
-                      withLink: "scan",
-                    })}
-                  </TableCell>
-                  <TableCell align="center">
-                    {shortenAddress({
-                      address: event.renteeAddress,
-                      number: 2,
-                      withLink: "scan",
-                    })}
-                  </TableCell>
-                  <TableCell align="center">
-                    {shortenAddress({
-                      address: event.serviceAddress,
-                      number: 2,
-                      withLink: "scan",
-                    })}
-                  </TableCell>
-                  <TableCell align="center">
-                    {rentStartTimestampDisplay}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          <CircularProgress />
+        </Box>
+      )}
     </div>
   );
 };

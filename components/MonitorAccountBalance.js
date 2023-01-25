@@ -1,6 +1,5 @@
 import React from "react";
 import { Buffer } from "buffer";
-import { userAgent } from "next/server";
 import Divider from "@mui/material/Divider";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
@@ -9,6 +8,8 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useRecoilStateLoadable } from "recoil";
 import {
   shortenAddress,
@@ -27,7 +28,7 @@ const MonitorAccountBalance = ({
   // * Define rent market class.
   // * -------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
-  const [accountBalanceArray, setAccountBalanceArray] = React.useState([]);
+  const [accountBalanceArray, setAccountBalanceArray] = React.useState();
 
   // * -------------------------------------------------------------------------
   // * Handle toast message.
@@ -122,6 +123,29 @@ const MonitorAccountBalance = ({
       >
         WITHDRAW
       </Button>
+    );
+  }
+
+  if (accountBalanceArray === undefined) {
+    return (
+      <div>
+        <Divider sx={{ margin: "5px" }}>
+          <Chip label="Account Balance Data" />
+        </Divider>
+
+        <Box
+          sx={{
+            marginTop: "20px",
+            display: "flex",
+            width: "100vw",
+            height: "100vh",
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      </div>
     );
   }
 

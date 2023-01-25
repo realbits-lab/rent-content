@@ -1,5 +1,4 @@
 import React from "react";
-import { Network, Alchemy } from "alchemy-sdk";
 import { Buffer } from "buffer";
 import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
@@ -10,6 +9,8 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useRecoilStateLoadable } from "recoil";
 import {
   shortenAddress,
@@ -24,22 +25,9 @@ const MonitorPendingRentFee = ({
   rentMarketAddress,
   inputBlockchainNetwork,
 }) => {
-  // * Define constant varialbe.
-  const TABLE_MIN_WIDTH = 400;
-
   // * Define rent market class.
   const rentMarket = React.useRef();
-  const [pendingRentFeeArray, setPendingRentFeeArray] = React.useState([]);
-
-  // * Define alchemy configuration.
-  const settings = {
-    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
-    network:
-      process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK === "maticmum"
-        ? Network.MATIC_MUMBAI
-        : Network.MATIC_MAINNET,
-  };
-  const alchemy = new Alchemy(settings);
+  const [pendingRentFeeArray, setPendingRentFeeArray] = React.useState();
 
   //----------------------------------------------------------------------------
   // Handle toast message.
@@ -104,6 +92,29 @@ const MonitorPendingRentFee = ({
     rentMarketAddress,
     inputBlockchainNetwork,
   ]);
+
+  if (pendingRentFeeArray === undefined) {
+    return (
+      <div>
+        <Divider sx={{ margin: "5px" }}>
+          <Chip label="Pending Rent Fee Data" />
+        </Divider>
+
+        <Box
+          sx={{
+            marginTop: "20px",
+            display: "flex",
+            width: "100vw",
+            height: "100vh",
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      </div>
+    );
+  }
 
   return (
     <div>
