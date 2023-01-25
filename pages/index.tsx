@@ -6,8 +6,9 @@ import {
 } from "@web3modal/ethereum";
 import { Web3Modal } from "@web3modal/react";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
-import { polygon, polygonMumbai } from "wagmi/chains";
+import { polygon, polygonMumbai, localhost } from "wagmi/chains";
 import RentContent from "../components/RentContent";
+import { getChainName } from "../components/RentContentUtil";
 
 function App() {
   // console.log(
@@ -27,7 +28,25 @@ function App() {
   //   process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS
   // );
 
-  const chains = [polygon, polygonMumbai];
+  let chains = [];
+  if (
+    getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
+    "matic"
+  ) {
+    chains = [polygon];
+  } else if (
+    getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
+    "maticmum"
+  ) {
+    chains = [polygonMumbai];
+  } else if (
+    getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
+    "localhost"
+  ) {
+    chains = [localhost];
+  } else {
+    chains = [];
+  }
 
   // * Wagmi client
   const { provider } = configureChains(chains, [
@@ -56,8 +75,9 @@ function App() {
           serviceAddress={process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS}
         />
       </WagmiConfig>
+
       <Web3Modal
-        projectId="<YOUR_PROJECT_ID>"
+        projectId={process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID}
         ethereumClient={ethereumClient}
       />
     </>

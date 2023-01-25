@@ -1,4 +1,5 @@
 import React from "react";
+import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -362,6 +363,8 @@ const RentContent = ({
               ? "Monitor - Rent NFT"
               : "Rent Market"}
           </Typography>
+          <Web3Button />
+          <Web3NetworkSwitch />
         </Toolbar>
       </AppBar>
 

@@ -1,26 +1,7 @@
 import React from "react";
 import moment from "moment";
-import {
-  browserName,
-  isBrowser,
-  isDesktop,
-  isMobile,
-  osVersion,
-  osName,
-  mobileVendor,
-  mobileModel,
-  engineName,
-  engineVersion,
-  getUA,
-} from "react-device-detect";
-import {
-  EthereumClient,
-  modalConnectors,
-  walletConnectProvider,
-} from "@web3modal/ethereum";
-import { Web3Modal } from "@web3modal/react";
-import { configureChains, createClient, WagmiConfig } from "wagmi";
-import { polygon, polygonMumbai } from "wagmi/chains";
+import { isMobile, getUA } from "react-device-detect";
+import { useWeb3ModalNetwork } from "@web3modal/react";
 import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
 import Box from "@mui/material/Box";
@@ -67,6 +48,8 @@ const My = ({
   inputBlockchainNetwork,
 }) => {
   const theme = useTheme();
+  const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
+  // console.log("selectedChain: ", selectedChain);
   const METAMASK_DAPP_URL =
     "https://metamask.app.link/dapp/e499-182-222-13-78.jp.ngrok.io";
 
@@ -196,6 +179,7 @@ const My = ({
     inputMyRegisteredNFTArray,
     inputMyRentNFTArray,
     inputBlockchainNetwork,
+    selectedChain,
   ]);
 
   function initializePagination() {}
@@ -593,7 +577,17 @@ const My = ({
     }
 
     // TODO: Change loading process bar later.
-    if (collectionArray.length === 0) {
+    // console.log("selectedChain: ", selectedChain);
+    // console.log("selectedChain.network: ", selectedChain.network);
+    // console.log(
+    //   "getChainName({ chainId: inputBlockchainNetwork }): ",
+    //   getChainName({ chainId: inputBlockchainNetwork })
+    // );
+    if (
+      selectedChain.network ===
+        getChainName({ chainId: inputBlockchainNetwork }) &&
+      collectionArray.length === 0
+    ) {
       return <Typography>loading...</Typography>;
     }
 
@@ -680,29 +674,8 @@ const My = ({
     );
   }
 
-  const chains = [polygon, polygonMumbai];
-
-  // * Wagmi client
-  const { provider } = configureChains(chains, [
-    walletConnectProvider({
-      projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-    }),
-  ]);
-  const wagmiClient = createClient({
-    autoConnect: true,
-    connectors: modalConnectors({ appName: "web3Modal", chains }),
-    provider,
-  });
-
-  // * Web3Modal Ethereum Client
-  const ethereumClient = new EthereumClient(wagmiClient, chains);
-
   return (
     <div>
-      <Web3Modal
-        projectId={process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID}
-        ethereumClient={ethereumClient}
-      />
       <Grid
         container
         spacing={2}
@@ -711,6 +684,7 @@ const My = ({
         <Grid item>{buildTopMenu()}</Grid>
         <Grid item>{buildNftTable()}</Grid>
       </Grid>
+
       <RBSnackbar
         open={snackbarOpen}
         message={snackbarMessage}
