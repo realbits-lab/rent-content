@@ -39,6 +39,7 @@
     "rent-market": "^2.0.5",
     "typescript": "4.9.4",
     "uuid": "^9.0.0",
-    "wagmi": "^0.10.15"
+    "wagmi": "^0.10.15",
+    "web3modal": "^1.9.11"
   }
 }

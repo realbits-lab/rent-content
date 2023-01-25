@@ -1,5 +1,13 @@
 import React from "react";
 import WalletConnectProvider from "@walletconnect/web3-provider";
+import {
+  useContract,
+  useProvider,
+  useSigner,
+  useContractWrite,
+  usePrepareContractWrite,
+} from "wagmi";
+import Web3Modal from "web3modal";
 import { isMobile, getUA } from "react-device-detect";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -42,6 +50,7 @@ import {
   getChainName,
 } from "rent-market";
 import { shortenAddress } from "./RentContentUtil";
+import rentMarketABI from "./rentMarket.json";
 
 const Content = ({
   inputRentMarket,
@@ -53,6 +62,12 @@ const Content = ({
   // * Define input copied variables.
   // * -------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
+
+  const provider = useProvider();
+  console.log("provider: ", provider);
+  const signer = useSigner();
+  console.log("signer: ", signer);
+
   const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState([]);
   const [myUnregisteredNFTArray, setMyUnregisteredNFTArray] = React.useState(
     []
@@ -771,15 +786,31 @@ const Content = ({
 
                 //  * Create WalletConnect Provider
                 let provider;
-                if (isMobile && getUA.includes("MetaMaskMobile") === false) {
-                  provider = new WalletConnectProvider({
+                if (true || isMobile === true) {
+                  const options = new WalletConnectProvider({
                     // * Required.
+                    rpc: {
+                      137: "https://matic-mainnet.chainstacklabs.com",
+                    },
                     infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
                   });
+                  const providerOptions = {
+                    walletconnect: {
+                      package: WalletConnectProvider, // required
+                      options: options,
+                    },
+                  };
+                  const web3Modal = new Web3Modal({
+                    network: "mainnet",
+                    cacheProvider: true,
+                    providerOptions,
+                  });
+                  provider = await web3Modal.connect();
 
-                  //  * Enable session (triggers QR Code modal)
-                  await provider.enable();
+                  // * Enable session (triggers QR Code modal)
+                  // await provider.enable();
                 }
+                console.log("provider: ", provider);
 
                 // * rent fee and rent fee by token should be an ether unit expression.
                 await rentMarketRef.current.changeNFT({
