@@ -526,11 +526,11 @@ const Content = ({
   }
 
   function showMyRegisteredNFTElementTable() {
-    console.log("call showMyRegisteredNFTElementTable()");
-    console.log(
-      "myRegisteredUniqueNFTAddressArray: ",
-      myRegisteredUniqueNFTAddressArray
-    );
+    // console.log("call showMyRegisteredNFTElementTable()");
+    // console.log(
+    //   "myRegisteredUniqueNFTAddressArray: ",
+    //   myRegisteredUniqueNFTAddressArray
+    // );
 
     let openseaMode;
 

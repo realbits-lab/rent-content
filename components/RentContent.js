@@ -110,8 +110,8 @@ const RentContent = ({
   serviceAddress,
 }) => {
   const { address, isConnected } = useAccount();
-  console.log("address: ", address);
-  console.log("isConnected: ", isConnected);
+  // console.log("address: ", address);
+  // console.log("isConnected: ", isConnected);
 
   // const { data: ensName } = useEnsName({ address });
   // console.log("ensName: ", ensName);
