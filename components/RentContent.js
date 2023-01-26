@@ -110,8 +110,8 @@ const RentContent = ({
   serviceAddress,
 }) => {
   const { address, isConnected } = useAccount();
-  // console.log("address: ", address);
-  // console.log("isConnected: ", isConnected);
+  console.log("address: ", address);
+  console.log("isConnected: ", isConnected);
 
   // const { data: ensName } = useEnsName({ address });
   // console.log("ensName: ", ensName);
@@ -119,7 +119,7 @@ const RentContent = ({
   // * -------------------------------------------------------------------------
   // * Define each menu index.
   // * -------------------------------------------------------------------------
-  const DEFAULT_MENU_INDEX = 2;
+  const DEFAULT_MENU_INDEX = 1;
 
   const CONTENT_MENU_INDEX = 0;
   const MY_MENU_INDEX = 1;
