@@ -187,7 +187,7 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
                     {element.name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Scan:{" "}
+                    PolygonScan:{" "}
                     {shortenAddress({
                       address: element.serviceAddress,
                       withLink: "scan",

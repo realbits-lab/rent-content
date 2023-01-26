@@ -202,7 +202,7 @@ const Collection = ({
                     {element.name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Scan:{" "}
+                    PolygonScan:{" "}
                     {shortenAddress({
                       address: element.collectionAddress,
                       number: 4,
