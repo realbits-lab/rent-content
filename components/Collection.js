@@ -16,6 +16,7 @@ import {
   AlertSeverity,
   writeToastMessageState,
   shortenAddress,
+  getUniqueKey,
 } from "./RentContentUtil";
 
 const Collection = ({
@@ -188,7 +189,7 @@ const Collection = ({
           // console.log("element: ", element);
 
           return (
-            <Grid item sx={2} key={element.key}>
+            <Grid item width={"180px"} key={getUniqueKey()}>
               <Card>
                 <CardMedia
                   component="img"
@@ -201,9 +202,19 @@ const Collection = ({
                     {element.name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
+                    Scan:{" "}
                     {shortenAddress({
                       address: element.collectionAddress,
                       number: 4,
+                      withLink: "scan",
+                    })}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Opensea:{" "}
+                    {shortenAddress({
+                      address: element.collectionAddress,
+                      number: 4,
+                      withLink: "opensea",
                     })}
                   </Typography>
                 </CardContent>
