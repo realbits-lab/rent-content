@@ -17,6 +17,7 @@ import {
   AlertSeverity,
   shortenAddress,
   writeToastMessageState,
+  getUniqueKey,
 } from "./RentContentUtil";
 
 const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
@@ -77,7 +78,11 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
     }
   }, [inputServiceArray, inputRentMarket]);
 
-  const getServiceMetadata = async (services) => {
+  async function getServiceMetadata(services) {
+    if (services == undefined) {
+      return;
+    }
+
     const serviceArray = await Promise.all(
       services.map(async (service) => {
         // console.log("service: ", service);
@@ -95,7 +100,7 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
     );
     // console.log("serviceArray: ", serviceArray);
     setServiceArray(serviceArray);
-  };
+  }
 
   return (
     <div>
@@ -169,8 +174,8 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
           // console.log("element: ", element);
 
           return (
-            <Grid item key={element.key}>
-              <Card sx={{ maxWidth: 345 }}>
+            <Grid item width={"180px"} key={getUniqueKey()}>
+              <Card>
                 <CardMedia
                   component="img"
                   alt="image"
@@ -182,7 +187,11 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
                     {element.name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {shortenAddress({ address: element.serviceAddress })}
+                    Scan:{" "}
+                    {shortenAddress({
+                      address: element.serviceAddress,
+                      withLink: "scan",
+                    })}
                   </Typography>
                 </CardContent>
                 <CardActions>
