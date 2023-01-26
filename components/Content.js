@@ -1,5 +1,6 @@
 import React from "react";
 import WalletConnectProvider from "@walletconnect/web3-provider";
+import { useAccount } from "wagmi";
 import { isMobile } from "react-device-detect";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -51,6 +52,11 @@ const Content = ({
   inputMyRegisteredNFTArray,
   inputMyUnregisteredNFTArray,
 }) => {
+  // * -------------------------------------------------------------------------
+  // * Hook variables.
+  // * -------------------------------------------------------------------------
+  const { address, isConnected } = useAccount();
+
   // * -------------------------------------------------------------------------
   // * Define input copied variables.
   // * -------------------------------------------------------------------------
@@ -538,6 +544,21 @@ const Content = ({
       openseaMode = "";
     }
 
+    if (isConnected === false) {
+      return (
+        <Box
+          sx={{
+            marginTop: "20px",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <Button variant="text">Click the connect wallet button</Button>
+        </Box>
+      );
+    }
+
     if (myRegisteredUniqueNFTAddressArray === undefined) {
       return (
         <Box
@@ -701,6 +722,21 @@ const Content = ({
     // console.log("call showMyUnregisteredNFTElementTable()");
     // https://mui.com/material-ui/react-table/
     // https://medium.com/@freshmilkdev/reactjs-render-optimization-for-collapsible-material-ui-long-list-with-checkboxes-231b36892e20
+
+    if (isConnected === false) {
+      return (
+        <Box
+          sx={{
+            marginTop: "20px",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <Button variant="text">Click the connect wallet button</Button>
+        </Box>
+      );
+    }
 
     if (myUnregisteredUniqueNFTAddressArray === undefined) {
       return (

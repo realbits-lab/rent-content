@@ -1,7 +1,7 @@
 import React from "react";
 import moment from "moment";
 import { useWeb3ModalNetwork } from "@web3modal/react";
-import { useAccount, useEnsName } from "wagmi";
+import { useAccount } from "wagmi";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
@@ -55,8 +55,8 @@ const My = ({
   const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
   // console.log("selectedChain: ", selectedChain);
   const { address, isConnected } = useAccount();
-  console.log("address: ", address);
-  console.log("isConnected: ", isConnected);
+  // console.log("address: ", address);
+  // console.log("isConnected: ", isConnected);
 
   // * -------------------------------------------------------------------------
   // * Define copied local varialbe from input data.
@@ -565,24 +565,26 @@ const My = ({
     //   getChainName({ chainId: inputBlockchainNetwork })
     // );
 
+    if (isConnected === false) {
+      return (
+        <Box
+          sx={{
+            marginTop: "20px",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <Button variant="text">Click the connect wallet button</Button>
+        </Box>
+      );
+    }
+
     if (
       selectedChain.network ===
       getChainName({ chainId: inputBlockchainNetwork })
     ) {
-      if (isConnected === false) {
-        return (
-          <Box
-            sx={{
-              marginTop: "20px",
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "center",
-            }}
-          >
-            <Button variant="text">Click the connect wallet button</Button>
-          </Box>
-        );
-      } else if (
+      if (
         selectedItem === MyMenu.own &&
         inputMyRegisteredNFTArray === undefined
       ) {
