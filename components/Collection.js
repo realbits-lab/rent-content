@@ -16,6 +16,7 @@ import {
   AlertSeverity,
   writeToastMessageState,
   shortenAddress,
+  getUniqueKey,
 } from "./RentContentUtil";
 
 const Collection = ({
@@ -84,7 +85,11 @@ const Collection = ({
     blockchainNetwork,
   ]);
 
-  const getCollectionMetadata = async (collections) => {
+  async function getCollectionMetadata(collections) {
+    if (collections === undefined) {
+      return;
+    }
+
     const collectionArray = await Promise.all(
       collections.map(async (collection) => {
         // console.log("collection: ", collection);
@@ -102,7 +107,7 @@ const Collection = ({
     );
     // console.log("collectionArray: ", collectionArray);
     setCollectionArray(collectionArray);
-  };
+  }
 
   return (
     <div>
@@ -184,8 +189,8 @@ const Collection = ({
           // console.log("element: ", element);
 
           return (
-            <Grid item key={element.key}>
-              <Card sx={{ maxWidth: 345 }}>
+            <Grid item width={"180px"} key={getUniqueKey()}>
+              <Card>
                 <CardMedia
                   component="img"
                   alt="image"
@@ -197,9 +202,19 @@ const Collection = ({
                     {element.name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
+                    PolygonScan:{" "}
                     {shortenAddress({
                       address: element.collectionAddress,
                       number: 4,
+                      withLink: "scan",
+                    })}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Opensea:{" "}
+                    {shortenAddress({
+                      address: element.collectionAddress,
+                      number: 4,
+                      withLink: "opensea",
                     })}
                   </Typography>
                 </CardContent>
