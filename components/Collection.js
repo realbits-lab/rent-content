@@ -84,7 +84,11 @@ const Collection = ({
     blockchainNetwork,
   ]);
 
-  const getCollectionMetadata = async (collections) => {
+  async function getCollectionMetadata(collections) {
+    if (collections === undefined) {
+      return;
+    }
+
     const collectionArray = await Promise.all(
       collections.map(async (collection) => {
         // console.log("collection: ", collection);
@@ -102,7 +106,7 @@ const Collection = ({
     );
     // console.log("collectionArray: ", collectionArray);
     setCollectionArray(collectionArray);
-  };
+  }
 
   return (
     <div>
@@ -184,8 +188,8 @@ const Collection = ({
           // console.log("element: ", element);
 
           return (
-            <Grid item key={element.key}>
-              <Card sx={{ maxWidth: 345 }}>
+            <Grid item sx={2} key={element.key}>
+              <Card>
                 <CardMedia
                   component="img"
                   alt="image"
