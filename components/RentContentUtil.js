@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, Portal, Snackbar, Alert as MuiAlert } from "@mui/material";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4, v1 } from "uuid";
 import {
   RecoilRoot,
   atom,
@@ -495,7 +495,7 @@ export const isInt = (value) => {
 };
 
 export const writeToastMessageState = atom({
-  key: "writeToastMessageState",
+  key: `writeToastMessageState/${v1()}`,
   snackbarSeverity: AlertSeverity.info,
   snackbarMessage: "",
   snackbarTime: "time",
@@ -503,7 +503,7 @@ export const writeToastMessageState = atom({
 });
 
 export const readToastMessageState = selector({
-  key: "readToastMessageState",
+  key: `readToastMessageState/${v1()}`,
   get: ({ get }) => {
     const toastMessageState = get(writeToastMessageState);
     return toastMessageState;
