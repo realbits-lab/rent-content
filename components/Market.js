@@ -186,12 +186,12 @@ const Market = ({
             color="primary"
             variant="contained"
             onClick={async () => {
-              console.log("call onClick()");
+              // console.log("call onClick()");
               // console.log(
               //   "rentMarketClassRef.current: ",
               //   rentMarketClassRef.current
               // );
-              console.log("serviceAddress: ", serviceAddress);
+              // console.log("serviceAddress: ", serviceAddress);
               // * Create WalletConnect Provider.
               let provider;
               if (isMobile === true) {

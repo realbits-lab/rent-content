@@ -135,6 +135,7 @@ const Content = ({
   React.useEffect(() => {
     // console.log("call React.useEffect()");
     // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
+    // console.log("inputMyUnregisteredNFTArray: ", inputMyUnregisteredNFTArray);
 
     rentMarketRef.current = inputRentMarket;
     setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
@@ -685,15 +686,16 @@ const Content = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {myUnregisteredNFTArray
-              .filter((element) => element.nftAddress === nftContractAddress)
-              .slice(
-                tablePage * tableRowsPerPage,
-                tablePage * tableRowsPerPage + tableRowsPerPage
-              )
-              .map((element) => {
-                return buildUnregisterRowList({ element });
-              })}
+            {myUnregisteredNFTArray &&
+              myUnregisteredNFTArray
+                .filter((element) => element.nftAddress === nftContractAddress)
+                .slice(
+                  tablePage * tableRowsPerPage,
+                  tablePage * tableRowsPerPage + tableRowsPerPage
+                )
+                .map((element) => {
+                  return buildUnregisterRowList({ element });
+                })}
           </TableBody>
         </Table>
       </TableCell>
