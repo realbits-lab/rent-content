@@ -1,6 +1,13 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-}
+const prod = process.env.NODE_ENV === "production";
 
-module.exports = nextConfig
+module.exports = {
+  // productionBrowserSourceMaps: true,
+  reactStrictMode: true,
+  transpilePackages: ["rent-market"],
+  // webpack: (config) => {
+  //   return {
+  //     ...config,
+  //     devtool: prod ? "inline-source-map" : "inline-source-map",
+  //   };
+  // },
+};

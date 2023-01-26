@@ -1,39 +1,32 @@
 import React from "react";
 import axios from "axios";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import Chip from "@mui/material/Chip";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import { useRecoilStateLoadable } from "recoil";
 import {
-  Grid,
-  Card,
-  CardActions,
-  CardContent,
-  CardMedia,
-  Button,
-  Typography,
-  Divider,
-  Chip,
-  TextField,
-  Box,
-  Snackbar,
-  Alert,
-} from "@mui/material";
-import {
-  RentMarket,
-  Metamask,
   AlertSeverity,
-  ConnectStatus,
+  writeToastMessageState,
   shortenAddress,
-  RBSnackbar,
-} from "rent-market";
+  getUniqueKey,
+} from "./RentContentUtil";
 
 const Collection = ({
-  rentMarketAddress,
-  nftAddress,
   inputCollectionArray,
   inputRentMarket,
   blockchainNetwork,
 }) => {
-  //----------------------------------------------------------------------------
-  // Handle text input change.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Handle text input change.
+  // * -------------------------------------------------------------------------
   const [formValue, setFormValue] = React.useState({
     collectionAddress: "",
     collectionUri: "",
@@ -50,63 +43,53 @@ const Collection = ({
     });
   };
 
-  //----------------------------------------------------------------------------
-  // Handle toast mesage.
-  //----------------------------------------------------------------------------
-  const [snackbarValue, setSnackbarValue] = React.useState({
-    snackbarSeverity: AlertSeverity.info,
-    snackbarMessage: "",
-    snackbarTime: new Date(),
-    snackbarOpen: true,
-  });
-  const { snackbarSeverity, snackbarMessage, snackbarTime, snackbarOpen } =
-    snackbarValue;
+  // * -------------------------------------------------------------------------
+  // * Handle toast mesage.
+  // * -------------------------------------------------------------------------
+  const [writeToastMessageLoadable, setWriteToastMessage] =
+    useRecoilStateLoadable(writeToastMessageState);
+  const writeToastMessage =
+    writeToastMessageLoadable?.state === "hasValue"
+      ? writeToastMessageLoadable.contents
+      : {
+          snackbarSeverity: AlertSeverity.info,
+          snackbarMessage: "",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        };
 
-  //----------------------------------------------------------------------------
-  // Define rent market class.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Define rent market class.
+  // * -------------------------------------------------------------------------
   const rentMarket = React.useRef();
 
-  //----------------------------------------------------------------------------
-  // Data list.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Data list.
+  // * -------------------------------------------------------------------------
   const [collectionArray, setCollectionArray] = React.useState([]);
 
-  //----------------------------------------------------------------------------
-  // Initialize data.
-  //----------------------------------------------------------------------------
+  // * -------------------------------------------------------------------------
+  // * Initialize data.
+  // * -------------------------------------------------------------------------
   React.useEffect(() => {
     // console.log("React.useEffect");
+
     if (inputRentMarket) {
-      // console.log(
-      //   "rentMarket.current is made from input inputRentMarket: ",
-      //   inputRentMarket
-      // );
       getCollectionMetadata(inputCollectionArray);
       rentMarket.current = inputRentMarket;
-    } else {
-      // TODO: Handle later.
-      // const initRentMarket = async () => {
-      //   rentMarket.current = new RentMarket(
-      //     rentMarketAddress,
-      //     nftAddress,
-      //     blockchainNetwork,
-      //     onEventFunc
-      //   );
-      //   await rentMarket.current.initializeAll();
-      //   await onEventFunc();
-      // };
-      // // 1. Fetch token, collection, request/register data, and rent data to interconnect them.
-      // initRentMarket().catch(console.error);
     }
-  }, [inputCollectionArray, inputRentMarket]);
+  }, [
+    inputCollectionArray,
+    inputRentMarket,
+    inputRentMarket.rentMarketContract,
+    blockchainNetwork,
+  ]);
 
-  const onEventFunc = async () => {
-    // Set data list.
-    await getCollectionMetadata(rentMarket.current.collectionArray);
-  };
+  async function getCollectionMetadata(collections) {
+    if (collections === undefined) {
+      return;
+    }
 
-  const getCollectionMetadata = async (collections) => {
     const collectionArray = await Promise.all(
       collections.map(async (collection) => {
         // console.log("collection: ", collection);
@@ -124,35 +107,25 @@ const Collection = ({
     );
     // console.log("collectionArray: ", collectionArray);
     setCollectionArray(collectionArray);
-  };
+  }
 
   return (
     <div>
-      {/*--------------------------------------------------------------------*/}
-      {/* 1. Show metamask. */}
-      {/*--------------------------------------------------------------------*/}
-      <p />
-      <Divider>
-        <Chip label="Metamask" />
-      </Divider>
-      <p />
-      <Metamask blockchainNetwork={blockchainNetwork} />
-
-      {/*--------------------------------------------------------------------*/}
-      {/* 2. Show request register collection. */}
-      {/*--------------------------------------------------------------------*/}
-      <p />
-      <Divider>
+      {/* // * --------------------------------------------------------------*/}
+      {/* // * Show request register collection.                             */}
+      {/* // * --------------------------------------------------------------*/}
+      <Divider sx={{ margin: "5px" }}>
         <Chip label="Input" />
       </Divider>
-      <p />
+
       <Box
         sx={{
-          width: 500,
-          maxWidth: "100%",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <TextField
+          margin={"normal"}
           fullWidth
           required
           id="outlined"
@@ -161,8 +134,8 @@ const Collection = ({
           value={collectionAddress}
           onChange={handleChange}
         />
-        <p />
         <TextField
+          margin={"normal"}
           fullWidth
           required
           id="outlined"
@@ -172,53 +145,52 @@ const Collection = ({
           value={collectionUri}
           onChange={handleChange}
         />
+        <Button
+          margin={"normal"}
+          variant="contained"
+          onClick={async () => {
+            try {
+              await rentMarket.current.registerCollection(
+                collectionAddress,
+                collectionUri
+              );
+            } catch (error) {
+              console.error(error);
+              setWriteToastMessage({
+                snackbarSeverity: AlertSeverity.error,
+                snackbarMessage: error.reason,
+                snackbarTime: new Date(),
+                snackbarOpen: true,
+              });
+            }
+
+            // TODO: Show a success toast message.
+            // setWriteToastMessage({
+            //   snackbarSeverity: AlertSeverity.info,
+            //   snackbarMessage: "Make transaction for registering collection.",
+            //   snackbarTime: new Date(),
+            //   snackbarOpen: true,
+            // });
+          }}
+        >
+          Register
+        </Button>
       </Box>
-      <p />
-      <Button
-        variant="contained"
-        onClick={async () => {
-          try {
-            await rentMarket.current.registerCollection(
-              collectionAddress,
-              collectionUri
-            );
-          } catch (error) {
-            console.error(error);
-            setSnackbarValue({
-              snackbarSeverity: AlertSeverity.error,
-              snackbarMessage: error.reason,
-              snackbarTime: new Date(),
-              snackbarOpen: true,
-            });
-          }
 
-          // TODO: Show a success toast message.
-          // setSnackbarValue({
-          //   snackbarSeverity: AlertSeverity.info,
-          //   snackbarMessage: "Make transaction for registering collection.",
-          //   snackbarTime: new Date(),
-          //   snackbarOpen: true,
-          // });
-        }}
-      >
-        Register
-      </Button>
-
-      {/*--------------------------------------------------------------------*/}
-      {/* 3. Show collectionArray. */}
-      {/*--------------------------------------------------------------------*/}
-      <p />
-      <Divider>
+      {/* // * --------------------------------------------------------------*/}
+      {/* // * Show collection array.                                        */}
+      {/* // * --------------------------------------------------------------*/}
+      <Divider sx={{ margin: "5px" }}>
         <Chip label="Collection" />
       </Divider>
-      <p />
+
       <Grid container spacing={2}>
         {collectionArray.map(function (element) {
           // console.log("element: ", element);
 
           return (
-            <Grid item key={element.key}>
-              <Card sx={{ maxWidth: 345 }}>
+            <Grid item width={"180px"} key={getUniqueKey()}>
+              <Card>
                 <CardMedia
                   component="img"
                   alt="image"
@@ -230,7 +202,20 @@ const Collection = ({
                     {element.name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {shortenAddress(element.collectionAddress, 4)}
+                    PolygonScan:{" "}
+                    {shortenAddress({
+                      address: element.collectionAddress,
+                      number: 4,
+                      withLink: "scan",
+                    })}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Opensea:{" "}
+                    {shortenAddress({
+                      address: element.collectionAddress,
+                      number: 4,
+                      withLink: "opensea",
+                    })}
                   </Typography>
                 </CardContent>
                 <CardActions>
@@ -243,7 +228,7 @@ const Collection = ({
                         );
                       } catch (error) {
                         console.error(error);
-                        setSnackbarValue({
+                        setWriteToastMessage({
                           snackbarSeverity: AlertSeverity.error,
                           snackbarMessage: error.reason,
                           snackbarTime: new Date(),
@@ -251,7 +236,7 @@ const Collection = ({
                         });
                       }
 
-                      setSnackbarValue({
+                      setWriteToastMessage({
                         snackbarSeverity: AlertSeverity.info,
                         snackbarMessage:
                           "Make transaction for unregistering collection.",
@@ -268,12 +253,6 @@ const Collection = ({
           );
         })}
       </Grid>
-      <RBSnackbar
-        open={snackbarOpen}
-        message={snackbarMessage}
-        severity={snackbarSeverity}
-        currentTime={snackbarTime}
-      />
     </div>
   );
 };
