@@ -1,5 +1,9 @@
 import React from "react";
-import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
+import {
+  Web3Button,
+  Web3NetworkSwitch,
+  useWeb3ModalNetwork,
+} from "@web3modal/react";
 import { useAccount, useEnsName } from "wagmi";
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
@@ -27,9 +31,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CollectionsIcon from "@mui/icons-material/Collections";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
-import { RentMarket } from "rent-market";
-import My from "./My";
-import Market from "./Market";
+import { My, Market, RentMarket } from "rent-market";
 import Content from "./Content";
 import Collection from "./Collection";
 import Service from "./Service";
@@ -109,9 +111,11 @@ const RentContent = ({
   blockchainNetwork,
   serviceAddress,
 }) => {
+  const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
+  console.log("selectedChain: ", selectedChain);
   const { address, isConnected } = useAccount();
-  // console.log("address: ", address);
-  // console.log("isConnected: ", isConnected);
+  console.log("address: ", address);
+  console.log("isConnected: ", isConnected);
 
   // const { data: ensName } = useEnsName({ address });
   // console.log("ensName: ", ensName);
@@ -610,6 +614,7 @@ const RentContent = ({
               inputServiceAddress={serviceAddress}
               inputRegisterNFTArray={registerNFTArray}
               inputBlockchainNetwork={blockchainNetwork}
+              setWriteToastMessage={setWriteToastMessage}
             />
           )
         ) : selectedIndex === MY_MENU_INDEX ? (
@@ -622,6 +627,9 @@ const RentContent = ({
               inputMyRegisteredNFTArray={myRegisteredNFTArray}
               inputMyRentNFTArray={myRentNFTArray}
               inputBlockchainNetwork={blockchainNetwork}
+              setWriteToastMessage={setWriteToastMessage}
+              web3modalSelectedChain={selectedChain}
+              wagmiIsConnected={address}
             />
           )
         ) : selectedIndex === CONTENT_MENU_INDEX ? (
