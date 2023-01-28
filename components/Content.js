@@ -135,6 +135,7 @@ const Content = ({
   React.useEffect(() => {
     // console.log("call React.useEffect()");
     // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
+    // console.log("inputMyUnregisteredNFTArray: ", inputMyUnregisteredNFTArray);
 
     rentMarketRef.current = inputRentMarket;
     setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
@@ -290,11 +291,11 @@ const Content = ({
     const tablePage = getPage({ nftContractAddress, mode });
     const tableRowsPerPage = getRowsPerPage({ nftContractAddress, mode });
     let count = 0;
-    if (mode === "register") {
+    if (mode === "register" && myRegisteredNFTArray) {
       count = myRegisteredNFTArray.filter(
         (e) => e.nftAddress === nftContractAddress
       ).length;
-    } else if (mode === "unregister") {
+    } else if (mode === "unregister" && myUnregisteredNFTArray) {
       count = myUnregisteredNFTArray.filter(
         (e) => e.nftAddress === nftContractAddress
       ).length;
@@ -503,15 +504,16 @@ const Content = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {myRegisteredNFTArray
-            .filter((element) => element.nftAddress === nftContractAddress)
-            .slice(
-              tablePage * tableRowsPerPage,
-              tablePage * tableRowsPerPage + tableRowsPerPage
-            )
-            .map((element) => {
-              return buildRegisterRowList({ element });
-            })}
+          {myRegisteredNFTArray &&
+            myRegisteredNFTArray
+              .filter((element) => element.nftAddress === nftContractAddress)
+              .slice(
+                tablePage * tableRowsPerPage,
+                tablePage * tableRowsPerPage + tableRowsPerPage
+              )
+              .map((element) => {
+                return buildRegisterRowList({ element });
+              })}
         </TableBody>
         <TableFooter>
           <TableRow>
@@ -684,15 +686,16 @@ const Content = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {myUnregisteredNFTArray
-              .filter((element) => element.nftAddress === nftContractAddress)
-              .slice(
-                tablePage * tableRowsPerPage,
-                tablePage * tableRowsPerPage + tableRowsPerPage
-              )
-              .map((element) => {
-                return buildUnregisterRowList({ element });
-              })}
+            {myUnregisteredNFTArray &&
+              myUnregisteredNFTArray
+                .filter((element) => element.nftAddress === nftContractAddress)
+                .slice(
+                  tablePage * tableRowsPerPage,
+                  tablePage * tableRowsPerPage + tableRowsPerPage
+                )
+                .map((element) => {
+                  return buildUnregisterRowList({ element });
+                })}
           </TableBody>
         </Table>
       </TableCell>
