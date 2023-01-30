@@ -2,7 +2,7 @@ const prod = process.env.NODE_ENV === "production";
 
 module.exports = {
   // productionBrowserSourceMaps: true,
-  reactStrictMode: true,
+  reactStrictMode: false,
   transpilePackages: ["rent-market"],
   // webpack: (config) => {
   //   return {
