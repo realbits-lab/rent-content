@@ -215,7 +215,12 @@ export const checkMobile = () => {
   return check;
 };
 
-export const shortenAddress = ({ address, number = 4, withLink = "" }) => {
+export const shortenAddress = ({
+  address,
+  number = 4,
+  withLink = "",
+  color = "#ffffff",
+}) => {
   // console.log("address: ", address);
   // console.log("withLink: ", withLink);
 
@@ -257,7 +262,7 @@ export const shortenAddress = ({ address, number = 4, withLink = "" }) => {
       case "maticscan":
       case "scan":
         return (
-          <Link href={polygonScanUrl} target="_blank">
+          <Link href={polygonScanUrl} target="_blank" color={color}>
             {`${address.substring(
               0,
               number + 2
@@ -269,7 +274,7 @@ export const shortenAddress = ({ address, number = 4, withLink = "" }) => {
       case "opensea_maticmum":
       case "opensea":
         return (
-          <Link href={`${openseaUrl}${address}`} target="_blank">
+          <Link href={`${openseaUrl}${address}`} target="_blank" color={color}>
             {`${address.substring(
               0,
               number + 2

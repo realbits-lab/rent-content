@@ -8,6 +8,7 @@ import { useAccount, useEnsName } from "wagmi";
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
+import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
@@ -46,6 +47,7 @@ import {
   writeToastMessageState,
   readToastMessageState,
   checkMobile,
+  shortenAddress,
 } from "./RentContentUtil";
 
 const RENT_CONTENT_COMPONENT_DRAWER_WIDTH = 180;
@@ -327,8 +329,6 @@ const RentContent = ({
     }
   }
 
-  // console.log("Build RentContent component.");
-
   // * -------------------------------------------------------------------------
   // * Rendering function.
   // * -------------------------------------------------------------------------
@@ -375,6 +375,13 @@ const RentContent = ({
               ? "Monitor - Rent NFT"
               : "Rent Market"}
           </Typography>
+          <div color={"ffffff"}>
+            {shortenAddress({
+              address: process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS,
+              number: 5,
+              withLink: "scan",
+            })}
+          </div>
         </Toolbar>
       </AppBar>
 
