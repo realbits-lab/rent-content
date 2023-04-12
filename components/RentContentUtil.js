@@ -219,10 +219,11 @@ export const shortenAddress = ({
   address,
   number = 4,
   withLink = "",
-  color = "#ffffff",
+  color = "#0000FF",
 }) => {
-  // console.log("address: ", address);
-  // console.log("withLink: ", withLink);
+  console.log("call shortenAddress()");
+  console.log("address: ", address);
+  console.log("withLink: ", withLink);
 
   const POLYGON_MATICMUM_SCAN_URL = "https://mumbai.polygonscan.com/address/";
   const POLYGON_MATIC_SCAN_URL = "https://polygonscan.com/address/";
@@ -258,15 +259,17 @@ export const shortenAddress = ({
     (typeof address === "string" || address instanceof String) &&
     address.length > 0
   ) {
+    const addressString = `${address.substring(
+      0,
+      number + 2
+    )}${middleString}${address.substring(address.length - number)}`;
+
     switch (withLink) {
       case "maticscan":
       case "scan":
         return (
           <Link href={polygonScanUrl} target="_blank" color={color}>
-            {`${address.substring(
-              0,
-              number + 2
-            )}${middleString}${address.substring(address.length - number)}`}
+            {addressString}
           </Link>
         );
 
@@ -275,21 +278,15 @@ export const shortenAddress = ({
       case "opensea":
         return (
           <Link href={`${openseaUrl}${address}`} target="_blank" color={color}>
-            {`${address.substring(
-              0,
-              number + 2
-            )}${middleString}${address.substring(address.length - number)}`}
+            {addressString}
           </Link>
         );
 
       default:
-        return `${address.substring(
-          0,
-          number + 2
-        )}${middleString}${address.substring(address.length - number)}`;
+        return addressString;
     }
   } else {
-    return "";
+    return "n/a";
   }
 };
 

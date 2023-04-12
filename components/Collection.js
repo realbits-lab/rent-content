@@ -164,7 +164,8 @@ const Collection = ({
               });
             }
 
-            // TODO: Show a success toast message.
+            //* TODO: Show a success toast message.
+            //* TODO: Show a transaction hash value and status.
             // setWriteToastMessage({
             //   snackbarSeverity: AlertSeverity.info,
             //   snackbarMessage: "Make transaction for registering collection.",
@@ -186,7 +187,7 @@ const Collection = ({
 
       <Grid container spacing={2}>
         {collectionArray.map(function (element) {
-          // console.log("element: ", element);
+          console.log("element: ", element);
 
           return (
             <Grid item width={"180px"} key={getUniqueKey()}>
