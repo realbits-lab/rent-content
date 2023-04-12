@@ -221,9 +221,9 @@ export const shortenAddress = ({
   withLink = "",
   color = "#0000FF",
 }) => {
-  console.log("call shortenAddress()");
-  console.log("address: ", address);
-  console.log("withLink: ", withLink);
+  // console.log("call shortenAddress()");
+  // console.log("address: ", address);
+  // console.log("withLink: ", withLink);
 
   const POLYGON_MATICMUM_SCAN_URL = "https://mumbai.polygonscan.com/address/";
   const POLYGON_MATIC_SCAN_URL = "https://polygonscan.com/address/";

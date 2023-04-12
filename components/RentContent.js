@@ -4,11 +4,10 @@ import {
   Web3NetworkSwitch,
   useWeb3ModalNetwork,
 } from "@web3modal/react";
-import { useAccount, useEnsName } from "wagmi";
+import { useAccount } from "wagmi";
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
-import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
@@ -708,7 +707,6 @@ const RentContent = ({
         ) : (
           <></>
         )}
-        <Box></Box>
       </Main>
 
       {/* // * --------------------------------------------------------------*/}

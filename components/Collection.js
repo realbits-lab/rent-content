@@ -187,7 +187,7 @@ const Collection = ({
 
       <Grid container spacing={2}>
         {collectionArray.map(function (element) {
-          console.log("element: ", element);
+          // console.log("element: ", element);
 
           return (
             <Grid item width={"180px"} key={getUniqueKey()}>
