@@ -19,21 +19,21 @@ function getChainId({ chainName }) {
 }
 
 export default async function handler(req, res) {
-  console.log("call /api/update-metadata");
+  // console.log("call /api/update-metadata");
 
   const AUTHENTICATED_ADDRESS = "0x3851dacd8fa9f3eb64d69151a3597f33e5960a2f";
 
   //* Check method error.
   if (req.method !== "POST") {
-    console.log("req.method: ", req.method);
+    // console.log("req.method: ", req.method);
     res.status(500).json({ error: "Invalid method. Support only POST." });
     return;
   }
 
   //* Required fields in body: jsonList, signature
   const { jsonList, signature } = req.body;
-  console.log("jsonList: ", jsonList);
-  console.log("signature: ", signature);
+  // console.log("jsonList: ", jsonList);
+  // console.log("signature: ", signature);
 
   //* Check signature address.
   const chainId = getChainId({
@@ -76,7 +76,7 @@ export default async function handler(req, res) {
     console.error(error);
     return res.status(500).json({ message: error.message });
   }
-  console.log("recovered: ", recovered);
+  // console.log("recovered: ", recovered);
   // console.log("publicAddress: ", publicAddress);
 
   //* Handle authentication error later.
@@ -92,12 +92,12 @@ export default async function handler(req, res) {
 
   //* Delete all avatar record.
   const deleteAvatars = await prisma.avatar.deleteMany({});
-  console.log("deleteAvatars: ", deleteAvatars);
+  // console.log("deleteAvatars: ", deleteAvatars);
 
   //* Update avatar record.
   const promises = jsonList.map(async (element) => {
-    console.log("element: ", element);
-    console.log("element.attributes: ", element.attributes);
+    // console.log("element: ", element);
+    // console.log("element.attributes: ", element.attributes);
 
     //* Get each attribute.
     let hair,
