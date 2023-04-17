@@ -272,6 +272,41 @@ const Collection = ({
       {/* //* Show request register collection.                              */}
       {/* //*----------------------------------------------------------------*/}
       <Divider sx={{ margin: "5px" }}>
+        <Chip label="Update" />
+      </Divider>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Button
+          variant="contained"
+          sx={{ m: 1 }}
+          onClick={async () => {
+            setWriteToastMessage({
+              snackbarSeverity: AlertSeverity.info,
+              snackbarMessage: "Start to updata metadata database.",
+              snackbarTime: new Date(),
+              snackbarOpen: true,
+            });
+
+            await updateMetadataDatabase();
+
+            setWriteToastMessage({
+              snackbarSeverity: AlertSeverity.info,
+              snackbarMessage: "Done to updata metadata database.",
+              snackbarTime: new Date(),
+              snackbarOpen: true,
+            });
+          }}
+        >
+          Update DB
+        </Button>
+      </Box>
+
+      <Divider sx={{ margin: "5px" }}>
         <Chip label="Input" />
       </Divider>
 
@@ -410,29 +445,6 @@ const Collection = ({
                     }}
                   >
                     Unregister
-                  </Button>
-                  <Button
-                    variant="contained"
-                    sx={{ m: 1, width: "80%" }}
-                    onClick={async () => {
-                      setWriteToastMessage({
-                        snackbarSeverity: AlertSeverity.info,
-                        snackbarMessage: "Start to updata metadata database.",
-                        snackbarTime: new Date(),
-                        snackbarOpen: true,
-                      });
-
-                      await updateMetadataDatabase();
-
-                      setWriteToastMessage({
-                        snackbarSeverity: AlertSeverity.info,
-                        snackbarMessage: "Done to updata metadata database.",
-                        snackbarTime: new Date(),
-                        snackbarOpen: true,
-                      });
-                    }}
-                  >
-                    Update DB
                   </Button>
                 </CardActions>
               </Card>
