@@ -27,3 +27,15 @@ foo@bar:~$ npm run dev
 ```console
 foo@bar:~$ npm run build
 ```
+
+# ethers npm version
+
+- Use ethers@^5.7.2
+
+```
+npm ERR! peer ethers@">=5.5.1 <6" from @wagmi/core@0.10.9
+npm ERR! node_modules/@wagmi/core
+npm ERR!   peer @wagmi/core@">=0.10" from @web3modal/ethereum@2.3.0
+npm ERR!   node_modules/@web3modal/ethereum
+npm ERR!     @web3modal/ethereum@"^2.3.0" from the root project
+```

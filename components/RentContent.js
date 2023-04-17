@@ -1,10 +1,6 @@
 import React from "react";
-import {
-  Web3Button,
-  Web3NetworkSwitch,
-  useWeb3ModalNetwork,
-} from "@web3modal/react";
-import { useAccount } from "wagmi";
+import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
+import { useAccount, useNetwork } from "wagmi";
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -112,8 +108,7 @@ const RentContent = ({
   blockchainNetwork,
   serviceAddress,
 }) => {
-  const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
-  // console.log("selectedChain: ", selectedChain);
+  const { chain, chains } = useNetwork();
   const { address, isConnected } = useAccount();
   // console.log("address: ", address);
   // console.log("isConnected: ", isConnected);
@@ -634,7 +629,7 @@ const RentContent = ({
               inputMyRentNFTArray={myRentNFTArray}
               inputBlockchainNetwork={blockchainNetwork}
               setWriteToastMessage={setWriteToastMessage}
-              web3modalSelectedChain={selectedChain}
+              web3modalSelectedChain={chain}
               wagmiIsConnected={address}
             />
           )

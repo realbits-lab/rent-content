@@ -1,8 +1,8 @@
 import React from "react";
 import {
   EthereumClient,
-  modalConnectors,
-  walletConnectProvider,
+  w3mConnectors,
+  w3mProvider,
 } from "@web3modal/ethereum";
 import { Web3Modal } from "@web3modal/react";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
@@ -28,40 +28,61 @@ function App() {
   //   process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS
   // );
 
-  let chains = [];
+  let wagmiBlockchainNetworks = [];
   if (
     getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
     "matic"
   ) {
-    chains = [polygon];
+    wagmiBlockchainNetworks = [polygon];
   } else if (
     getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
     "maticmum"
   ) {
-    chains = [polygonMumbai];
+    wagmiBlockchainNetworks = [polygonMumbai];
   } else if (
     getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
     "localhost"
   ) {
-    chains = [localhost];
+    wagmiBlockchainNetworks = [localhost];
   } else {
-    chains = [];
+    wagmiBlockchainNetworks = [];
   }
 
-  // * Wagmi client
-  const { provider } = configureChains(chains, [
-    walletConnectProvider({
-      projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-    }),
-  ]);
+  //* Wagmi client
+  //* Use wallet connect configuration.
+  const { chains, provider, webSocketProvider } = configureChains(
+    wagmiBlockchainNetworks,
+    [
+      w3mProvider({
+        projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? "",
+      }),
+    ]
+  );
+  //* Use alchemy configuration.
+  // const { chains, provider, webSocketProvider } = configureChains(
+  //   wagmiBlockchainNetworks,
+  //   [
+  //     alchemyProvider({
+  //       apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY ?? "",
+  //     }),
+  //   ]
+  // );
   const wagmiClient = createClient({
     autoConnect: true,
-    connectors: modalConnectors({ appName: "web3Modal", chains }),
+    connectors: w3mConnectors({
+      projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? "",
+      version: 2,
+      chains: wagmiBlockchainNetworks,
+    }),
     provider,
+    webSocketProvider,
   });
 
   // * Web3Modal Ethereum Client
-  const ethereumClient = new EthereumClient(wagmiClient, chains);
+  const ethereumClient = new EthereumClient(
+    wagmiClient,
+    wagmiBlockchainNetworks
+  );
 
   return (
     <>
