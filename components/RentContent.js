@@ -1,10 +1,6 @@
 import React from "react";
-import {
-  Web3Button,
-  Web3NetworkSwitch,
-  useWeb3ModalNetwork,
-} from "@web3modal/react";
-import { useAccount } from "wagmi";
+import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
+import { useAccount, useNetwork } from "wagmi";
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -51,9 +47,9 @@ import {
 
 const RENT_CONTENT_COMPONENT_DRAWER_WIDTH = 180;
 
-// * ---------------------------------------------------------------------------
-// * Define Main component style.
-// * ---------------------------------------------------------------------------
+//*-----------------------------------------------------------------------------
+//* Define Main component style.
+//*-----------------------------------------------------------------------------
 const Main = styled("main", {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
@@ -74,9 +70,9 @@ const Main = styled("main", {
   }),
 }));
 
-// * ---------------------------------------------------------------------------
-// * Define AppBar component style.
-// * ---------------------------------------------------------------------------
+//*-----------------------------------------------------------------------------
+//* Define AppBar component style.
+//*-----------------------------------------------------------------------------
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
@@ -94,9 +90,9 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-// * ---------------------------------------------------------------------------
-// * Define DrawerHeader component style.
-// * ---------------------------------------------------------------------------
+//*-----------------------------------------------------------------------------
+//* Define DrawerHeader component style.
+//*-----------------------------------------------------------------------------
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -112,8 +108,7 @@ const RentContent = ({
   blockchainNetwork,
   serviceAddress,
 }) => {
-  const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
-  // console.log("selectedChain: ", selectedChain);
+  const { chain, chains } = useNetwork();
   const { address, isConnected } = useAccount();
   // console.log("address: ", address);
   // console.log("isConnected: ", isConnected);
@@ -121,11 +116,10 @@ const RentContent = ({
   // const { data: ensName } = useEnsName({ address });
   // console.log("ensName: ", ensName);
 
-  // * -------------------------------------------------------------------------
-  // * Define each menu index.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Define each menu index.
+  //*---------------------------------------------------------------------------
   const DEFAULT_MENU_INDEX = 2;
-
   const CONTENT_MENU_INDEX = 0;
   const MY_MENU_INDEX = 1;
   const MARKET_MENU_INDEX = 2;
@@ -137,20 +131,20 @@ const RentContent = ({
   const MONITOR_PENDING_RENT_FEE_MENU_INDEX = 8;
   const MONITOR_RENT_NFT_MENU_INDEX = 9;
 
-  // * -------------------------------------------------------------------------
-  // * Set MUI theme.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Set MUI theme.
+  //*---------------------------------------------------------------------------
   const theme = useTheme();
 
-  // * -------------------------------------------------------------------------
-  // * Define rent market class.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Define rent market class.
+  //*---------------------------------------------------------------------------
   const rentMarketClassRef = React.useRef();
 
-  // * -------------------------------------------------------------------------
-  // * Data list.
-  // * Undefined varialbe means loading status.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Data list.
+  //* Undefined varialbe means loading status.
+  //*---------------------------------------------------------------------------
   const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState();
   const [myUnregisteredNFTArray, setMyUnregisteredNFTArray] = React.useState();
   const [collectionArray, setCollectionArray] = React.useState();
@@ -159,15 +153,15 @@ const RentContent = ({
   const [inputRentMarket, setInputRentMarket] = React.useState();
   const isMobileRef = React.useRef(false);
 
-  // * -------------------------------------------------------------------------
-  // * If undefined, it'd loading status.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* If undefined, it'd loading status.
+  //*---------------------------------------------------------------------------
   const [registerNFTArray, setRegisterNFTArray] = React.useState();
   const [myRentNFTArray, setMyRentNFTArray] = React.useState();
 
-  // * -------------------------------------------------------------------------
-  // * Handle drawer open.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Handle drawer open.
+  //*---------------------------------------------------------------------------
   const [openDrawer, setOpenDrawer] = React.useState(true);
   const handleDrawerOpen = () => {
     setOpenDrawer(true);
@@ -176,9 +170,9 @@ const RentContent = ({
     setOpenDrawer(false);
   };
 
-  // * -------------------------------------------------------------------------
-  // * Handle drawer selected index.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Handle drawer selected index.
+  //*---------------------------------------------------------------------------
   const [selectedIndex, setSelectedIndex] = React.useState(DEFAULT_MENU_INDEX);
   const handleListItemClick = (event, index) => {
     // * Set selected index.
@@ -190,9 +184,9 @@ const RentContent = ({
     }
   };
 
-  // * -------------------------------------------------------------------------
-  // * Handle toast message.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Handle toast message.
+  //*---------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
   const writeToastMessage =
@@ -218,7 +212,7 @@ const RentContent = ({
           snackbarOpen: true,
         };
 
-  // * Initialize data.
+  //* Initialize data.
   React.useEffect(() => {
     // console.log("call useEffect()");
     // console.log("rentMarketAddress: ", rentMarketAddress);
@@ -239,8 +233,8 @@ const RentContent = ({
       });
       // console.log("rentMarketClassRef.current: ", rentMarketClassRef.current);
 
-      // * Set inputRentMarket for updating component which uses rentMarket.
-      // * For calling function of rentMarket contract.
+      //* Set inputRentMarket for updating component which uses rentMarket.
+      //* For calling function of rentMarket contract.
       // console.log("call setInputRentMarket()");
       setInputRentMarket(rentMarketClassRef.current);
 
@@ -258,7 +252,7 @@ const RentContent = ({
         });
       }
 
-      // * Close drawer in mobile browser.
+      //* Close drawer in mobile browser.
       isMobileRef.current = checkMobile();
       // console.log("isMobileRef.current: ", isMobileRef.current);
       if (isMobileRef.current === true) {
@@ -266,10 +260,10 @@ const RentContent = ({
       }
     }
 
-    // * -----------------------------------------------------------------------
-    // * Fetch token, collection, service, request/register data,
-    // * and rent data to interconnect them.
-    // * -----------------------------------------------------------------------
+    //*-------------------------------------------------------------------------
+    //* Fetch token, collection, service, request/register data,
+    //* and rent data to interconnect them.
+    //*-------------------------------------------------------------------------
     initRentMarket().catch(console.error);
   }, [rentMarketAddress, testNftAddress, blockchainNetwork, serviceAddress]);
 
@@ -328,18 +322,18 @@ const RentContent = ({
     }
   }
 
-  // * -------------------------------------------------------------------------
-  // * Rendering function.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Rendering function.
+  //*---------------------------------------------------------------------------
   return (
     <Box
       sx={{
         display: "flex",
       }}
     >
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * App bar title part.                                           */}
-      {/* // * --------------------------------------------------------------*/}
+      {/* //*----------------------------------------------------------------*/}
+      {/* //* App bar title part.                                            */}
+      {/* //*----------------------------------------------------------------*/}
       <AppBar position="fixed" open={openDrawer}>
         <Toolbar>
           <IconButton
@@ -384,9 +378,9 @@ const RentContent = ({
         </Toolbar>
       </AppBar>
 
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Drawer part.                                                  */}
-      {/* // * --------------------------------------------------------------*/}
+      {/* //*----------------------------------------------------------------*/}
+      {/* //* Drawer part.                                                   */}
+      {/* //*----------------------------------------------------------------*/}
       <Drawer
         sx={{
           width: RENT_CONTENT_COMPONENT_DRAWER_WIDTH,
@@ -411,9 +405,9 @@ const RentContent = ({
         </DrawerHeader>
         <Divider />
         <List>
-          {/* // * ----------------------------------------------------------*/}
-          {/* // * Market menu.                                             */}
-          {/* // * ----------------------------------------------------------*/}
+          {/* //*------------------------------------------------------------*/}
+          {/* //* Market menu.                                               */}
+          {/* //*------------------------------------------------------------*/}
 
           <Divider sx={{ margin: "5px" }}>
             <Chip label="User" />
@@ -448,9 +442,9 @@ const RentContent = ({
             </ListItem>
           }
 
-          {/* // * ----------------------------------------------------------*/}
-          {/* // * Content menu.                                             */}
-          {/* // * ----------------------------------------------------------*/}
+          {/* //*------------------------------------------------------------*/}
+          {/* //* Content menu.                                              */}
+          {/* //*------------------------------------------------------------*/}
 
           <Divider sx={{ margin: "5px" }}>
             <Chip label="Content" />
@@ -472,9 +466,9 @@ const RentContent = ({
             </ListItem>
           }
 
-          {/* // * ----------------------------------------------------------*/}
-          {/* // * Market menu.                                              */}
-          {/* // * ----------------------------------------------------------*/}
+          {/* //*------------------------------------------------------------*/}
+          {/* //* Market menu.                                               */}
+          {/* //*------------------------------------------------------------*/}
 
           <Divider sx={{ margin: "5px" }}>
             <Chip label="Market" />
@@ -524,9 +518,9 @@ const RentContent = ({
             </ListItem>
           } */}
 
-          {/* // * ----------------------------------------------------------*/}
-          {/* // * Monitor menu.                                             */}
-          {/* // * ----------------------------------------------------------*/}
+          {/* //*------------------------------------------------------------*/}
+          {/* //* Monitor menu.                                              */}
+          {/* //*------------------------------------------------------------*/}
 
           <Divider sx={{ margin: "5px" }}>
             <Chip label="Monitor" />
@@ -599,9 +593,9 @@ const RentContent = ({
         <Divider />
       </Drawer>
 
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Right content page.                                           */}
-      {/* // * --------------------------------------------------------------*/}
+      {/* //*----------------------------------------------------------------*/}
+      {/* //* Right content page.                                            */}
+      {/* //*----------------------------------------------------------------*/}
       <Main open={openDrawer}>
         <DrawerHeader />
         <Grid container spacing={2}>
@@ -634,7 +628,7 @@ const RentContent = ({
               inputMyRentNFTArray={myRentNFTArray}
               inputBlockchainNetwork={blockchainNetwork}
               setWriteToastMessage={setWriteToastMessage}
-              web3modalSelectedChain={selectedChain}
+              web3modalSelectedChain={chain}
               wagmiIsConnected={address}
             />
           )
@@ -709,9 +703,9 @@ const RentContent = ({
         )}
       </Main>
 
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Toast message.                                                */}
-      {/* // * --------------------------------------------------------------*/}
+      {/* //*----------------------------------------------------------------*/}
+      {/* //* Toast message.                                                 */}
+      {/* //*----------------------------------------------------------------*/}
       <RBSnackbar
         open={readToastMessage.snackbarOpen}
         message={readToastMessage.snackbarMessage}
