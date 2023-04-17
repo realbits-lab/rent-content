@@ -164,7 +164,8 @@ const Collection = ({
               });
             }
 
-            // TODO: Show a success toast message.
+            //* TODO: Show a success toast message.
+            //* TODO: Show a transaction hash value and status.
             // setWriteToastMessage({
             //   snackbarSeverity: AlertSeverity.info,
             //   snackbarMessage: "Make transaction for registering collection.",
