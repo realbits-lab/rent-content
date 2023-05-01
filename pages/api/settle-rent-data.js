@@ -6,22 +6,29 @@ const prisma = new PrismaClient();
 export default async function handler(req, res) {
   // console.log("call /api/settle-rent-data");
 
-  const API_KEY = process.env.API_KEY;
-  const PRIVATE_KEY = process.env.PRIVATE_KEY;
-  const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS;
+  const NEXT_PUBLIC_ALCHEMY_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
+  const NEXT_PUBLIC_BLOCKCHAIN_NETWORK =
+    process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK;
+  const NETXT_PUBLIC_SETTLE_PRIVATE_KEY =
+    process.env.NETXT_PUBLIC_SETTLE_PRIVATE_KEY;
+  const NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS =
+    process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
 
   //* Get alchemy provider.
   const alchemyProvider = new ethers.providers.AlchemyProvider(
-    (network = "goerli"),
-    API_KEY
+    (network = NEXT_PUBLIC_BLOCKCHAIN_NETWORK),
+    NEXT_PUBLIC_ALCHEMY_KEY
   );
 
   //* Get signer.
-  const signer = new ethers.Wallet(PRIVATE_KEY, alchemyProvider);
+  const signer = new ethers.Wallet(
+    NETXT_PUBLIC_SETTLE_PRIVATE_KEY,
+    alchemyProvider
+  );
 
   //* Get rent market contract instance.
   const rentMarketContract = new ethers.Contract(
-    CONTRACT_ADDRESS,
+    NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS,
     rentmarketABI.abi,
     signer
   );
@@ -36,7 +43,7 @@ export default async function handler(req, res) {
   //* Check auth key.
   const { auth_key } = req.body;
 
-	//* Check 1 hour passed since the last check with database.
+  //* Check 1 hour passed since the last check with database.
 
   //* Get all rent data.
   // struct rentData {
