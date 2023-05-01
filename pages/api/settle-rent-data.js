@@ -9,6 +9,7 @@ const prisma = new PrismaClient();
 export default async function handler(req, res) {
   // console.log("call /api/settle-rent-data");
 
+  const NEXT_PUBLIC_SETTLE_AUTH_KEY = process.env.NEXT_PUBLIC_SETTLE_AUTH_KEY;
   const NEXT_PUBLIC_ALCHEMY_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
   const NEXT_PUBLIC_BLOCKCHAIN_NETWORK =
     process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK;
@@ -35,6 +36,7 @@ export default async function handler(req, res) {
     rentmarketABI.abi,
     signer
   );
+  console.log("rentMarketContract: ", rentMarketContract);
 
   //* Get alchemy instance.
   const settings = {
@@ -56,22 +58,27 @@ export default async function handler(req, res) {
   //* Check auth key.
   const { auth_key } = req.body;
   console.log("auth_key: ", auth_key);
+  if (auth_key !== NEXT_PUBLIC_SETTLE_AUTH_KEY) {
+    res.status(500).json({ error: "Invalid auth key." });
+    return;
+  }
 
-  //* Check 1 hour passed since the last check from SettleRentData event.
-  const eventHash = keccak256(
-    "SettleRentData(address,uint256,uint256,address,uint256,bool,uint256,address,address,address,uint256)"
-  );
-  const topicHash = `0x${Buffer.from(eventHash).toString("hex")}`;
-  const responseGetLogs = await alchemy.core.getLogs({
-    fromBlock: 27956165,
-    toBlock: "latest",
-    address: NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS,
-    topics: [topicHash],
-  });
-  console.log("responseGetLogs: ", responseGetLogs);
-  const eventArray = responseGetLogs.map((event) => {
-    console.log("event: ", event);
-  });
+  //* TODO: Prevent DoS attack.
+  // //* Check 1 hour passed since the last check from SettleRentData event.
+  // const eventHash = keccak256(
+  //   "SettleRentData(address,uint256,uint256,address,uint256,bool,uint256,address,address,address,uint256)"
+  // );
+  // const topicHash = `0x${Buffer.from(eventHash).toString("hex")}`;
+  // const responseGetLogs = await alchemy.core.getLogs({
+  //   fromBlock: 27956165,
+  //   toBlock: "latest",
+  //   address: NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS,
+  //   topics: [topicHash],
+  // });
+  // console.log("responseGetLogs: ", responseGetLogs);
+  // const eventArray = responseGetLogs.map((event) => {
+  //   console.log("event: ", event);
+  // });
 
   //* Get all rent data.
   // struct rentData {
@@ -88,20 +95,33 @@ export default async function handler(req, res) {
   //     uint256 rentStartTimestamp;
   // }
   const resultRentArray = await rentMarketContract.getAllRentData();
+  console.log("resultRentArray: ", resultRentArray);
 
   //* If we found one of which rent duration is finished, settle that.
   const promises = resultRentArray.map(async function (element) {
+    console.log("element: ", element);
     const currentSeconds = new Date().getTime() / 1000;
-    if (element.rentStartTimestamp + element.rentDuration > currentSeconds) {
+    console.log("currentSeconds: ", currentSeconds);
+    const rentEndSeconds = element.rentStartTimestamp
+      .add(element.rentDuration)
+      .toNumber();
+    console.log("rentEndSeconds: ", rentEndSeconds);
+
+    if (currentSeconds > rentEndSeconds) {
+      console.log("try to call settleRentData()");
+
       //* Call settleRentData function.
       const tx = await rentMarketContract.settleRentData(
-        element.nftAdderss,
+        element.nftAddress,
         element.tokenId
       );
+      console.log("tx: ", tx);
       await tx.wait();
     }
   });
+  console.log("try to call Promise.all()");
   await Promise.all(promises);
+  console.log("finish to call Promise.all()");
 
   //* Send ok.
   res.status(200).json({ data: "ok" });
