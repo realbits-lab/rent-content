@@ -97,6 +97,8 @@ export default async function handler(req, res) {
   const resultRentArray = await rentMarketContract.getAllRentData();
   console.log("resultRentArray: ", resultRentArray);
 
+	//* TODO: Handle error: replacement fee too low.
+  //* TODO: Handle gas prices.
   //* If we found one of which rent duration is finished, settle that.
   const promises = resultRentArray.map(async function (element) {
     console.log("element: ", element);

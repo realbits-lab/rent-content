@@ -349,7 +349,7 @@ const MonitorRentNft = ({
 
                 const settleButton = (
                   <Button
-                    variant="outlined"
+                    variant="contained"
                     onClick={async () => {
                       // * Create WalletConnect Provider.
                       let provider;
