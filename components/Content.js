@@ -394,6 +394,7 @@ const Content = ({
         <TableCell align="center">
           {element.rentFee / Math.pow(10, 18)}
         </TableCell>
+        <TableCell align="center">{element.rentDuration.toNumber()}</TableCell>
         <TableCell align="center">
           <Button
             size="small"
@@ -494,6 +495,9 @@ const Content = ({
             </TableCell>
             <TableCell align="center" padding="normal">
               fee
+            </TableCell>
+            <TableCell align="center" padding="normal">
+              duration
             </TableCell>
             <TableCell align="center" padding="normal">
               change

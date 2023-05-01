@@ -1,5 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import rentmarketABI from "../contracts/rentMarket.json";
+import { Network, Alchemy } from "alchemy-sdk";
+import { ethers } from "ethers";
+import keccak256 from "keccak256";
+import rentmarketABI from "../../contracts/rentMarket.json";
 
 const prisma = new PrismaClient();
 
@@ -16,7 +19,7 @@ export default async function handler(req, res) {
 
   //* Get alchemy provider.
   const alchemyProvider = new ethers.providers.AlchemyProvider(
-    (network = NEXT_PUBLIC_BLOCKCHAIN_NETWORK),
+    NEXT_PUBLIC_BLOCKCHAIN_NETWORK,
     NEXT_PUBLIC_ALCHEMY_KEY
   );
 
@@ -33,6 +36,16 @@ export default async function handler(req, res) {
     signer
   );
 
+  //* Get alchemy instance.
+  const settings = {
+    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
+    network:
+      process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK === "maticmum"
+        ? Network.MATIC_MUMBAI
+        : Network.MATIC_MAINNET,
+  };
+  const alchemy = new Alchemy(settings);
+
   //* Check method.
   if (req.method !== "POST") {
     // console.log("req.method: ", req.method);
@@ -42,8 +55,23 @@ export default async function handler(req, res) {
 
   //* Check auth key.
   const { auth_key } = req.body;
+  console.log("auth_key: ", auth_key);
 
-  //* Check 1 hour passed since the last check with database.
+  //* Check 1 hour passed since the last check from SettleRentData event.
+  const eventHash = keccak256(
+    "SettleRentData(address,uint256,uint256,address,uint256,bool,uint256,address,address,address,uint256)"
+  );
+  const topicHash = `0x${Buffer.from(eventHash).toString("hex")}`;
+  const responseGetLogs = await alchemy.core.getLogs({
+    fromBlock: 27956165,
+    toBlock: "latest",
+    address: NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS,
+    topics: [topicHash],
+  });
+  console.log("responseGetLogs: ", responseGetLogs);
+  const eventArray = responseGetLogs.map((event) => {
+    console.log("event: ", event);
+  });
 
   //* Get all rent data.
   // struct rentData {
