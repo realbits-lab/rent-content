@@ -644,10 +644,7 @@ const RentContent = ({
           )
         ) : selectedIndex === COLLECTION_MENU_INDEX ? (
           inputRentMarket && (
-            <Collection
-              blockchainNetwork={blockchainNetwork}
-              inputRentMarket={inputRentMarket}
-            />
+            <Collection blockchainNetwork={blockchainNetwork} />
           )
         ) : selectedIndex === SERVICE_MENU_INDEX ? (
           inputRentMarket && (

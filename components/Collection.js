@@ -4,11 +4,8 @@ import { ethers } from "ethers";
 import {
   useAccount,
   useNetwork,
-  useContract,
   useContractRead,
-  useContractEvent,
   useContractWrite,
-  usePrepareContractWrite,
   useWaitForTransaction,
   useWalletClient,
 } from "wagmi";
@@ -33,7 +30,7 @@ import {
 import rentmarketABI from "@/contracts/rentMarket.json";
 import rentNFTABI from "@/contracts/rentNFT.json";
 
-const Collection = ({ inputRentMarket, blockchainNetwork }) => {
+const Collection = ({ blockchainNetwork }) => {
   //*---------------------------------------------------------------------------
   //* Handle text input change.
   //*---------------------------------------------------------------------------
@@ -67,11 +64,6 @@ const Collection = ({ inputRentMarket, blockchainNetwork }) => {
           snackbarTime: new Date(),
           snackbarOpen: true,
         };
-
-  //*---------------------------------------------------------------------------
-  //* Define rent market class.
-  //*---------------------------------------------------------------------------
-  const rentMarket = React.useRef();
 
   //*---------------------------------------------------------------------------
   //* Data list.
@@ -191,18 +183,10 @@ const Collection = ({ inputRentMarket, blockchainNetwork }) => {
   React.useEffect(() => {
     // console.log("call useEffect()");
 
-    if (inputRentMarket) {
-      rentMarket.current = inputRentMarket;
-    }
     if (dataAllCollection) {
       getCollectionMetadata(dataAllCollection);
     }
-  }, [
-    dataAllCollection,
-    inputRentMarket,
-    inputRentMarket.rentMarketContract,
-    blockchainNetwork,
-  ]);
+  }, [dataAllCollection, blockchainNetwork]);
 
   async function getCollectionMetadata(collections) {
     if (collections === undefined) {
