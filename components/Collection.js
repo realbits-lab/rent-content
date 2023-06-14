@@ -3,11 +3,13 @@ import axios from "axios";
 import { ethers } from "ethers";
 import {
   useAccount,
-  useSigner,
   useNetwork,
   useContract,
   useContractRead,
   useContractEvent,
+  useContractWrite,
+  usePrepareContractWrite,
+  useWalletClient,
 } from "wagmi";
 import { useRecoilStateLoadable } from "recoil";
 import Grid from "@mui/material/Grid";
@@ -30,11 +32,7 @@ import {
 import rentmarketABI from "@/contracts/rentMarket.json";
 import rentNFTABI from "@/contracts/rentNFT.json";
 
-const Collection = ({
-  inputCollectionArray,
-  inputRentMarket,
-  blockchainNetwork,
-}) => {
+const Collection = ({ inputRentMarket, blockchainNetwork }) => {
   //*---------------------------------------------------------------------------
   //* Handle text input change.
   //*---------------------------------------------------------------------------
@@ -86,21 +84,83 @@ const Collection = ({
   const RENT_MARKET_CONTRACT_ADDRES =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
 
-  const { data: signer, isError, isLoading } = useSigner();
+  const { data: walletClient } = useWalletClient();
   const { chain, chains } = useNetwork();
   const { address, isConnected } = useAccount();
+  const [unregisterCollectionAddress, setUnregisterCollectionAddress] =
+    React.useState();
+
+  const { config: configRegisterCollection } = usePrepareContractWrite({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "registerCollection",
+  });
+  const {
+    data: dataRegisterCollection,
+    isLoading: isLoadingRegisterCollection,
+    isSuccess: isSuccessRegisterCollection,
+    write: writeRegisterCollection,
+  } = useContractWrite(configRegisterCollection);
+
+  const { config: configUnregisterCollection } = usePrepareContractWrite({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "unregisterCollection",
+    args: [unregisterCollectionAddress],
+    onSettled(data, error) {
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+  // console.log("configUnregisterCollection: ", configUnregisterCollection);
+  const { write: writeUnregisterCollection } = useContractWrite(
+    // configUnregisterCollection
+    {
+      address: RENT_MARKET_CONTRACT_ADDRES,
+      abi: rentmarketABI.abi,
+      functionName: "unregisterCollection",
+      // args: [unregisterCollectionAddress],
+      onSettled(data, error) {
+        // console.log("data: ", data);
+        // console.log("error: ", error);
+      },
+    }
+  );
+  // console.log("writeUnregisterCollection: ", writeUnregisterCollection);
 
   const {
-    data: dataGetAllRegisterData,
-    isError: isErrorGetAllRegisterData,
-    isLoading: isLoadingGetAllRegisterData,
-    status: statusGetAllRegisterData,
+    data: dataAllCollection,
+    isError: isErrorAllCollection,
+    isLoading: isLoadingAllCollection,
+    status: statusAllCollection,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "getAllCollection",
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+
+  const {
+    data: dataAllRegisterData,
+    isError: isErrorAllRegisterData,
+    isLoading: isLoadingAllRegisterData,
+    status: statusAllRegisterData,
   } = useContractRead({
     address: RENT_MARKET_CONTRACT_ADDRES,
     abi: rentmarketABI.abi,
     functionName: "getAllRegisterData",
-    cacheOnBlock: true,
-    // watch: true,
     onSuccess(data) {
       // console.log("call onSuccess()");
       // console.log("data: ", data);
@@ -120,14 +180,16 @@ const Collection = ({
   //* Initialize data.
   //*---------------------------------------------------------------------------
   React.useEffect(() => {
-    // console.log("React.useEffect");
+    // console.log("call useEffect()");
 
     if (inputRentMarket) {
-      getCollectionMetadata(inputCollectionArray);
       rentMarket.current = inputRentMarket;
     }
+    if (dataAllCollection) {
+      getCollectionMetadata(dataAllCollection);
+    }
   }, [
-    inputCollectionArray,
+    dataAllCollection,
     inputRentMarket,
     inputRentMarket.rentMarketContract,
     blockchainNetwork,
@@ -141,8 +203,20 @@ const Collection = ({
     const collectionArray = await Promise.all(
       collections.map(async (collection) => {
         // console.log("collection: ", collection);
-        const response = await axios.get(collection.uri);
+        let response;
+        try {
+          response = await axios.get(collection.uri, {
+            headers: {
+              "Cache-Control": "no-cache",
+              Pragma: "no-cache",
+              Expires: "0",
+            },
+          });
+        } catch (error) {
+          console.error(error);
+        }
         // console.log("response: ", response);
+
         return {
           key: collection.key,
           collectionAddress: collection.collectionAddress,
@@ -188,36 +262,36 @@ const Collection = ({
 
     const params = [address, msgParams];
     const method = "eth_signTypedData_v4";
-    console.log("params: ", params);
-    console.log("method: ", method);
+    // console.log("params: ", params);
+    // console.log("method: ", method);
 
     const requestResult = await ethereum.request({
       method,
       params,
     });
-    console.log("requestResult: ", requestResult);
+    // console.log("requestResult: ", requestResult);
 
     return requestResult;
   }
 
   async function updateMetadataDatabase() {
-    console.log("dataGetAllRegisterData: ", dataGetAllRegisterData);
+    // console.log("dataAllRegisterData: ", dataAllRegisterData);
     //* Check data validation.
-    if (!dataGetAllRegisterData) {
-      console.log("Not yet received all registered nft data.");
+    if (!dataAllRegisterData) {
+      // console.log("Not yet received all registered nft data.");
       return;
     }
 
     //* Get metadata from each nft token uri.
     let metadataArray = [];
-    const promises = dataGetAllRegisterData.map(async (element) => {
-      console.log("element: ", element);
+    const promises = dataAllRegisterData.map(async (element) => {
+      // console.log("element: ", element);
 
       //* Get nft contract.
       const nftContract = new ethers.Contract(
         element.nftAddress,
         rentNFTABI.abi,
-        signer
+        walletClient
       );
 
       //* Get token uri.
@@ -245,7 +319,7 @@ const Collection = ({
       }
     });
     await Promise.all(promises);
-    console.log("metadataArray: ", metadataArray);
+    // console.log("metadataArray: ", metadataArray);
 
     //* Get signature.
     const signMessageResult = await handleSignMessage();
@@ -263,7 +337,7 @@ const Collection = ({
         signature: signMessageResult,
       }),
     });
-    console.log("responseUpdateMetadata: ", responseUpdateMetadata);
+    // console.log("responseUpdateMetadata: ", responseUpdateMetadata);
   }
 
   return (
@@ -343,10 +417,13 @@ const Collection = ({
           variant="contained"
           onClick={async () => {
             try {
-              await rentMarket.current.registerCollection(
-                collectionAddress,
-                collectionUri
-              );
+              // await rentMarket.current.registerCollection(
+              //   collectionAddress,
+              //   collectionUri
+              // );
+              writeRegisterCollection?.({
+                args: [collectionAddress, collectionUri],
+              });
             } catch (error) {
               console.error(error);
               setWriteToastMessage({
@@ -423,9 +500,19 @@ const Collection = ({
                     sx={{ m: 1, width: "80%" }}
                     onClick={async () => {
                       try {
-                        await rentMarket.current.unregisterCollection(
-                          element.collectionAddress
-                        );
+                        // await rentMarket.current.unregisterCollection(
+                        //   element.collectionAddress
+                        // );
+                        // setUnregisterCollectionAddress(
+                        //   element.collectionAddress
+                        // );
+                        // console.log(
+                        //   "writeUnregisterCollection: ",
+                        //   writeUnregisterCollection
+                        // );
+                        writeUnregisterCollection?.({
+                          args: [element.collectionAddress],
+                        });
                       } catch (error) {
                         console.error(error);
                         setWriteToastMessage({

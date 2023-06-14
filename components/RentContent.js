@@ -28,14 +28,14 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CollectionsIcon from "@mui/icons-material/Collections";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
 import { My, Market, RentMarket } from "rent-market";
-import Content from "./Content";
-import Collection from "./Collection";
-import Service from "./Service";
-import Token from "./Token";
-import MonitorToken from "./MonitorToken";
-import MonitorRentNft from "./MonitorRentNft";
-import MonitorPendingRentFee from "./MonitorPendingRentFee";
-import MonitorAccountBalance from "./MonitorAccountBalance";
+import Content from "@/components/Content";
+import Collection from "@/components/Collection";
+import Service from "@/components/Service";
+import Token from "@/components/Token";
+import MonitorToken from "@/components/MonitorToken";
+import MonitorRentNft from "@/components/MonitorRentNft";
+import MonitorPendingRentFee from "@/components/MonitorPendingRentFee";
+import MonitorAccountBalance from "@/components/MonitorAccountBalance";
 import {
   AlertSeverity,
   RBSnackbar,
@@ -646,7 +646,6 @@ const RentContent = ({
           inputRentMarket && (
             <Collection
               blockchainNetwork={blockchainNetwork}
-              inputCollectionArray={collectionArray}
               inputRentMarket={inputRentMarket}
             />
           )
