@@ -660,7 +660,7 @@ const Content = ({
               }
             }}
           >
-            Launch
+            Register
           </Button>
         </TableCell>
       </TableRow>
@@ -686,7 +686,7 @@ const Content = ({
               <TableCell>image</TableCell>
               <TableCell>name</TableCell>
               <TableCell align="right">tokenId</TableCell>
-              <TableCell align="right">launch</TableCell>
+              <TableCell align="right">register</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

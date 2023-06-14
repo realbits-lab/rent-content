@@ -3,12 +3,13 @@ import axios from "axios";
 import { ethers } from "ethers";
 import {
   useAccount,
-  useSigner,
   useNetwork,
-  useContract,
   useContractRead,
-  useContractEvent,
+  useContractWrite,
+  useWaitForTransaction,
+  useWalletClient,
 } from "wagmi";
+import { useRecoilStateLoadable } from "recoil";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -20,21 +21,16 @@ import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import { useRecoilStateLoadable } from "recoil";
 import {
   AlertSeverity,
   writeToastMessageState,
   shortenAddress,
   getUniqueKey,
-} from "./RentContentUtil";
-import rentmarketABI from "../contracts/rentMarket.json";
-import rentNFTABI from "../contracts/rentNFT.json";
+} from "@/components/RentContentUtil";
+import rentmarketABI from "@/contracts/rentMarket.json";
+import rentNFTABI from "@/contracts/rentNFT.json";
 
-const Collection = ({
-  inputCollectionArray,
-  inputRentMarket,
-  blockchainNetwork,
-}) => {
+const Collection = ({ blockchainNetwork }) => {
   //*---------------------------------------------------------------------------
   //* Handle text input change.
   //*---------------------------------------------------------------------------
@@ -70,11 +66,6 @@ const Collection = ({
         };
 
   //*---------------------------------------------------------------------------
-  //* Define rent market class.
-  //*---------------------------------------------------------------------------
-  const rentMarket = React.useRef();
-
-  //*---------------------------------------------------------------------------
   //* Data list.
   //*---------------------------------------------------------------------------
   const [collectionArray, setCollectionArray] = React.useState([]);
@@ -82,25 +73,95 @@ const Collection = ({
   //*---------------------------------------------------------------------------
   //* Wagmi hook functions.
   //*---------------------------------------------------------------------------
+  const [unregisterCollectionAddress, setUnregisterCollectionAddress] =
+    React.useState();
   const UPDATE_METADATA_API_URL = "/api/update-metadata";
   const RENT_MARKET_CONTRACT_ADDRES =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
 
-  const { data: signer, isError, isLoading } = useSigner();
+  const { data: walletClient } = useWalletClient();
   const { chain, chains } = useNetwork();
   const { address, isConnected } = useAccount();
 
+  const { data: dataRegisterCollection, write: writeRegisterCollection } =
+    useContractWrite({
+      address: RENT_MARKET_CONTRACT_ADDRES,
+      abi: rentmarketABI.abi,
+      functionName: "registerCollection",
+    });
   const {
-    data: dataGetAllRegisterData,
-    isError: isErrorGetAllRegisterData,
-    isLoading: isLoadingGetAllRegisterData,
-    status: statusGetAllRegisterData,
+    isLoading: isLoadingTransactionRegisterCollection,
+    isSuccess: isSuccessTransactionRegisterCollection,
+  } = useWaitForTransaction({
+    hash: dataRegisterCollection?.hash,
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Registering collection transaction is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+  });
+
+  const { data: dataUnregisterCollection, write: writeUnregisterCollection } =
+    useContractWrite({
+      address: RENT_MARKET_CONTRACT_ADDRES,
+      abi: rentmarketABI.abi,
+      functionName: "unregisterCollection",
+    });
+  const {
+    isLoading: isLoadingTransactionUnregisterCollection,
+    isSuccess: isSuccessTransactionUnregisterCollection,
+  } = useWaitForTransaction({
+    hash: dataUnregisterCollection?.hash,
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Unregistering collection transaction is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+  });
+
+  const {
+    data: dataAllCollection,
+    isError: isErrorAllCollection,
+    isLoading: isLoadingAllCollection,
+    status: statusAllCollection,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "getAllCollection",
+    watch: true,
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+
+  const {
+    data: dataAllRegisterData,
+    isError: isErrorAllRegisterData,
+    isLoading: isLoadingAllRegisterData,
+    status: statusAllRegisterData,
   } = useContractRead({
     address: RENT_MARKET_CONTRACT_ADDRES,
     abi: rentmarketABI.abi,
     functionName: "getAllRegisterData",
-    cacheOnBlock: true,
-    // watch: true,
+    watch: true,
     onSuccess(data) {
       // console.log("call onSuccess()");
       // console.log("data: ", data);
@@ -120,18 +181,12 @@ const Collection = ({
   //* Initialize data.
   //*---------------------------------------------------------------------------
   React.useEffect(() => {
-    // console.log("React.useEffect");
+    // console.log("call useEffect()");
 
-    if (inputRentMarket) {
-      getCollectionMetadata(inputCollectionArray);
-      rentMarket.current = inputRentMarket;
+    if (dataAllCollection) {
+      getCollectionMetadata(dataAllCollection);
     }
-  }, [
-    inputCollectionArray,
-    inputRentMarket,
-    inputRentMarket.rentMarketContract,
-    blockchainNetwork,
-  ]);
+  }, [dataAllCollection, blockchainNetwork]);
 
   async function getCollectionMetadata(collections) {
     if (collections === undefined) {
@@ -141,8 +196,20 @@ const Collection = ({
     const collectionArray = await Promise.all(
       collections.map(async (collection) => {
         // console.log("collection: ", collection);
-        const response = await axios.get(collection.uri);
+        let response;
+        try {
+          response = await axios.get(collection.uri, {
+            headers: {
+              "Cache-Control": "no-cache",
+              Pragma: "no-cache",
+              Expires: "0",
+            },
+          });
+        } catch (error) {
+          console.error(error);
+        }
         // console.log("response: ", response);
+
         return {
           key: collection.key,
           collectionAddress: collection.collectionAddress,
@@ -188,36 +255,36 @@ const Collection = ({
 
     const params = [address, msgParams];
     const method = "eth_signTypedData_v4";
-    console.log("params: ", params);
-    console.log("method: ", method);
+    // console.log("params: ", params);
+    // console.log("method: ", method);
 
     const requestResult = await ethereum.request({
       method,
       params,
     });
-    console.log("requestResult: ", requestResult);
+    // console.log("requestResult: ", requestResult);
 
     return requestResult;
   }
 
   async function updateMetadataDatabase() {
-    console.log("dataGetAllRegisterData: ", dataGetAllRegisterData);
+    // console.log("dataAllRegisterData: ", dataAllRegisterData);
     //* Check data validation.
-    if (!dataGetAllRegisterData) {
-      console.log("Not yet received all registered nft data.");
+    if (!dataAllRegisterData) {
+      // console.log("Not yet received all registered nft data.");
       return;
     }
 
     //* Get metadata from each nft token uri.
     let metadataArray = [];
-    const promises = dataGetAllRegisterData.map(async (element) => {
-      console.log("element: ", element);
+    const promises = dataAllRegisterData.map(async (element) => {
+      // console.log("element: ", element);
 
       //* Get nft contract.
       const nftContract = new ethers.Contract(
         element.nftAddress,
         rentNFTABI.abi,
-        signer
+        walletClient
       );
 
       //* Get token uri.
@@ -245,7 +312,7 @@ const Collection = ({
       }
     });
     await Promise.all(promises);
-    console.log("metadataArray: ", metadataArray);
+    // console.log("metadataArray: ", metadataArray);
 
     //* Get signature.
     const signMessageResult = await handleSignMessage();
@@ -263,7 +330,7 @@ const Collection = ({
         signature: signMessageResult,
       }),
     });
-    console.log("responseUpdateMetadata: ", responseUpdateMetadata);
+    // console.log("responseUpdateMetadata: ", responseUpdateMetadata);
   }
 
   return (
@@ -271,42 +338,8 @@ const Collection = ({
       {/* //*----------------------------------------------------------------*/}
       {/* //* Show request register collection.                              */}
       {/* //*----------------------------------------------------------------*/}
-      <Divider sx={{ margin: "5px" }}>
-        <Chip label="Update" />
-      </Divider>
-
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <Button
-          variant="contained"
-          sx={{ m: 1 }}
-          onClick={async () => {
-            setWriteToastMessage({
-              snackbarSeverity: AlertSeverity.info,
-              snackbarMessage: "Start to updata metadata database.",
-              snackbarTime: new Date(),
-              snackbarOpen: true,
-            });
-
-            await updateMetadataDatabase();
-
-            setWriteToastMessage({
-              snackbarSeverity: AlertSeverity.info,
-              snackbarMessage: "Done to updata metadata database.",
-              snackbarTime: new Date(),
-              snackbarOpen: true,
-            });
-          }}
-        >
-          Update DB
-        </Button>
-      </Box>
-
-      <Divider sx={{ margin: "5px" }}>
+      {/* //* Don't use database for fetching metadata, use alchemy API or SDK instead of database. */}
+      <Divider sx={{ margin: "5px", marginTop: "20px" }}>
         <Chip label="Input" />
       </Divider>
 
@@ -340,12 +373,12 @@ const Collection = ({
         <Button
           margin={"normal"}
           variant="contained"
+          disabled={isLoadingTransactionRegisterCollection}
           onClick={async () => {
             try {
-              await rentMarket.current.registerCollection(
-                collectionAddress,
-                collectionUri
-              );
+              writeRegisterCollection?.({
+                args: [collectionAddress, collectionUri],
+              });
             } catch (error) {
               console.error(error);
               setWriteToastMessage({
@@ -355,25 +388,20 @@ const Collection = ({
                 snackbarOpen: true,
               });
             }
-
-            //* TODO: Show a success toast message.
-            //* TODO: Show a transaction hash value and status.
-            // setWriteToastMessage({
-            //   snackbarSeverity: AlertSeverity.info,
-            //   snackbarMessage: "Make transaction for registering collection.",
-            //   snackbarTime: new Date(),
-            //   snackbarOpen: true,
-            // });
           }}
         >
-          Register
+          {isLoadingTransactionRegisterCollection ? (
+            <Typography>Registering...</Typography>
+          ) : (
+            <Typography>Register</Typography>
+          )}
         </Button>
       </Box>
 
       {/* //*----------------------------------------------------------------*/}
       {/* //* Show collection array.                                         */}
       {/* //*----------------------------------------------------------------*/}
-      <Divider sx={{ margin: "5px" }}>
+      <Divider sx={{ margin: "5px", marginTop: "20px", marginBottom: "20px" }}>
         <Chip label="Collection" />
       </Divider>
 
@@ -382,12 +410,12 @@ const Collection = ({
           // console.log("element: ", element);
 
           return (
-            <Grid item width={"180px"} key={getUniqueKey()}>
+            <Grid item width={"45%"} key={getUniqueKey()}>
               <Card>
                 <CardMedia
                   component="img"
                   alt="image"
-                  height="140"
+                  height="140px"
                   image={element.image}
                 />
                 <CardContent>
@@ -420,11 +448,19 @@ const Collection = ({
                   <Button
                     variant="contained"
                     sx={{ m: 1, width: "80%" }}
+                    disabled={
+                      element.collectionAddress ===
+                        unregisterCollectionAddress &&
+                      isLoadingTransactionUnregisterCollection
+                    }
                     onClick={async () => {
                       try {
-                        await rentMarket.current.unregisterCollection(
+                        setUnregisterCollectionAddress(
                           element.collectionAddress
                         );
+                        writeUnregisterCollection?.({
+                          args: [element.collectionAddress],
+                        });
                       } catch (error) {
                         console.error(error);
                         setWriteToastMessage({
@@ -444,7 +480,13 @@ const Collection = ({
                       });
                     }}
                   >
-                    Unregister
+                    {element.collectionAddress ===
+                      unregisterCollectionAddress &&
+                    isLoadingTransactionUnregisterCollection ? (
+                      <Typography>Unregistering...</Typography>
+                    ) : (
+                      <Typography>Unregister</Typography>
+                    )}
                   </Button>
                 </CardActions>
               </Card>

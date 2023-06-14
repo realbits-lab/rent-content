@@ -28,14 +28,14 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CollectionsIcon from "@mui/icons-material/Collections";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
 import { My, Market, RentMarket } from "rent-market";
-import Content from "./Content";
-import Collection from "./Collection";
-import Service from "./Service";
-import Token from "./Token";
-import MonitorToken from "./MonitorToken";
-import MonitorRentNft from "./MonitorRentNft";
-import MonitorPendingRentFee from "./MonitorPendingRentFee";
-import MonitorAccountBalance from "./MonitorAccountBalance";
+import Content from "@/components/Content";
+import Collection from "@/components/Collection";
+import Service from "@/components/Service";
+import Token from "@/components/Token";
+import MonitorToken from "@/components/MonitorToken";
+import MonitorRentNft from "@/components/MonitorRentNft";
+import MonitorPendingRentFee from "@/components/MonitorPendingRentFee";
+import MonitorAccountBalance from "@/components/MonitorAccountBalance";
 import {
   AlertSeverity,
   RBSnackbar,
@@ -119,7 +119,8 @@ const RentContent = ({
   //*---------------------------------------------------------------------------
   //* Define each menu index.
   //*---------------------------------------------------------------------------
-  const DEFAULT_MENU_INDEX = 2;
+  const DEFAULT_MENU_INDEX = 3;
+
   const CONTENT_MENU_INDEX = 0;
   const MY_MENU_INDEX = 1;
   const MARKET_MENU_INDEX = 2;
@@ -643,11 +644,7 @@ const RentContent = ({
           )
         ) : selectedIndex === COLLECTION_MENU_INDEX ? (
           inputRentMarket && (
-            <Collection
-              blockchainNetwork={blockchainNetwork}
-              inputCollectionArray={collectionArray}
-              inputRentMarket={inputRentMarket}
-            />
+            <Collection blockchainNetwork={blockchainNetwork} />
           )
         ) : selectedIndex === SERVICE_MENU_INDEX ? (
           inputRentMarket && (
