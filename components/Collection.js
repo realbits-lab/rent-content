@@ -355,7 +355,7 @@ const Collection = ({ inputRentMarket, blockchainNetwork }) => {
       {/* //* Show request register collection.                              */}
       {/* //*----------------------------------------------------------------*/}
       {/* //* Don't use database for fetching metadata, use alchemy API or SDK instead of database. */}
-      <Divider sx={{ margin: "5px" }}>
+      <Divider sx={{ margin: "5px", marginTop: "20px" }}>
         <Chip label="Input" />
       </Divider>
 
@@ -417,7 +417,7 @@ const Collection = ({ inputRentMarket, blockchainNetwork }) => {
       {/* //*----------------------------------------------------------------*/}
       {/* //* Show collection array.                                         */}
       {/* //*----------------------------------------------------------------*/}
-      <Divider sx={{ margin: "5px" }}>
+      <Divider sx={{ margin: "5px", marginTop: "20px", marginBottom: "20px" }}>
         <Chip label="Collection" />
       </Divider>
 
