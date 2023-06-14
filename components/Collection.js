@@ -9,6 +9,7 @@ import {
   useContractRead,
   useContractEvent,
 } from "wagmi";
+import { useRecoilStateLoadable } from "recoil";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -20,15 +21,14 @@ import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import { useRecoilStateLoadable } from "recoil";
 import {
   AlertSeverity,
   writeToastMessageState,
   shortenAddress,
   getUniqueKey,
-} from "./RentContentUtil";
-import rentmarketABI from "../contracts/rentMarket.json";
-import rentNFTABI from "../contracts/rentNFT.json";
+} from "@/components/RentContentUtil";
+import rentmarketABI from "@/contracts/rentMarket.json";
+import rentNFTABI from "@/contracts/rentNFT.json";
 
 const Collection = ({
   inputCollectionArray,
@@ -271,7 +271,8 @@ const Collection = ({
       {/* //*----------------------------------------------------------------*/}
       {/* //* Show request register collection.                              */}
       {/* //*----------------------------------------------------------------*/}
-      <Divider sx={{ margin: "5px" }}>
+      {/* //* Don't use database for fetching metadata, use alchemy API or SDK instead of database. */}
+      {/* <Divider sx={{ margin: "5px" }}>
         <Chip label="Update" />
       </Divider>
 
@@ -304,7 +305,7 @@ const Collection = ({
         >
           Update DB
         </Button>
-      </Box>
+      </Box> */}
 
       <Divider sx={{ margin: "5px" }}>
         <Chip label="Input" />
