@@ -9,6 +9,7 @@ import {
   useContractEvent,
   useContractWrite,
   usePrepareContractWrite,
+  useWaitForTransaction,
   useWalletClient,
 } from "wagmi";
 import { useRecoilStateLoadable } from "recoil";
@@ -80,6 +81,8 @@ const Collection = ({ inputRentMarket, blockchainNetwork }) => {
   //*---------------------------------------------------------------------------
   //* Wagmi hook functions.
   //*---------------------------------------------------------------------------
+  const [unregisterCollectionAddress, setUnregisterCollectionAddress] =
+    React.useState();
   const UPDATE_METADATA_API_URL = "/api/update-metadata";
   const RENT_MARKET_CONTRACT_ADDRES =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
@@ -87,46 +90,50 @@ const Collection = ({ inputRentMarket, blockchainNetwork }) => {
   const { data: walletClient } = useWalletClient();
   const { chain, chains } = useNetwork();
   const { address, isConnected } = useAccount();
-  const [unregisterCollectionAddress, setUnregisterCollectionAddress] =
-    React.useState();
 
-  const { config: configRegisterCollection } = usePrepareContractWrite({
-    address: RENT_MARKET_CONTRACT_ADDRES,
-    abi: rentmarketABI.abi,
-    functionName: "registerCollection",
-  });
+  const { data: dataRegisterCollection, write: writeRegisterCollection } =
+    useContractWrite({
+      address: RENT_MARKET_CONTRACT_ADDRES,
+      abi: rentmarketABI.abi,
+      functionName: "registerCollection",
+    });
   const {
-    data: dataRegisterCollection,
-    isLoading: isLoadingRegisterCollection,
-    isSuccess: isSuccessRegisterCollection,
-    write: writeRegisterCollection,
-  } = useContractWrite(configRegisterCollection);
-
-  const { config: configUnregisterCollection } = usePrepareContractWrite({
-    address: RENT_MARKET_CONTRACT_ADDRES,
-    abi: rentmarketABI.abi,
-    functionName: "unregisterCollection",
-    args: [unregisterCollectionAddress],
-    onSettled(data, error) {
-      // console.log("data: ", data);
-      // console.log("error: ", error);
+    isLoading: isLoadingTransactionRegisterCollection,
+    isSuccess: isSuccessTransactionRegisterCollection,
+  } = useWaitForTransaction({
+    hash: dataRegisterCollection?.hash,
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Registering collection transaction is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
     },
   });
-  // console.log("configUnregisterCollection: ", configUnregisterCollection);
-  const { write: writeUnregisterCollection } = useContractWrite(
-    // configUnregisterCollection
-    {
+
+  const { data: dataUnregisterCollection, write: writeUnregisterCollection } =
+    useContractWrite({
       address: RENT_MARKET_CONTRACT_ADDRES,
       abi: rentmarketABI.abi,
       functionName: "unregisterCollection",
-      // args: [unregisterCollectionAddress],
-      onSettled(data, error) {
-        // console.log("data: ", data);
-        // console.log("error: ", error);
-      },
-    }
-  );
-  // console.log("writeUnregisterCollection: ", writeUnregisterCollection);
+    });
+  const {
+    isLoading: isLoadingTransactionUnregisterCollection,
+    isSuccess: isSuccessTransactionUnregisterCollection,
+  } = useWaitForTransaction({
+    hash: dataUnregisterCollection?.hash,
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Unregistering collection transaction is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+  });
 
   const {
     data: dataAllCollection,
@@ -137,6 +144,7 @@ const Collection = ({ inputRentMarket, blockchainNetwork }) => {
     address: RENT_MARKET_CONTRACT_ADDRES,
     abi: rentmarketABI.abi,
     functionName: "getAllCollection",
+    watch: true,
     onSuccess(data) {
       // console.log("call onSuccess()");
       // console.log("data: ", data);
@@ -161,6 +169,7 @@ const Collection = ({ inputRentMarket, blockchainNetwork }) => {
     address: RENT_MARKET_CONTRACT_ADDRES,
     abi: rentmarketABI.abi,
     functionName: "getAllRegisterData",
+    watch: true,
     onSuccess(data) {
       // console.log("call onSuccess()");
       // console.log("data: ", data);
@@ -346,41 +355,6 @@ const Collection = ({ inputRentMarket, blockchainNetwork }) => {
       {/* //* Show request register collection.                              */}
       {/* //*----------------------------------------------------------------*/}
       {/* //* Don't use database for fetching metadata, use alchemy API or SDK instead of database. */}
-      {/* <Divider sx={{ margin: "5px" }}>
-        <Chip label="Update" />
-      </Divider>
-
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <Button
-          variant="contained"
-          sx={{ m: 1 }}
-          onClick={async () => {
-            setWriteToastMessage({
-              snackbarSeverity: AlertSeverity.info,
-              snackbarMessage: "Start to updata metadata database.",
-              snackbarTime: new Date(),
-              snackbarOpen: true,
-            });
-
-            await updateMetadataDatabase();
-
-            setWriteToastMessage({
-              snackbarSeverity: AlertSeverity.info,
-              snackbarMessage: "Done to updata metadata database.",
-              snackbarTime: new Date(),
-              snackbarOpen: true,
-            });
-          }}
-        >
-          Update DB
-        </Button>
-      </Box> */}
-
       <Divider sx={{ margin: "5px" }}>
         <Chip label="Input" />
       </Divider>
@@ -415,12 +389,9 @@ const Collection = ({ inputRentMarket, blockchainNetwork }) => {
         <Button
           margin={"normal"}
           variant="contained"
+          disabled={isLoadingTransactionRegisterCollection}
           onClick={async () => {
             try {
-              // await rentMarket.current.registerCollection(
-              //   collectionAddress,
-              //   collectionUri
-              // );
               writeRegisterCollection?.({
                 args: [collectionAddress, collectionUri],
               });
@@ -433,18 +404,13 @@ const Collection = ({ inputRentMarket, blockchainNetwork }) => {
                 snackbarOpen: true,
               });
             }
-
-            //* TODO: Show a success toast message.
-            //* TODO: Show a transaction hash value and status.
-            // setWriteToastMessage({
-            //   snackbarSeverity: AlertSeverity.info,
-            //   snackbarMessage: "Make transaction for registering collection.",
-            //   snackbarTime: new Date(),
-            //   snackbarOpen: true,
-            // });
           }}
         >
-          Register
+          {isLoadingTransactionRegisterCollection ? (
+            <Typography>Registering...</Typography>
+          ) : (
+            <Typography>Register</Typography>
+          )}
         </Button>
       </Box>
 
@@ -460,12 +426,12 @@ const Collection = ({ inputRentMarket, blockchainNetwork }) => {
           // console.log("element: ", element);
 
           return (
-            <Grid item width={"180px"} key={getUniqueKey()}>
+            <Grid item width={"45%"} key={getUniqueKey()}>
               <Card>
                 <CardMedia
                   component="img"
                   alt="image"
-                  height="140"
+                  height="140px"
                   image={element.image}
                 />
                 <CardContent>
@@ -498,18 +464,16 @@ const Collection = ({ inputRentMarket, blockchainNetwork }) => {
                   <Button
                     variant="contained"
                     sx={{ m: 1, width: "80%" }}
+                    disabled={
+                      element.collectionAddress ===
+                        unregisterCollectionAddress &&
+                      isLoadingTransactionUnregisterCollection
+                    }
                     onClick={async () => {
                       try {
-                        // await rentMarket.current.unregisterCollection(
-                        //   element.collectionAddress
-                        // );
-                        // setUnregisterCollectionAddress(
-                        //   element.collectionAddress
-                        // );
-                        // console.log(
-                        //   "writeUnregisterCollection: ",
-                        //   writeUnregisterCollection
-                        // );
+                        setUnregisterCollectionAddress(
+                          element.collectionAddress
+                        );
                         writeUnregisterCollection?.({
                           args: [element.collectionAddress],
                         });
@@ -532,7 +496,13 @@ const Collection = ({ inputRentMarket, blockchainNetwork }) => {
                       });
                     }}
                   >
-                    Unregister
+                    {element.collectionAddress ===
+                      unregisterCollectionAddress &&
+                    isLoadingTransactionUnregisterCollection ? (
+                      <Typography>Unregistering...</Typography>
+                    ) : (
+                      <Typography>Unregister</Typography>
+                    )}
                   </Button>
                 </CardActions>
               </Card>
