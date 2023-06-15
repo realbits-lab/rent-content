@@ -44,29 +44,29 @@ import {
   AlertSeverity,
   shortenAddress,
   writeToastMessageState,
-} from "./RentContentUtil";
+} from "@/components/RentContentUtil";
 
-const Content = ({
+export default function Content({
   inputRentMarket,
   inputBlockchainNetwork,
   inputMyRegisteredNFTArray,
   inputMyUnregisteredNFTArray,
-}) => {
-  // * -------------------------------------------------------------------------
-  // * Hook variables.
-  // * -------------------------------------------------------------------------
+}) {
+  //*---------------------------------------------------------------------------
+  //* Hook variables.
+  //*---------------------------------------------------------------------------
   const { address, isConnected } = useAccount();
 
-  // * -------------------------------------------------------------------------
-  // * Define input copied variables.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Define input copied variables.
+  //*---------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
   const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState();
   const [myUnregisteredNFTArray, setMyUnregisteredNFTArray] = React.useState();
 
-  // * -------------------------------------------------------------------------
-  // * Set unique variables for table collapse.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Set unique variables for table collapse.
+  //*---------------------------------------------------------------------------
   const [
     myRegisteredUniqueNFTAddressArray,
     setMyRegisteredUniqueNFTAddressArray,
@@ -76,15 +76,15 @@ const Content = ({
     setMyUnregisteredUniqueNFTAddressArray,
   ] = React.useState();
 
-  // * -------------------------------------------------------------------------
-  // * Nft list data.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Nft list data.
+  //*---------------------------------------------------------------------------
   const [changeElement, setChangeElement] = React.useState([]);
   const [openInput, setOpenInput] = React.useState(false);
 
-  // * -------------------------------------------------------------------------
-  // * Handle toast message.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Handle toast message.
+  //*---------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
   const writeToastMessage =
@@ -97,10 +97,10 @@ const Content = ({
           snackbarOpen: true,
         };
 
-  // * -------------------------------------------------------------------------
-  // * Handle text input change.
-  // * Variables for changeNFT function.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Handle text input change.
+  //* Variables for changeNFT function.
+  //*---------------------------------------------------------------------------
   const [formValue, setFormValue] = React.useState({
     inputRentFee: 0,
     inputFeeTokenAddress: "",
@@ -123,15 +123,15 @@ const Content = ({
     });
   };
 
-  // * -------------------------------------------------------------------------
-  // * Table pagination data.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Table pagination data.
+  //*---------------------------------------------------------------------------
   const [page, setPage] = React.useState([]);
   const [rowsPerPage, setRowsPerPage] = React.useState([]);
 
-  // * -------------------------------------------------------------------------
-  // * Initialize data.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Initialize data.
+  //*---------------------------------------------------------------------------
   React.useEffect(() => {
     // console.log("call React.useEffect()");
     // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
@@ -368,9 +368,9 @@ const Content = ({
     );
   }
 
-  // * -------------------------------------------------------------------------
-  // * Draw each register data row list in table.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Draw each register data row list in table.
+  //*---------------------------------------------------------------------------
   function buildRegisterRowList({ element }) {
     // console.log("element: ", element);
 
@@ -459,9 +459,9 @@ const Content = ({
     );
   }
 
-  // * -------------------------------------------------------------------------
-  // * Draw each register data row body in table.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Draw each register data row body in table.
+  //*---------------------------------------------------------------------------
   function RegisterNftDataRowList({ nftContractAddress }) {
     // console.log("call RegisterNftDataRowList()");
 
@@ -791,25 +791,25 @@ const Content = ({
 
   return (
     <div>
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Show registered NFT with change and unregister button.        */}
-      {/* // * --------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Show registered NFT with change and unregister button.          */}
+      {/*//*-----------------------------------------------------------------*/}
       <Divider sx={{ margin: "5px" }}>
         <Chip label="My Registered NFT" />
       </Divider>
       {showMyRegisteredNFTElementTable()}
 
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Show my unregistered NFT with request register button.        */}
-      {/* // * --------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Show my unregistered NFT with request register button.          */}
+      {/*//*-----------------------------------------------------------------*/}
       <Divider sx={{ margin: "5px" }}>
         <Chip label="My Unregistered NFT" />
       </Divider>
       {showMyUnregisteredNFTElementTable()}
 
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Show input dialog.                                            */}
-      {/* // * --------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Show input dialog.                                              */}
+      {/*//*-----------------------------------------------------------------*/}
       <Dialog
         fullWidth
         open={openInput}
@@ -889,7 +889,7 @@ const Content = ({
                 // console.log("inputRentFeeByToken: ", inputRentFeeByToken);
                 // console.log("inputRentDuration: ", inputRentDuration);
 
-                // * Create WalletConnect Provider.
+                //* Create WalletConnect Provider.
                 let provider;
                 if (isMobile === true) {
                   provider = new WalletConnectProvider({
@@ -900,12 +900,12 @@ const Content = ({
                     infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
                   });
 
-                  // * Enable session (triggers QR Code modal).
+                  //* Enable session (triggers QR Code modal).
                   await provider.enable();
                   // console.log("provider: ", provider);
                 }
 
-                // * rent fee and rent fee by token should be an ether unit expression.
+                //* rent fee and rent fee by token should be an ether unit expression.
                 await rentMarketRef.current.changeNFT({
                   provider: provider,
                   element: changeElement,
@@ -941,6 +941,4 @@ const Content = ({
       </Dialog>
     </div>
   );
-};
-
-export default Content;
+}
