@@ -39,7 +39,7 @@ class RentMarket {
     onEventFunc,
     onErrorFunc,
   }) {
-    console.log("call constructor()");
+    // console.log("call constructor()");
     // console.log("onEventFunc: ", onEventFunc);
     // console.log("onErrorFunc: ", onErrorFunc);
     // console.log("rentMarketAddress: ", rentMarketAddress);
@@ -809,7 +809,7 @@ class RentMarket {
   }
 
   async fetchCollection() {
-    console.log("call fetchCollection()");
+    // console.log("call fetchCollection()");
 
     //* Get request collection array.
     let allCollectionArray;
@@ -952,7 +952,7 @@ class RentMarket {
   }
 
   async getAllCollection() {
-    console.log("call getAllCollection()");
+    // console.log("call getAllCollection()");
 
     //* Call rentMarket getAllCollection function.
     // console.log("this.rentMarketContract: ", this.rentMarketContract);
