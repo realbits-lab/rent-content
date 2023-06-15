@@ -1,5 +1,6 @@
 import React from "react";
 import WalletConnectProvider from "@walletconnect/web3-provider";
+import { useWeb3Modal } from "@web3modal/react";
 import {
   useAccount,
   useNetwork,
@@ -142,6 +143,12 @@ export default function Content({
   //*---------------------------------------------------------------------------
   //* Wagmi hook functions.
   //*---------------------------------------------------------------------------
+  const {
+    isOpen: isOpenWeb3Modal,
+    open: openWeb3Modal,
+    close: closeWeb3Modal,
+    setDefaultChain: setDefaultChainWeb3Modal,
+  } = useWeb3Modal();
   const RENT_MARKET_CONTRACT_ADDRES =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
   const [unregisterTokenAddress, setUnregisterTokenAddress] = React.useState();
@@ -606,7 +613,9 @@ export default function Content({
             justifyContent: "center",
           }}
         >
-          <Button variant="text">Click the connect wallet button</Button>
+          <Button variant="text" onClick={openWeb3Modal}>
+            Click the connect wallet button
+          </Button>
         </Box>
       );
     }
@@ -898,7 +907,7 @@ export default function Content({
                 <MenuItem key={getUniqueKey()} value={ZERO_ADDRESS_STRING}>
                   None
                 </MenuItem>
-                {dataAllToken.map((token, idx) => (
+                {dataAllToken?.map((token, idx) => (
                   <MenuItem key={idx} value={token.tokenAddress}>
                     {token.name}
                   </MenuItem>
