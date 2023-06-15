@@ -133,7 +133,7 @@ const RentContent = ({
   const MONITOR_PENDING_RENT_FEE_MENU_INDEX = 8;
   const MONITOR_RENT_NFT_MENU_INDEX = 9;
 
-  const DEFAULT_MENU_INDEX = CONTENT_MENU_INDEX;
+  const DEFAULT_MENU_INDEX = MARKET_MENU_INDEX;
 
   //*---------------------------------------------------------------------------
   //* Set MUI theme.

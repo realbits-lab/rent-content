@@ -1,4 +1,12 @@
 import * as React from "react";
+import {
+  useAccount,
+  useNetwork,
+  useContractRead,
+  useContractWrite,
+  useWaitForTransaction,
+  useWalletClient,
+} from "wagmi";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { isMobile } from "react-device-detect";
 import Grid from "@mui/material/Grid";
@@ -36,6 +44,8 @@ import {
   getErrorDescription,
   getChainName,
 } from "@/components/RentContentUtil";
+import rentmarketABI from "@/contracts/rentMarket.json";
+import faucetTokenABI from "@/contracts/faucetToken.json";
 
 const Market = ({
   inputRentMarketClass,
@@ -46,19 +56,64 @@ const Market = ({
   setWriteToastMessage,
 }) => {
   const theme = useTheme();
+  const RENT_MARKET_CONTRACT_ADDRES =
+    process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
+  const SERVICE_OWNER_ADDRESS = process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS;
 
-  // * -------------------------------------------------------------------------
-  // * Define copied local varialbe from input data.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Wagmi hook functions.
+  //*---------------------------------------------------------------------------
+  const { data: dataApprove, write: writeApprove } = useContractWrite({
+    abi: faucetTokenABI.abi,
+    functionName: "approve",
+  });
+  const { isLoading: isLoadingApprove, isSuccess: isSuccessApprove } =
+    useWaitForTransaction({
+      hash: dataApprove?.hash,
+      onSuccess(data) {
+        setWriteToastMessage({
+          snackbarSeverity: AlertSeverity.info,
+          snackbarMessage: "Approve transaction is made successfully.",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        });
+      },
+    });
+
+  const { data: dataRentNftByToken, write: writeRentNftByToken } =
+    useContractWrite({
+      address: RENT_MARKET_CONTRACT_ADDRES,
+      abi: rentmarketABI.abi,
+      functionName: "rentNFTByToken",
+    });
+  const {
+    isLoading: isLoadingRentNftByToken,
+    isSuccess: isSuccessRentNftByToken,
+  } = useWaitForTransaction({
+    hash: dataRentNftByToken?.hash,
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Renting nft by token transaction is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+  });
+
+  //*---------------------------------------------------------------------------
+  //* Define copied local varialbe from input data.
+  //*---------------------------------------------------------------------------
   const rentMarketClassRef = React.useRef();
   const [collectionArray, setCollectionArray] = React.useState([]);
   const [serviceAddress, setServiceAddress] = React.useState("");
   const [registerNFTArray, setRegisterNFTArray] = React.useState([]);
   const [blockchainNetwork, setBlockchainNetwork] = React.useState("");
 
-  // * -------------------------------------------------------------------------
-  // * Define collection array data.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Define collection array data.
+  //*---------------------------------------------------------------------------
   const [collectionMetadata, setCollectionMetadata] = React.useState({
     collectionAddress: "",
     collectionName: "",
@@ -82,15 +137,15 @@ const Market = ({
     });
   };
 
-  // * -------------------------------------------------------------------------
-  // * Define pagination data.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Define pagination data.
+  //*---------------------------------------------------------------------------
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-  // * -------------------------------------------------------------------------
-  // * Initialize data.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Initialize data.
+  //*---------------------------------------------------------------------------
   React.useEffect(() => {
     // console.log("call React.useEffect()");
     // console.log("inputRentMarketClass: ", inputRentMarketClass);
@@ -191,11 +246,51 @@ const Market = ({
             color="primary"
             variant="outlined"
             onClick={async () => {
-              let provider;
-              await rentMarketClassRef.current.rentNFTByToken({
-                provider,
-                element,
-                serviceAddress,
+              // let provider;
+              // await rentMarketClassRef.current.rentNFTByToken({
+              //   provider,
+              //   element,
+              //   serviceAddress,
+              // });
+              console.log("element: ", element);
+              try {
+                writeApprove?.({
+                  address: element.feeTokenAddress,
+                  args: [RENT_MARKET_CONTRACT_ADDRES, element.rentFeeByToken],
+                });
+              } catch (error) {
+                console.error(error);
+                setWriteToastMessage({
+                  snackbarSeverity: AlertSeverity.error,
+                  snackbarMessage: error.reason,
+                  snackbarTime: new Date(),
+                  snackbarOpen: true,
+                });
+              }
+
+              try {
+                writeRentNftByToken?.({
+                  args: [
+                    element.nftAddress,
+                    element.tokenId,
+                    SERVICE_OWNER_ADDRESS,
+                  ],
+                });
+              } catch (error) {
+                console.error(error);
+                setWriteToastMessage({
+                  snackbarSeverity: AlertSeverity.error,
+                  snackbarMessage: error.reason,
+                  snackbarTime: new Date(),
+                  snackbarOpen: true,
+                });
+              }
+
+              setWriteToastMessage({
+                snackbarSeverity: AlertSeverity.info,
+                snackbarMessage: "Make transaction for renting nft.",
+                snackbarTime: new Date(),
+                snackbarOpen: true,
               });
             }}
           >
