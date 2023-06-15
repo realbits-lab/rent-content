@@ -12,9 +12,6 @@ import {
   TextField,
   Box,
 } from "@mui/material";
-import { RentMarket } from "rent-market";
-import { Metamask } from "rent-market";
-import { ConnectStatus } from "rent-market";
 
 const Token = ({
   rentMarketAddress,
@@ -94,7 +91,6 @@ const Token = ({
         <Chip label="Metamask" />
       </Divider>
       <p />
-      <Metamask blockchainNetwork={inputBlockchainNetwork} />
 
       {/*--------------------------------------------------------------------*/}
       {/* 2. Show request register token. */}

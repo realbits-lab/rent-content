@@ -27,7 +27,9 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CollectionsIcon from "@mui/icons-material/Collections";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
-import { My, Market, RentMarket } from "rent-market";
+import My from "@/components/My";
+import Market from "@/components/Market";
+import RentMarket from "@/components/RentMarket";
 import Content from "@/components/Content";
 import Collection from "@/components/Collection";
 import Service from "@/components/Service";
@@ -43,7 +45,7 @@ import {
   readToastMessageState,
   checkMobile,
   shortenAddress,
-} from "./RentContentUtil";
+} from "@/components/RentContentUtil";
 
 const RENT_CONTENT_COMPONENT_DRAWER_WIDTH = 180;
 
