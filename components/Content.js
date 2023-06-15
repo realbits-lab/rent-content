@@ -485,25 +485,25 @@ export default function Content({
             }}
           >
             <TableCell align="center" padding="normal">
-              image
+              Content
             </TableCell>
             <TableCell align="center" padding="normal">
               name
             </TableCell>
             <TableCell align="center" padding="normal">
-              id
+              Token Id
             </TableCell>
             <TableCell align="center" padding="normal">
-              fee
+              Fee (matic)
             </TableCell>
             <TableCell align="center" padding="normal">
-              duration
+              Rent Duration (seconds)
             </TableCell>
             <TableCell align="center" padding="normal">
-              change
+              Change
             </TableCell>
             <TableCell align="center" padding="normal">
-              delete
+              Unregister
             </TableCell>
           </TableRow>
         </TableHead>
@@ -794,7 +794,7 @@ export default function Content({
       {/*//*-----------------------------------------------------------------*/}
       {/*//* Show registered NFT with change and unregister button.          */}
       {/*//*-----------------------------------------------------------------*/}
-      <Divider sx={{ margin: "5px" }}>
+      <Divider sx={{ margin: "5px", marginTop: "20px" }}>
         <Chip label="My Registered NFT" />
       </Divider>
       {showMyRegisteredNFTElementTable()}
@@ -802,7 +802,7 @@ export default function Content({
       {/*//*-----------------------------------------------------------------*/}
       {/*//* Show my unregistered NFT with request register button.          */}
       {/*//*-----------------------------------------------------------------*/}
-      <Divider sx={{ margin: "5px" }}>
+      <Divider sx={{ margin: "5px", marginTop: "20px" }}>
         <Chip label="My Unregistered NFT" />
       </Divider>
       {showMyUnregisteredNFTElementTable()}
