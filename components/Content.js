@@ -795,7 +795,9 @@ export default function Content({
             justifyContent: "center",
           }}
         >
-          <Button variant="text">Click the connect wallet button</Button>
+          <Button variant="text" onClick={openWeb3Modal}>
+            Click the connect wallet button
+          </Button>
         </Box>
       );
     }
