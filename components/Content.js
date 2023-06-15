@@ -420,6 +420,23 @@ export default function Content({
   //*---------------------------------------------------------------------------
   function buildRegisterRowList({ element }) {
     // console.log("element: ", element);
+    const found = dataAllToken.find((token) => {
+      // console.log("token: ", token);
+      return (
+        token.tokenAddress.toLowerCase() ===
+          element.feeTokenAddress.toLowerCase() ||
+        element.feeTokenAddress.toLowerCase() ===
+          ZERO_ADDRESS_STRING.toLowerCase()
+      );
+    });
+    // console.log("found: ", found);
+
+    let buttonColor;
+    if (found) {
+      buttonColor = "black";
+    } else {
+      buttonColor = "red";
+    }
 
     return (
       <TableRow key={getUniqueKey()}>
@@ -463,14 +480,14 @@ export default function Content({
               setOpenInput(true);
             }}
           >
-            <EditRoundedIcon />
+            <EditRoundedIcon sx={{ color: buttonColor }} />
           </Button>
         </TableCell>
         <TableCell align="center">
           <Button
             size="small"
             onClick={async () => {
-              // * Create WalletConnect Provider.
+              //* Create WalletConnect Provider.
               let provider;
               if (isMobile === true) {
                 provider = new WalletConnectProvider({
@@ -481,7 +498,7 @@ export default function Content({
                   infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
                 });
 
-                // * Enable session (triggers QR Code modal).
+                //* Enable session (triggers QR Code modal).
                 await provider.enable();
                 // console.log("provider: ", provider);
               }
