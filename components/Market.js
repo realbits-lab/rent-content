@@ -148,15 +148,24 @@ const Market = ({
         }}
       >
         <TableCell align="center">
-          <Avatar
-            alt="image"
-            src={
-              element.metadata
-                ? changeIPFSToGateway(element.metadata.image)
-                : ""
-            }
-            sx={{ width: RBSize.big, height: RBSize.big }}
-          />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Avatar
+              alt="image"
+              src={
+                element.metadata
+                  ? changeIPFSToGateway(element.metadata.image)
+                  : ""
+              }
+              sx={{ width: RBSize.big, height: RBSize.big }}
+            />
+          </Box>
         </TableCell>
         <TableCell align="center">
           {element.metadata ? element.metadata.name : "n/a"}
@@ -381,7 +390,7 @@ const Market = ({
       <Table size="small" aria-label="purchases">
         <TableHead>
           <TableRow key={getUniqueKey()}>
-            <TableCell align="center">Avatar</TableCell>
+            <TableCell align="center">Content</TableCell>
             <TableCell align="center">Name</TableCell>
             <TableCell align="center">Fee</TableCell>
             <TableCell align="center">Rent</TableCell>
@@ -395,6 +404,7 @@ const Market = ({
                 sx={{
                   display: "flex",
                   justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
                 <Box>
@@ -446,7 +456,7 @@ const Market = ({
               <Table size="small">
                 <TableHead>
                   <TableRow key={getUniqueKey()} spacing={0}>
-                    <TableCell align="center">Avatar</TableCell>
+                    <TableCell align="center">Content</TableCell>
                     <TableCell align="center">Name</TableCell>
                     <TableCell align="center">Fee</TableCell>
                     <TableCell align="center">Rent</TableCell>
