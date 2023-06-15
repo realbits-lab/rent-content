@@ -109,8 +109,6 @@ export default function Token() {
       address: RENT_MARKET_CONTRACT_ADDRES,
       abi: rentmarketABI.abi,
       functionName: "unregisterToken",
-      //* 200 Gwei
-      gas: 200_000_000_000n,
     });
   const {
     isLoading: isLoadingTransactionUnregisterToken,
