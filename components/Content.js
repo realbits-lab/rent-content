@@ -1,6 +1,13 @@
 import React from "react";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { useAccount } from "wagmi";
+import {
+  useAccount,
+  useNetwork,
+  useContractRead,
+  useContractWrite,
+  useWaitForTransaction,
+  useWalletClient,
+} from "wagmi";
 import { isMobile } from "react-device-detect";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -28,6 +35,7 @@ import TableRow from "@mui/material/TableRow";
 import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
 import Paper from "@mui/material/Paper";
+import MenuItem from "@mui/material/MenuItem";
 import { useTheme } from "@mui/material/styles";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
@@ -45,6 +53,7 @@ import {
   shortenAddress,
   writeToastMessageState,
 } from "@/components/RentContentUtil";
+import rentmarketABI from "@/contracts/rentMarket.json";
 
 export default function Content({
   inputRentMarket,
@@ -101,9 +110,10 @@ export default function Content({
   //* Handle text input change.
   //* Variables for changeNFT function.
   //*---------------------------------------------------------------------------
+  const ZERO_ADDRESS_STRING = "0x0000000000000000000000000000000000000000";
   const [formValue, setFormValue] = React.useState({
     inputRentFee: 0,
-    inputFeeTokenAddress: "",
+    inputFeeTokenAddress: ZERO_ADDRESS_STRING,
     inputRentFeeByToken: 0,
     inputRentDuration: 0,
   });
@@ -130,8 +140,38 @@ export default function Content({
   const [rowsPerPage, setRowsPerPage] = React.useState([]);
 
   //*---------------------------------------------------------------------------
-  //* Initialize data.
+  //* Wagmi hook functions.
   //*---------------------------------------------------------------------------
+  const RENT_MARKET_CONTRACT_ADDRES =
+    process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
+  const [unregisterTokenAddress, setUnregisterTokenAddress] = React.useState();
+
+  const {
+    data: dataAllToken,
+    isError: isErrorAllToken,
+    isLoading: isLoadingAllToken,
+    status: statusAllToken,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "getAllToken",
+    watch: true,
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+  // console.log("dataAllToken: ", dataAllToken);
+
   React.useEffect(() => {
     // console.log("call React.useEffect()");
     // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
@@ -394,6 +434,9 @@ export default function Content({
         <TableCell align="center">
           {element.rentFee / Math.pow(10, 18)}
         </TableCell>
+        <TableCell align="center">
+          {element.rentFeeByToken / Math.pow(10, 18)}
+        </TableCell>
         <TableCell align="center">{element.rentDuration.toNumber()}</TableCell>
         <TableCell align="center">
           <Button
@@ -495,6 +538,9 @@ export default function Content({
             </TableCell>
             <TableCell align="center" padding="normal">
               Fee (matic)
+            </TableCell>
+            <TableCell align="center" padding="normal">
+              Fee (token)
             </TableCell>
             <TableCell align="center" padding="normal">
               Rent Duration (seconds)
@@ -817,48 +863,73 @@ export default function Content({
           setOpenInput(false);
         }}
       >
-        <DialogTitle>Rent Fee</DialogTitle>
+        <DialogTitle>Change rent fee or rent duration</DialogTitle>
         <DialogContent>
-          <TextField
-            fullWidth
-            required
-            id="outlined-required"
-            label="Rent Fee (matic unit)"
-            name="inputRentFee"
-            value={inputRentFee}
-            onChange={handleChange}
-            sx={{ marginTop: "10px", marginBottom: "10px" }}
-          />
-          <TextField
-            fullWidth
-            required
-            id="outlined"
-            label="Token Address"
-            name="inputFeeTokenAddress"
-            value={inputFeeTokenAddress}
-            onChange={handleChange}
-            sx={{ marginTop: "10px", marginBottom: "10px" }}
-          />
-          <TextField
-            fullWidth
-            required
-            id="outlined"
-            label="Rent Fee by Token (ether unit)"
-            name="inputRentFeeByToken"
-            value={inputRentFeeByToken}
-            onChange={handleChange}
-            sx={{ marginTop: "10px", marginBottom: "10px" }}
-          />
-          <TextField
-            fullWidth
-            required
-            id="outlined"
-            label="Rent Duration (second unit)"
-            name="inputRentDuration"
-            value={inputRentDuration}
-            onChange={handleChange}
-            sx={{ marginTop: "10px", marginBottom: "10px" }}
-          />
+          <Box component="form" noValidate autoComplete="off">
+            <div>
+              <Divider sx={{ marginTop: "20px", marginBottom: "20px" }}>
+                <Chip label="MATIC FEE" />
+              </Divider>
+              <TextField
+                fullWidth
+                required
+                id="outlined-required"
+                label="Rent Fee (matic)"
+                name="inputRentFee"
+                value={inputRentFee}
+                onChange={handleChange}
+                sx={{ marginTop: "10px", marginBottom: "10px" }}
+              />
+
+              <Divider sx={{ marginTop: "20px", marginBottom: "20px" }}>
+                <Chip label="TOKEN FEE" />
+              </Divider>
+              <TextField
+                select
+                fullWidth
+                required
+                id="outlined"
+                label="Token Address"
+                name="inputFeeTokenAddress"
+                value={inputFeeTokenAddress}
+                onChange={handleChange}
+                sx={{ marginTop: "10px", marginBottom: "10px" }}
+              >
+                <MenuItem key={getUniqueKey()} value={ZERO_ADDRESS_STRING}>
+                  None
+                </MenuItem>
+                {dataAllToken.map((token, idx) => (
+                  <MenuItem key={idx} value={token.tokenAddress}>
+                    {token.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TextField
+                fullWidth
+                required
+                id="outlined"
+                label="Rent Fee by Token"
+                name="inputRentFeeByToken"
+                value={inputRentFeeByToken}
+                onChange={handleChange}
+                sx={{ marginTop: "10px", marginBottom: "10px" }}
+              />
+
+              <Divider sx={{ marginTop: "20px", marginBottom: "20px" }}>
+                <Chip label="RENT DURATION" />
+              </Divider>
+              <TextField
+                fullWidth
+                required
+                id="outlined"
+                label="Rent Duration (second unit)"
+                name="inputRentDuration"
+                value={inputRentDuration}
+                onChange={handleChange}
+                sx={{ marginTop: "10px", marginBottom: "10px" }}
+              />
+            </div>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button
@@ -866,7 +937,7 @@ export default function Content({
               setOpenInput(false);
             }}
           >
-            Close
+            CLOSE
           </Button>
           <Button
             onClick={async () => {
@@ -935,7 +1006,7 @@ export default function Content({
               setOpenInput(false);
             }}
           >
-            Change
+            SAVE
           </Button>
         </DialogActions>
       </Dialog>

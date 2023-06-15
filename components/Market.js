@@ -138,14 +138,14 @@ const Market = ({
     return (
       <TableRow
         key={getUniqueKey()}
-        sx={{
-          "&:hover": {
-            backgroundColor: theme.palette.success.light,
-          },
-          "&:hover .MuiTableCell-root": {
-            color: "white",
-          },
-        }}
+        // sx={{
+        //   "&:hover": {
+        //     backgroundColor: theme.palette.success.light,
+        //   },
+        //   "&:hover .MuiTableCell-root": {
+        //     color: "white",
+        //   },
+        // }}
       >
         <TableCell align="center">
           <Box
@@ -171,21 +171,43 @@ const Market = ({
           {element.metadata ? element.metadata.name : "n/a"}
         </TableCell>
         <TableCell align="center">
-          {element.rentFee / Math.pow(10, 18)}
+          <Button
+            color="primary"
+            variant="outlined"
+            onClick={async () => {
+              let provider;
+              await rentMarketClassRef.current.rentNFT({
+                provider,
+                element,
+                serviceAddress,
+              });
+            }}
+          >
+            {element.rentFee / Math.pow(10, 18)}
+          </Button>
         </TableCell>
-        {/* <TableCell align="center">{element.rentDuration.toNumber()}</TableCell> */}
         <TableCell align="center">
+          <Button
+            color="primary"
+            variant="outlined"
+            onClick={async () => {
+              let provider;
+              await rentMarketClassRef.current.rentNFTByToken({
+                provider,
+                element,
+                serviceAddress,
+              });
+            }}
+          >
+            {element.rentFeeByToken / Math.pow(10, 18)}
+          </Button>
+        </TableCell>
+        <TableCell align="center">{element.rentDuration.toNumber()}</TableCell>
+        {/* <TableCell align="center">
           <Button
             color="primary"
             variant="contained"
             onClick={async () => {
-              // console.log("call onClick()");
-              // console.log(
-              //   "rentMarketClassRef.current: ",
-              //   rentMarketClassRef.current
-              // );
-              // console.log("serviceAddress: ", serviceAddress);
-              // * Create WalletConnect Provider.
               let provider;
               if (isMobile === true) {
                 provider = new WalletConnectProvider({
@@ -195,11 +217,8 @@ const Market = ({
                   },
                   infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
                 });
-
-                // * Enable session (triggers QR Code modal).
                 await provider.enable();
               }
-              // console.log("provider: ", provider);
 
               try {
                 await rentMarketClassRef.current.rentNFT({
@@ -208,43 +227,28 @@ const Market = ({
                   serviceAddress,
                 });
               } catch (error) {
-                // console.log("error: ", error);
-
                 let message = error.data
                   ? error.data.message
                   : error.reason || error.message || error || "";
 
                 if (error.message) {
-                  // const testMessage =
-                  //   '[ethjs-query] while formatting outputs from RPC \'{"value":{"code":-32603,"data":{"code":-32603,"message":"Error: VM Exception while processing transaction: reverted with reason string \'RM9\'","data":{"message":"Error: VM Exception while processing transaction: reverted with reason string \'RM9\'","txHash":"0x14cdec3dbaaa5ab97fcf2524c28bc0acd482a4e1131deedc53ef441c1ba4a8a1","data":"0x08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003524d390000000000000000000000000000000000000000000000000000000000"}}}}\'';
                   let regex = new RegExp(
                     "while formatting outputs from RPC '(.*)'"
                   );
                   let match = regex.exec(error.message);
-                  // console.log("match: ", match);
 
                   if (match !== null && match.length == 2) {
-                    // console.log("match[1]: ", match[1]);
                     let messageJson = JSON.parse(match[1]);
-                    // console.log("messageJson: ", messageJson);
-                    // console.log(
-                    //   "messageJson.value.data.message: ",
-                    //   messageJson.value.data.message
-                    // );
-
                     regex = new RegExp(
                       "Error: VM Exception while processing transaction: reverted with reason string '(.*)'"
                     );
                     match = regex.exec(messageJson.value.data.message);
                     if (match !== null && match.length == 2) {
-                      // console.log("match[1]: ", match[1]);
                       message = getErrorDescription({ errorString: match[1] });
-                      // console.log("message: ", message);
                     }
                   }
                 }
 
-                // console.error(error);
                 setWriteToastMessage({
                   snackbarSeverity: AlertSeverity.error,
                   snackbarMessage: message,
@@ -252,12 +256,11 @@ const Market = ({
                   snackbarOpen: true,
                 });
               }
-              // console.log("done onClick()");
             }}
           >
             RENT
           </Button>
-        </TableCell>
+        </TableCell> */}
       </TableRow>
     );
   }
@@ -392,8 +395,9 @@ const Market = ({
           <TableRow key={getUniqueKey()}>
             <TableCell align="center">Content</TableCell>
             <TableCell align="center">Name</TableCell>
-            <TableCell align="center">Fee</TableCell>
-            <TableCell align="center">Rent</TableCell>
+            <TableCell align="center">Rent by Matic</TableCell>
+            <TableCell align="center">Rent by Token</TableCell>
+            <TableCell align="center">Rent Duration</TableCell>
           </TableRow>
         </TableHead>
 
@@ -458,8 +462,9 @@ const Market = ({
                   <TableRow key={getUniqueKey()} spacing={0}>
                     <TableCell align="center">Content</TableCell>
                     <TableCell align="center">Name</TableCell>
-                    <TableCell align="center">Fee</TableCell>
-                    <TableCell align="center">Rent</TableCell>
+                    <TableCell align="center">Rent by Matic</TableCell>
+                    <TableCell align="center">Rent by Token</TableCell>
+                    <TableCell align="center">Rent Duration</TableCell>
                   </TableRow>
                 </TableHead>
 
