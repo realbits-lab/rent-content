@@ -445,15 +445,6 @@ const RentContent = ({
               </ListItemButton>
             </ListItem>
           }
-
-          {/* //*------------------------------------------------------------*/}
-          {/* //* Content menu.                                              */}
-          {/* //*------------------------------------------------------------*/}
-
-          <Divider sx={{ margin: "5px" }}>
-            <Chip label="Content" />
-          </Divider>
-
           {
             <ListItem key="Content" disablePadding>
               <ListItemButton
