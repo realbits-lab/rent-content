@@ -1,6 +1,13 @@
 import React from "react";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { useAccount } from "wagmi";
+import {
+  useAccount,
+  useNetwork,
+  useContractRead,
+  useContractWrite,
+  useWaitForTransaction,
+  useWalletClient,
+} from "wagmi";
 import { isMobile } from "react-device-detect";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -28,6 +35,7 @@ import TableRow from "@mui/material/TableRow";
 import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
 import Paper from "@mui/material/Paper";
+import MenuItem from "@mui/material/MenuItem";
 import { useTheme } from "@mui/material/styles";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
@@ -44,29 +52,30 @@ import {
   AlertSeverity,
   shortenAddress,
   writeToastMessageState,
-} from "./RentContentUtil";
+} from "@/components/RentContentUtil";
+import rentmarketABI from "@/contracts/rentMarket.json";
 
-const Content = ({
+export default function Content({
   inputRentMarket,
   inputBlockchainNetwork,
   inputMyRegisteredNFTArray,
   inputMyUnregisteredNFTArray,
-}) => {
-  // * -------------------------------------------------------------------------
-  // * Hook variables.
-  // * -------------------------------------------------------------------------
+}) {
+  //*---------------------------------------------------------------------------
+  //* Hook variables.
+  //*---------------------------------------------------------------------------
   const { address, isConnected } = useAccount();
 
-  // * -------------------------------------------------------------------------
-  // * Define input copied variables.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Define input copied variables.
+  //*---------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
   const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState();
   const [myUnregisteredNFTArray, setMyUnregisteredNFTArray] = React.useState();
 
-  // * -------------------------------------------------------------------------
-  // * Set unique variables for table collapse.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Set unique variables for table collapse.
+  //*---------------------------------------------------------------------------
   const [
     myRegisteredUniqueNFTAddressArray,
     setMyRegisteredUniqueNFTAddressArray,
@@ -76,15 +85,15 @@ const Content = ({
     setMyUnregisteredUniqueNFTAddressArray,
   ] = React.useState();
 
-  // * -------------------------------------------------------------------------
-  // * Nft list data.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Nft list data.
+  //*---------------------------------------------------------------------------
   const [changeElement, setChangeElement] = React.useState([]);
   const [openInput, setOpenInput] = React.useState(false);
 
-  // * -------------------------------------------------------------------------
-  // * Handle toast message.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Handle toast message.
+  //*---------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
   const writeToastMessage =
@@ -97,13 +106,14 @@ const Content = ({
           snackbarOpen: true,
         };
 
-  // * -------------------------------------------------------------------------
-  // * Handle text input change.
-  // * Variables for changeNFT function.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Handle text input change.
+  //* Variables for changeNFT function.
+  //*---------------------------------------------------------------------------
+  const ZERO_ADDRESS_STRING = "0x0000000000000000000000000000000000000000";
   const [formValue, setFormValue] = React.useState({
     inputRentFee: 0,
-    inputFeeTokenAddress: "",
+    inputFeeTokenAddress: ZERO_ADDRESS_STRING,
     inputRentFeeByToken: 0,
     inputRentDuration: 0,
   });
@@ -123,15 +133,45 @@ const Content = ({
     });
   };
 
-  // * -------------------------------------------------------------------------
-  // * Table pagination data.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Table pagination data.
+  //*---------------------------------------------------------------------------
   const [page, setPage] = React.useState([]);
   const [rowsPerPage, setRowsPerPage] = React.useState([]);
 
-  // * -------------------------------------------------------------------------
-  // * Initialize data.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Wagmi hook functions.
+  //*---------------------------------------------------------------------------
+  const RENT_MARKET_CONTRACT_ADDRES =
+    process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
+  const [unregisterTokenAddress, setUnregisterTokenAddress] = React.useState();
+
+  const {
+    data: dataAllToken,
+    isError: isErrorAllToken,
+    isLoading: isLoadingAllToken,
+    status: statusAllToken,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "getAllToken",
+    watch: true,
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+  // console.log("dataAllToken: ", dataAllToken);
+
   React.useEffect(() => {
     // console.log("call React.useEffect()");
     // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
@@ -368,9 +408,9 @@ const Content = ({
     );
   }
 
-  // * -------------------------------------------------------------------------
-  // * Draw each register data row list in table.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Draw each register data row list in table.
+  //*---------------------------------------------------------------------------
   function buildRegisterRowList({ element }) {
     // console.log("element: ", element);
 
@@ -393,6 +433,9 @@ const Content = ({
         <TableCell align="center">{element.tokenId.toNumber()}</TableCell>
         <TableCell align="center">
           {element.rentFee / Math.pow(10, 18)}
+        </TableCell>
+        <TableCell align="center">
+          {element.rentFeeByToken / Math.pow(10, 18)}
         </TableCell>
         <TableCell align="center">{element.rentDuration.toNumber()}</TableCell>
         <TableCell align="center">
@@ -459,9 +502,9 @@ const Content = ({
     );
   }
 
-  // * -------------------------------------------------------------------------
-  // * Draw each register data row body in table.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Draw each register data row body in table.
+  //*---------------------------------------------------------------------------
   function RegisterNftDataRowList({ nftContractAddress }) {
     // console.log("call RegisterNftDataRowList()");
 
@@ -485,25 +528,28 @@ const Content = ({
             }}
           >
             <TableCell align="center" padding="normal">
-              image
+              Content
             </TableCell>
             <TableCell align="center" padding="normal">
               name
             </TableCell>
             <TableCell align="center" padding="normal">
-              id
+              Token Id
             </TableCell>
             <TableCell align="center" padding="normal">
-              fee
+              Fee (matic)
             </TableCell>
             <TableCell align="center" padding="normal">
-              duration
+              Fee (token)
             </TableCell>
             <TableCell align="center" padding="normal">
-              change
+              Rent Duration (seconds)
             </TableCell>
             <TableCell align="center" padding="normal">
-              delete
+              Change
+            </TableCell>
+            <TableCell align="center" padding="normal">
+              Unregister
             </TableCell>
           </TableRow>
         </TableHead>
@@ -791,25 +837,25 @@ const Content = ({
 
   return (
     <div>
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Show registered NFT with change and unregister button.        */}
-      {/* // * --------------------------------------------------------------*/}
-      <Divider sx={{ margin: "5px" }}>
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Show registered NFT with change and unregister button.          */}
+      {/*//*-----------------------------------------------------------------*/}
+      <Divider sx={{ margin: "5px", marginTop: "20px" }}>
         <Chip label="My Registered NFT" />
       </Divider>
       {showMyRegisteredNFTElementTable()}
 
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Show my unregistered NFT with request register button.        */}
-      {/* // * --------------------------------------------------------------*/}
-      <Divider sx={{ margin: "5px" }}>
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Show my unregistered NFT with request register button.          */}
+      {/*//*-----------------------------------------------------------------*/}
+      <Divider sx={{ margin: "5px", marginTop: "20px" }}>
         <Chip label="My Unregistered NFT" />
       </Divider>
       {showMyUnregisteredNFTElementTable()}
 
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Show input dialog.                                            */}
-      {/* // * --------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Show input dialog.                                              */}
+      {/*//*-----------------------------------------------------------------*/}
       <Dialog
         fullWidth
         open={openInput}
@@ -817,48 +863,73 @@ const Content = ({
           setOpenInput(false);
         }}
       >
-        <DialogTitle>Rent Fee</DialogTitle>
+        <DialogTitle>Change rent fee or rent duration</DialogTitle>
         <DialogContent>
-          <TextField
-            fullWidth
-            required
-            id="outlined-required"
-            label="Rent Fee (matic unit)"
-            name="inputRentFee"
-            value={inputRentFee}
-            onChange={handleChange}
-            sx={{ marginTop: "10px", marginBottom: "10px" }}
-          />
-          <TextField
-            fullWidth
-            required
-            id="outlined"
-            label="Token Address"
-            name="inputFeeTokenAddress"
-            value={inputFeeTokenAddress}
-            onChange={handleChange}
-            sx={{ marginTop: "10px", marginBottom: "10px" }}
-          />
-          <TextField
-            fullWidth
-            required
-            id="outlined"
-            label="Rent Fee by Token (ether unit)"
-            name="inputRentFeeByToken"
-            value={inputRentFeeByToken}
-            onChange={handleChange}
-            sx={{ marginTop: "10px", marginBottom: "10px" }}
-          />
-          <TextField
-            fullWidth
-            required
-            id="outlined"
-            label="Rent Duration (second unit)"
-            name="inputRentDuration"
-            value={inputRentDuration}
-            onChange={handleChange}
-            sx={{ marginTop: "10px", marginBottom: "10px" }}
-          />
+          <Box component="form" noValidate autoComplete="off">
+            <div>
+              <Divider sx={{ marginTop: "20px", marginBottom: "20px" }}>
+                <Chip label="MATIC FEE" />
+              </Divider>
+              <TextField
+                fullWidth
+                required
+                id="outlined-required"
+                label="Rent Fee (matic)"
+                name="inputRentFee"
+                value={inputRentFee}
+                onChange={handleChange}
+                sx={{ marginTop: "10px", marginBottom: "10px" }}
+              />
+
+              <Divider sx={{ marginTop: "20px", marginBottom: "20px" }}>
+                <Chip label="TOKEN FEE" />
+              </Divider>
+              <TextField
+                select
+                fullWidth
+                required
+                id="outlined"
+                label="Token Address"
+                name="inputFeeTokenAddress"
+                value={inputFeeTokenAddress}
+                onChange={handleChange}
+                sx={{ marginTop: "10px", marginBottom: "10px" }}
+              >
+                <MenuItem key={getUniqueKey()} value={ZERO_ADDRESS_STRING}>
+                  None
+                </MenuItem>
+                {dataAllToken.map((token, idx) => (
+                  <MenuItem key={idx} value={token.tokenAddress}>
+                    {token.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TextField
+                fullWidth
+                required
+                id="outlined"
+                label="Rent Fee by Token"
+                name="inputRentFeeByToken"
+                value={inputRentFeeByToken}
+                onChange={handleChange}
+                sx={{ marginTop: "10px", marginBottom: "10px" }}
+              />
+
+              <Divider sx={{ marginTop: "20px", marginBottom: "20px" }}>
+                <Chip label="RENT DURATION" />
+              </Divider>
+              <TextField
+                fullWidth
+                required
+                id="outlined"
+                label="Rent Duration (second unit)"
+                name="inputRentDuration"
+                value={inputRentDuration}
+                onChange={handleChange}
+                sx={{ marginTop: "10px", marginBottom: "10px" }}
+              />
+            </div>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button
@@ -866,7 +937,7 @@ const Content = ({
               setOpenInput(false);
             }}
           >
-            Close
+            CLOSE
           </Button>
           <Button
             onClick={async () => {
@@ -889,7 +960,7 @@ const Content = ({
                 // console.log("inputRentFeeByToken: ", inputRentFeeByToken);
                 // console.log("inputRentDuration: ", inputRentDuration);
 
-                // * Create WalletConnect Provider.
+                //* Create WalletConnect Provider.
                 let provider;
                 if (isMobile === true) {
                   provider = new WalletConnectProvider({
@@ -900,12 +971,12 @@ const Content = ({
                     infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
                   });
 
-                  // * Enable session (triggers QR Code modal).
+                  //* Enable session (triggers QR Code modal).
                   await provider.enable();
                   // console.log("provider: ", provider);
                 }
 
-                // * rent fee and rent fee by token should be an ether unit expression.
+                //* rent fee and rent fee by token should be an ether unit expression.
                 await rentMarketRef.current.changeNFT({
                   provider: provider,
                   element: changeElement,
@@ -935,12 +1006,10 @@ const Content = ({
               setOpenInput(false);
             }}
           >
-            Change
+            SAVE
           </Button>
         </DialogActions>
       </Dialog>
     </div>
   );
-};
-
-export default Content;
+}

@@ -18,6 +18,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Chip from "@mui/material/Chip";
 import MuiAppBar from "@mui/material/AppBar";
 import StoreIcon from "@mui/icons-material/Store";
+import TokenIcon from "@mui/icons-material/Token";
 import SellIcon from "@mui/icons-material/Sell";
 import MiscellaneousServicesIcon from "@mui/icons-material/MiscellaneousServices";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -27,7 +28,9 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CollectionsIcon from "@mui/icons-material/Collections";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
-import { My, Market, RentMarket } from "rent-market";
+import My from "@/components/My";
+import Market from "@/components/Market";
+import RentMarket from "@/components/RentMarket";
 import Content from "@/components/Content";
 import Collection from "@/components/Collection";
 import Service from "@/components/Service";
@@ -43,7 +46,7 @@ import {
   readToastMessageState,
   checkMobile,
   shortenAddress,
-} from "./RentContentUtil";
+} from "@/components/RentContentUtil";
 
 const RENT_CONTENT_COMPONENT_DRAWER_WIDTH = 180;
 
@@ -119,8 +122,6 @@ const RentContent = ({
   //*---------------------------------------------------------------------------
   //* Define each menu index.
   //*---------------------------------------------------------------------------
-  const DEFAULT_MENU_INDEX = 3;
-
   const CONTENT_MENU_INDEX = 0;
   const MY_MENU_INDEX = 1;
   const MARKET_MENU_INDEX = 2;
@@ -131,6 +132,8 @@ const RentContent = ({
   const MONITOR_ACCOUNT_BALANCE_MENU_INDEX = 7;
   const MONITOR_PENDING_RENT_FEE_MENU_INDEX = 8;
   const MONITOR_RENT_NFT_MENU_INDEX = 9;
+
+  const DEFAULT_MENU_INDEX = CONTENT_MENU_INDEX;
 
   //*---------------------------------------------------------------------------
   //* Set MUI theme.
@@ -442,15 +445,6 @@ const RentContent = ({
               </ListItemButton>
             </ListItem>
           }
-
-          {/* //*------------------------------------------------------------*/}
-          {/* //* Content menu.                                              */}
-          {/* //*------------------------------------------------------------*/}
-
-          <Divider sx={{ margin: "5px" }}>
-            <Chip label="Content" />
-          </Divider>
-
           {
             <ListItem key="Content" disablePadding>
               <ListItemButton
@@ -505,11 +499,13 @@ const RentContent = ({
               </ListItemButton>
             </ListItem>
           }
-          {/* {
+          {
             <ListItem key="Token" disablePadding>
               <ListItemButton
                 selected={selectedIndex === TOKEN_MENU_INDEX}
-                onClick={(event) => handleListItemClick(event, TOKEN_MENU_INDEX)}
+                onClick={(event) =>
+                  handleListItemClick(event, TOKEN_MENU_INDEX)
+                }
               >
                 <ListItemIcon>
                   <TokenIcon />
@@ -517,7 +513,7 @@ const RentContent = ({
                 <ListItemText primary="Token" />
               </ListItemButton>
             </ListItem>
-          } */}
+          }
 
           {/* //*------------------------------------------------------------*/}
           {/* //* Monitor menu.                                              */}
@@ -655,14 +651,7 @@ const RentContent = ({
             />
           )
         ) : selectedIndex === TOKEN_MENU_INDEX ? (
-          inputRentMarket && (
-            <Token
-              blockchainNetwork={blockchainNetwork}
-              inputTokenArray={tokenArray}
-              inputRentMarket={inputRentMarket}
-              inputBlockchainNetwork={blockchainNetwork}
-            />
-          )
+          inputRentMarket && <Token />
         ) : selectedIndex === MONITOR_TOKEN_MENU_INDEX ? (
           inputRentMarket && (
             <MonitorToken
