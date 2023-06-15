@@ -16,18 +16,22 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
+import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import rentmarketABI from "@/contracts/rentMarket.json";
+import faucetTokenABI from "@/contracts/faucetToken.json";
 import {
   AlertSeverity,
   writeToastMessageState,
   shortenAddress,
+  getUniqueKey,
 } from "@/components/RentContentUtil";
 
 export default function Token() {
   const RENT_MARKET_CONTRACT_ADDRES =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
+  const BLOCKCHAIN_NETWORK = process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK;
 
   //*---------------------------------------------------------------------------
   //* Wagmi hook functions.
@@ -59,6 +63,25 @@ export default function Token() {
     },
   });
   // console.log("dataAllToken: ", dataAllToken);
+
+  const { data: dataFaucetToken, write: writeFaucetToken } = useContractWrite({
+    abi: faucetTokenABI.abi,
+    functionName: "faucet",
+  });
+  const {
+    isLoading: isLoadingTransactionFaucetToken,
+    isSuccess: isSuccessTransactionFaucetToken,
+  } = useWaitForTransaction({
+    hash: dataFaucetToken?.hash,
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage: "Fauceting token transaction is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+  });
 
   const { data: dataRegisterToken, write: writeRegisterToken } =
     useContractWrite({
@@ -106,11 +129,13 @@ export default function Token() {
   //*---------------------------------------------------------------------------
   //* Handle text input change.
   //*---------------------------------------------------------------------------
+  const ZERO_ADDRESS_STRING = "0x0000000000000000000000000000000000000000";
   const [formValue, setFormValue] = React.useState({
     tokenAddress: "",
     tokenName: "",
+    inputFeeTokenAddress: ZERO_ADDRESS_STRING,
   });
-  const { tokenAddress, tokenName } = formValue;
+  const { tokenAddress, tokenName, inputFeeTokenAddress } = formValue;
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -140,7 +165,75 @@ export default function Token() {
   return (
     <div>
       {/*//*-----------------------------------------------------------------*/}
-      {/*//* Request register token.                                         */}
+      {/*//* Faucet content token for test network.                          */}
+      {/*//*-----------------------------------------------------------------*/}
+      {BLOCKCHAIN_NETWORK === "maticmum" && (
+        <div>
+          <Divider sx={{ margin: "5px", marginTop: "20px" }}>
+            <Chip label="Faucet" />
+          </Divider>
+          <TextField
+            select
+            fullWidth
+            required
+            id="outlined"
+            label="Token Address"
+            name="inputFeeTokenAddress"
+            value={inputFeeTokenAddress}
+            onChange={handleChange}
+            sx={{ marginTop: "10px", marginBottom: "10px" }}
+          >
+            <MenuItem key={getUniqueKey()} value={ZERO_ADDRESS_STRING}>
+              None
+            </MenuItem>
+            {dataAllToken?.map((token, idx) => (
+              <MenuItem key={idx} value={token.tokenAddress}>
+                {token.name}
+              </MenuItem>
+            ))}
+          </TextField>
+          <Button
+            fullWidth
+            margin={"normal"}
+            sx={{ marginTop: "10px" }}
+            disabled={isLoadingTransactionFaucetToken}
+            variant="contained"
+            onClick={async () => {
+              if (inputFeeTokenAddress === ZERO_ADDRESS_STRING) return;
+
+              try {
+                writeFaucetToken?.({
+                  address: inputFeeTokenAddress,
+                });
+              } catch (error) {
+                console.error(error);
+                setWriteToastMessage({
+                  snackbarSeverity: AlertSeverity.error,
+                  snackbarMessage: error.reason,
+                  snackbarTime: new Date(),
+                  snackbarOpen: true,
+                });
+              }
+
+              setWriteToastMessage({
+                snackbarSeverity: AlertSeverity.info,
+                snackbarMessage: "Make transaction for fauceting token.",
+                snackbarTime: new Date(),
+                snackbarOpen: true,
+              });
+            }}
+          >
+            {isLoadingTransactionFaucetToken ? (
+              <Typography>Fauceting...</Typography>
+            ) : (
+              <Typography>Faucet</Typography>
+            )}
+          </Button>
+        </div>
+      )}
+
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Input token address and name.                                   */}
       {/*//*-----------------------------------------------------------------*/}
       <Divider sx={{ margin: "5px", marginTop: "20px" }}>
         <Chip label="Input" />
@@ -175,6 +268,8 @@ export default function Token() {
         />
         <Button
           margin={"normal"}
+          sx={{ marginTop: "10px" }}
+          disabled={isLoadingTransactionRegisterToken}
           variant="contained"
           onClick={async () => {
             try {
@@ -199,7 +294,11 @@ export default function Token() {
             });
           }}
         >
-          <Typography>Register</Typography>
+          {isLoadingTransactionRegisterToken ? (
+            <Typography>Registering...</Typography>
+          ) : (
+            <Typography>Register</Typography>
+          )}
         </Button>
       </Box>
 
@@ -215,7 +314,7 @@ export default function Token() {
 
           return (
             <Grid item key={idx}>
-              <Card sx={{ maxWidth: 345 }}>
+              <Card>
                 <CardContent>
                   <Typography gutterBottom variant="h5" component="div">
                     {token.name}
@@ -232,6 +331,10 @@ export default function Token() {
                 <CardActions>
                   <Button
                     size="small"
+                    disabled={
+                      token.tokenAddress === unregisterTokenAddress &&
+                      isLoadingTransactionUnregisterToken
+                    }
                     onClick={async () => {
                       try {
                         setUnregisterTokenAddress(token.tokenAddress);
@@ -257,7 +360,12 @@ export default function Token() {
                       });
                     }}
                   >
-                    Unregister
+                    {token.tokenAddress === unregisterTokenAddress &&
+                    isLoadingTransactionUnregisterToken ? (
+                      <Typography>Unregistering...</Typography>
+                    ) : (
+                      <Typography>Unregister</Typography>
+                    )}
                   </Button>
                 </CardActions>
               </Card>

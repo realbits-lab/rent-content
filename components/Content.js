@@ -1,5 +1,6 @@
 import React from "react";
 import WalletConnectProvider from "@walletconnect/web3-provider";
+import { useWeb3Modal } from "@web3modal/react";
 import {
   useAccount,
   useNetwork,
@@ -142,6 +143,12 @@ export default function Content({
   //*---------------------------------------------------------------------------
   //* Wagmi hook functions.
   //*---------------------------------------------------------------------------
+  const {
+    isOpen: isOpenWeb3Modal,
+    open: openWeb3Modal,
+    close: closeWeb3Modal,
+    setDefaultChain: setDefaultChainWeb3Modal,
+  } = useWeb3Modal();
   const RENT_MARKET_CONTRACT_ADDRES =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
   const [unregisterTokenAddress, setUnregisterTokenAddress] = React.useState();
@@ -413,6 +420,23 @@ export default function Content({
   //*---------------------------------------------------------------------------
   function buildRegisterRowList({ element }) {
     // console.log("element: ", element);
+    const found = dataAllToken.find((token) => {
+      // console.log("token: ", token);
+      return (
+        token.tokenAddress.toLowerCase() ===
+          element.feeTokenAddress.toLowerCase() ||
+        element.feeTokenAddress.toLowerCase() ===
+          ZERO_ADDRESS_STRING.toLowerCase()
+      );
+    });
+    // console.log("found: ", found);
+
+    let buttonColor;
+    if (found) {
+      buttonColor = "black";
+    } else {
+      buttonColor = "red";
+    }
 
     return (
       <TableRow key={getUniqueKey()}>
@@ -456,14 +480,14 @@ export default function Content({
               setOpenInput(true);
             }}
           >
-            <EditRoundedIcon />
+            <EditRoundedIcon sx={{ color: buttonColor }} />
           </Button>
         </TableCell>
         <TableCell align="center">
           <Button
             size="small"
             onClick={async () => {
-              // * Create WalletConnect Provider.
+              //* Create WalletConnect Provider.
               let provider;
               if (isMobile === true) {
                 provider = new WalletConnectProvider({
@@ -474,7 +498,7 @@ export default function Content({
                   infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
                 });
 
-                // * Enable session (triggers QR Code modal).
+                //* Enable session (triggers QR Code modal).
                 await provider.enable();
                 // console.log("provider: ", provider);
               }
@@ -606,7 +630,9 @@ export default function Content({
             justifyContent: "center",
           }}
         >
-          <Button variant="text">Click the connect wallet button</Button>
+          <Button variant="text" onClick={openWeb3Modal}>
+            Click the connect wallet button
+          </Button>
         </Box>
       );
     }
@@ -786,7 +812,9 @@ export default function Content({
             justifyContent: "center",
           }}
         >
-          <Button variant="text">Click the connect wallet button</Button>
+          <Button variant="text" onClick={openWeb3Modal}>
+            Click the connect wallet button
+          </Button>
         </Box>
       );
     }
@@ -898,7 +926,7 @@ export default function Content({
                 <MenuItem key={getUniqueKey()} value={ZERO_ADDRESS_STRING}>
                   None
                 </MenuItem>
-                {dataAllToken.map((token, idx) => (
+                {dataAllToken?.map((token, idx) => (
                   <MenuItem key={idx} value={token.tokenAddress}>
                     {token.name}
                   </MenuItem>

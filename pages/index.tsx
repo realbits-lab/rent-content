@@ -55,8 +55,7 @@ function App() {
     wagmiBlockchainNetworks = [];
   }
 
-  //* Wagmi client
-  //* Use wallet connect configuration.
+  //* Set wagmi config.
   const {
     chains: wagmiChains,
     publicClient: wagmiPublicClient,
@@ -66,37 +65,21 @@ function App() {
       projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? "",
     }),
     alchemyProvider({ apiKey: ALCHEMY_API_KEY }),
-    publicProvider(),
   ]);
-  //* Use alchemy configuration.
-  // const { chains, provider, webSocketProvider } = configureChains(
-  //   wagmiBlockchainNetworks,
-  //   [
-  //     alchemyProvider({
-  //       apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY ?? "",
-  //     }),
-  //   ]
-  // );
   const wagmiConfig = createConfig({
     autoConnect: true,
     connectors: [
       ...w3mConnectors({
         projectId: WALLET_CONNECT_PROJECT_ID,
-        version: 1,
+        version: 2,
         chains: wagmiBlockchainNetworks,
-      }),
-      new WalletConnectConnector({
-        chains: wagmiBlockchainNetworks,
-        options: {
-          projectId: WALLET_CONNECT_PROJECT_ID,
-        },
       }),
     ],
     publicClient: wagmiPublicClient,
     webSocketPublicClient: wagmiWebSocketPublicClient,
   });
 
-  // * Web3Modal Ethereum Client
+  //* Set Web3Modal Ethereum Client.
   const ethereumClient = new EthereumClient(
     wagmiConfig,
     wagmiBlockchainNetworks
