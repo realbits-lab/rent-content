@@ -867,7 +867,7 @@ class RentMarket {
         }
       })
     );
-    // console.log("registerNFTArray: ", registerNFTArray);
+    // console.log("allRentNFTArray: ", allRentNFTArray);
 
     //* Set renteeNFT data.
     const myRenteeNFTArray = await Promise.all(
@@ -882,7 +882,7 @@ class RentMarket {
       })
     );
 
-    // Remove undefined element.
+    //* Remove undefined element.
     // console.log("myRenteeNFTArray: ", myRenteeNFTArray);
     const filteredMyRenteeeNFTArray = myRenteeNFTArray.filter(
       (element) => element !== undefined
