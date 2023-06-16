@@ -214,13 +214,13 @@ const My = ({
                 : 0;
               // console.log("rentStartTimestamp: ", rentStartTimestamp);
 
-              // * Get rent duration display string for own case.
+              //* Get rent duration display string for own case.
               const durationTimestampDisplay = `${moment
-                .unix(element.rentDuration.toNumber())
-                .diff(0, "days", true)} day`;
+                .duration(Number(element.rentDuration), "seconds")
+                .humanize()}`;
               // console.log("durationTimestampDisplay: ", durationTimestampDisplay);
 
-              // * Get end rent time display string for rent case.
+              //* Get end rent time display string for rent case.
               const endRentTimestamp =
                 rentStartTimestamp + element.rentDuration.toNumber();
               // console.log("endRentTimestamp: ", endRentTimestamp);
@@ -238,17 +238,17 @@ const My = ({
               return (
                 <TableRow
                   key={getUniqueKey()}
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: theme.palette.success.light,
-                    },
-                    "&:hover .MuiTableCell-root": {
-                      color: "white",
-                    },
-                  }}
-                  style={{
-                    cursor: "pointer",
-                  }}
+                  // sx={{
+                  //   "&:hover": {
+                  //     backgroundColor: theme.palette.success.light,
+                  //   },
+                  //   "&:hover .MuiTableCell-root": {
+                  //     color: "white",
+                  //   },
+                  // }}
+                  // style={{
+                  //   cursor: "pointer",
+                  // }}
                 >
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
                     <Box
