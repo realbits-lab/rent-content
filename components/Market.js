@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {
   useAccount,
   useNetwork,
@@ -7,6 +7,8 @@ import {
   useWaitForTransaction,
   useWalletClient,
 } from "wagmi";
+import { getContract } from "@wagmi/core";
+import { utils } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { isMobile } from "react-device-detect";
 import Grid from "@mui/material/Grid";
@@ -45,6 +47,7 @@ import {
   getChainName,
 } from "@/components/RentContentUtil";
 import rentmarketABI from "@/contracts/rentMarket.json";
+//* TODO: Test token
 import faucetTokenABI from "@/contracts/faucetToken.json";
 
 const Market = ({
@@ -63,6 +66,8 @@ const Market = ({
   //*---------------------------------------------------------------------------
   //* Wagmi hook functions.
   //*---------------------------------------------------------------------------
+  const { chain, chains } = useNetwork();
+  const { address, isConnecting, isDisconnected } = useAccount();
   const { data: dataApprove, write: writeApprove } = useContractWrite({
     abi: faucetTokenABI.abi,
     functionName: "approve",
@@ -186,6 +191,80 @@ const Market = ({
     inputBlockchainNetwork,
   ]);
 
+  async function erc20PermitSignature({ owner, spender, amount, contract }) {
+    // console.log("call erc20PermitSignature()");
+    // console.log("owner: ", owner);
+    // console.log("spender: ", spender);
+    // console.log("amount: ", amount);
+
+    try {
+      //* Deadline is 20 minutes later from current timestamp.
+      const transactionDeadline = Date.now() + 20 * 60;
+      // console.log("transactionDeadline: ", transactionDeadline);
+      const nonce = await contract.read.nonces({ args: [owner] });
+      // console.log("nonce: ", nonce);
+      const contractName = await contract.read.name();
+      // console.log("contractName: ", contractName);
+      const EIP712Domain = [
+        { name: "name", type: "string" },
+        { name: "version", type: "string" },
+        { name: "chainId", type: "uint256" },
+        { name: "verifyingContract", type: "address" },
+      ];
+      // console.log("chain: ", chain);
+      const domain = {
+        name: contractName,
+        version: "1",
+        chainId: chain.id,
+        verifyingContract: contract.address,
+      };
+      const Permit = [
+        { name: "owner", type: "address" },
+        { name: "spender", type: "address" },
+        { name: "value", type: "uint256" },
+        { name: "nonce", type: "uint256" },
+        { name: "deadline", type: "uint256" },
+      ];
+      const message = {
+        owner,
+        spender,
+        value: amount.toString(),
+        nonce: nonce.toString(16),
+        deadline: transactionDeadline,
+      };
+      const msgParams = JSON.stringify({
+        types: {
+          EIP712Domain,
+          Permit,
+        },
+        domain,
+        primaryType: "Permit",
+        message,
+      });
+
+      const params = [address, msgParams];
+      const method = "eth_signTypedData_v4";
+      // console.log("params: ", params);
+      // console.log("method: ", method);
+      const signature = await ethereum.request({
+        method,
+        params,
+      });
+      // console.log("signature: ", signature);
+      const signData = utils.splitSignature(signature);
+      const { r, s, v } = signData;
+      return {
+        r,
+        s,
+        v,
+        deadline: transactionDeadline,
+      };
+    } catch (error) {
+      console.error("error: ", error);
+      return error;
+    }
+  }
+
   function buildRowList({ element }) {
     // console.log("call buildRowList()");
     // console.log("element: ", element);
@@ -252,21 +331,18 @@ const Market = ({
               //   element,
               //   serviceAddress,
               // });
-              console.log("element: ", element);
-              try {
-                writeApprove?.({
-                  address: element.feeTokenAddress,
-                  args: [RENT_MARKET_CONTRACT_ADDRES, element.rentFeeByToken],
-                });
-              } catch (error) {
-                console.error(error);
-                setWriteToastMessage({
-                  snackbarSeverity: AlertSeverity.error,
-                  snackbarMessage: error.reason,
-                  snackbarTime: new Date(),
-                  snackbarOpen: true,
-                });
-              }
+              // console.log("element: ", element);
+              const contract = getContract({
+                address: element.feeTokenAddress,
+                abi: faucetTokenABI.abi,
+              });
+              // console.log("contract: ", contract);
+              await erc20PermitSignature({
+                owner: address,
+                spender: RENT_MARKET_CONTRACT_ADDRES,
+                amount: element.rentFeeByToken,
+                contract: contract,
+              });
 
               try {
                 writeRentNftByToken?.({
@@ -286,12 +362,12 @@ const Market = ({
                 });
               }
 
-              setWriteToastMessage({
-                snackbarSeverity: AlertSeverity.info,
-                snackbarMessage: "Make transaction for renting nft.",
-                snackbarTime: new Date(),
-                snackbarOpen: true,
-              });
+              // setWriteToastMessage({
+              //   snackbarSeverity: AlertSeverity.info,
+              //   snackbarMessage: "Make transaction for renting nft.",
+              //   snackbarTime: new Date(),
+              //   snackbarOpen: true,
+              // });
             }}
           >
             {element.rentFeeByToken / Math.pow(10, 18)}
