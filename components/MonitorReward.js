@@ -131,10 +131,6 @@ export default function MonitorReward() {
       ...rewardTokenContract,
       functionName: "remainingTimestampToNextVesting",
     },
-    {
-      ...rewardTokenContract,
-      functionName: "totalVestedAmount",
-    },
   ];
   const {
     data: dataRewardToken,
@@ -245,45 +241,37 @@ export default function MonitorReward() {
                 // console.log("func: ", func);
                 if (dataRewardToken[idx].status === "success") {
                   let value;
-                  if (dataRewardToken[idx].status === "success") {
-                    // if (typeof dataRewardToken[idx].result === "bigint") {
-                    if (
-                      functionName === "totalSupply" ||
-                      functionName === "currentReleasable" ||
-                      functionName === "totalAllocation" ||
-                      functionName === "minimumReleasable"
-                    ) {
-                      value = (
-                        dataRewardToken[idx].result / BigInt(Math.pow(10, 18))
-                      ).toLocaleString();
-                    } else if (functionName === "start") {
-                      value = moment
-                        .unix(Number(dataRewardToken[idx].result), "seconds")
-                        .format();
-                    } else if (functionName === "duration") {
-                      value = moment
-                        .duration(
-                          Number(dataRewardToken[idx].result),
-                          "seconds"
-                        )
-                        .format();
-                    } else if (
-                      functionName === "remainingTimestampToNextVesting"
-                    ) {
-                      value = moment
-                        .duration(
-                          Number(dataRewardToken[idx].result),
-                          "seconds"
-                        )
-                        .format();
-                    } else {
-                      value = dataRewardToken[idx].result.toString();
-                    }
+                  // if (typeof dataRewardToken[idx].result === "bigint") {
+                  if (
+                    functionName === "totalSupply" ||
+                    functionName === "currentReleasable" ||
+                    functionName === "totalAllocation" ||
+                    functionName === "minimumReleasable"
+                  ) {
+                    value = (
+                      dataRewardToken[idx].result / BigInt(Math.pow(10, 18))
+                    ).toLocaleString();
+                  } else if (functionName === "start") {
+                    value = moment
+                      .unix(Number(dataRewardToken[idx].result), "seconds")
+                      .format();
+                  } else if (functionName === "duration") {
+                    value = moment
+                      .duration(Number(dataRewardToken[idx].result), "seconds")
+                      .format();
+                  } else if (
+                    functionName === "remainingTimestampToNextVesting"
+                  ) {
+                    value = moment
+                      .duration(Number(dataRewardToken[idx].result), "seconds")
+                      .format();
+                  } else {
+                    value = dataRewardToken[idx].result.toString();
                   }
 
                   return (
                     <TableRow key={idx}>
-                      <TableCell align="left">{func[1].functionName}</TableCell>
+                      <TableCell align="left">{functionName}</TableCell>
                       <TableCell align="left">{value}</TableCell>
                     </TableRow>
                   );
@@ -294,32 +282,47 @@ export default function MonitorReward() {
       </TableContainer>
 
       {/*//*-----------------------------------------------------------------*/}
-      {/*//* Event                                                           */}
+      {/*//* Reward token share                                              */}
       {/*//*-----------------------------------------------------------------*/}
       <Divider sx={{ marginTop: "20px", marginBottom: "20px" }}>
-        <Chip label="Token Event" />
+        <Chip label="Reward Token Share" />
       </Divider>
 
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell align="center">Token Address</TableCell>
-              <TableCell align="center">Token Name</TableCell>
+              <TableCell align="center">Key</TableCell>
+              <TableCell align="center">Value</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {tokenEventArray.map((row, idx) => {
-              return (
-                <TableRow
-                  key={idx}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell align="center">{row.tokenAddress}</TableCell>
-                  <TableCell align="center">{row.name}</TableCell>
-                </TableRow>
-              );
-            })}
+            {dataRewardTokenShare &&
+              Object.entries(rewardTokenShareContractFunctions).map(
+                (func, idx) => {
+                  console.log("func: ", func);
+                  const functionName = func[1].functionName;
+                  console.log("functionName: ", functionName);
+                  if (dataRewardTokenShare[idx].status === "success") {
+                    let value;
+                    if (functionName === "getRewardTokenBalance") {
+                      value = (
+                        dataRewardTokenShare[idx].result /
+                        BigInt(Math.pow(10, 18))
+                      ).toLocaleString();
+                    } else {
+                      value = dataRewardTokenShare[idx].result.toString();
+                    }
+
+                    return (
+                      <TableRow key={idx}>
+                        <TableCell align="left">{functionName}</TableCell>
+                        <TableCell align="left">{value}</TableCell>
+                      </TableRow>
+                    );
+                  }
+                }
+              )}
           </TableBody>
         </Table>
       </TableContainer>
