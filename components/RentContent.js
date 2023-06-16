@@ -101,9 +101,9 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
   justifyContent: "flex-end",
+  //* Necessary for content to be below app bar.
+  ...theme.mixins.toolbar,
 }));
 
 const RentContent = ({
@@ -614,11 +614,11 @@ const RentContent = ({
       {/*//*-----------------------------------------------------------------*/}
       <Main open={openDrawer}>
         <DrawerHeader />
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
+        <Grid container justifyContent="end" spacing={2}>
+          <Grid item>
             <Web3Button />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item>
             <Web3NetworkSwitch />
           </Grid>
         </Grid>
