@@ -32,8 +32,15 @@ import {
   getChainName,
 } from "@/components/RentContentUtil";
 import rentmarketABI from "@/contracts/rentMarket.json";
+import rewardTokenABI from "@/contracts/rewardToken.json";
+import rewardTokenShareABI from "@/contracts/rewardTokenShare.json";
+import faucetTokenABI from "@/contracts/faucetToken.json";
 
-export default function MonitorToken() {
+export default function MonitorReward() {
+  const REWARD_TOKEN_CONTRACT_ADDRESS =
+    process.env.NEXT_PUBLIC_REWARD_TOKEN_CONTRACT_ADDRESS;
+  const REWARD_TOKEN_SHARE_CONTRACT_ADDRESS =
+    process.env.NEXT_PUBLIC_REWARD_TOKEN_SHARE_CONTRACT_ADDRESS;
   const [tokenEventArray, setTokenEventArray] = React.useState([]);
 
   //*---------------------------------------------------------------------------
@@ -59,7 +66,7 @@ export default function MonitorToken() {
           snackbarTime: new Date(),
           snackbarOpen: true,
         };
-  });
+  }, [writeToastMessageLoadable.contents, writeToastMessageLoadable?.state]);
 
   //*---------------------------------------------------------------------------
   //* Wagmi hook functions.
@@ -136,10 +143,10 @@ export default function MonitorToken() {
   return (
     <div>
       {/*//*-----------------------------------------------------------------*/}
-      {/*//* Token                                                           */}
+      {/*//* Reward token                                                    */}
       {/*//*-----------------------------------------------------------------*/}
       <Divider sx={{ marginTop: "20px", marginBottom: "20px" }}>
-        <Chip label="Token List" />
+        <Chip label="Reward Token" />
       </Divider>
 
       <TableContainer component={Paper}>
@@ -151,7 +158,7 @@ export default function MonitorToken() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {dataAllToken.map((token, idx) => {
+            {dataAllToken?.map((token, idx) => {
               console.log("token: ", token);
               return (
                 <TableRow
