@@ -64,7 +64,6 @@ function App() {
     w3mProvider({
       projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? "",
     }),
-    alchemyProvider({ apiKey: ALCHEMY_API_KEY }),
   ]);
   const wagmiConfig = createConfig({
     autoConnect: true,
