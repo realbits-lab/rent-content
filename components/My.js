@@ -1,4 +1,5 @@
 import React from "react";
+import { useWeb3Modal } from "@web3modal/react";
 import moment from "moment";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
@@ -47,25 +48,26 @@ const My = ({
   web3modalSelectedChain,
   wagmiIsConnected,
 }) => {
-  // * -------------------------------------------------------------------------
-  // * Hook variables.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Hook variables.
+  //*---------------------------------------------------------------------------
   const theme = useTheme();
 
-  // * -------------------------------------------------------------------------
-  // * Define copied local varialbe from input data.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Define copied local varialbe from input data.
+  //*---------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
   const [collectionArray, setCollectionArray] = React.useState([]);
   const [serviceAddress, setServiceAddress] = React.useState("");
   const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState([]);
   const [myRentNFTArray, setMyRentNFTArray] = React.useState([]);
   const [blockchainNetwork, setBlockchainNetwork] = React.useState("");
+  const [currentTimestamp, setCurrentTimestamp] = React.useState();
 
-  // * -------------------------------------------------------------------------
-  // * Handle selected collection.
-  // * Default is own menu.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Handle selected collection.
+  //* Default is own menu.
+  //*---------------------------------------------------------------------------
   const [selectedItem, setSelectedItem] = React.useState(MyMenu.own);
   const [myNftStatus, setMyNftStatus] = React.useState({
     myNftType: MyMenu.own,
@@ -87,15 +89,32 @@ const My = ({
     }
   };
 
-  // * -------------------------------------------------------------------------
-  // * Table pagination data.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Wagmi hook functions.
+  //*---------------------------------------------------------------------------
+  const {
+    isOpen: isOpenWeb3Modal,
+    open: openWeb3Modal,
+    close: closeWeb3Modal,
+    setDefaultChain: setDefaultChainWeb3Modal,
+  } = useWeb3Modal();
+
+  //*---------------------------------------------------------------------------
+  //* Table pagination data.
+  //*---------------------------------------------------------------------------
   const [page, setPage] = React.useState([]);
   const [rowsPerPage, setRowsPerPage] = React.useState([]);
 
-  // * -------------------------------------------------------------------------
-  // * Initialize data.
-  // * -------------------------------------------------------------------------
+  React.useEffect(() => {
+    // console.log("call useEffect()");
+    const countdown = setInterval(() => {
+      const timestamp = Math.floor(Date.now() / 1000);
+      // console.log("timestamp: ", timestamp);
+      setCurrentTimestamp(timestamp);
+    }, 1000);
+    return () => clearInterval(countdown);
+  }, [currentTimestamp]);
+
   React.useEffect(() => {
     // console.log("call React.useEffect()");
     // console.log("inputRentMarket: ", inputRentMarket);
@@ -189,21 +208,23 @@ const My = ({
               tablePage * tableRowsPerPage + tableRowsPerPage
             )
             .map((element) => {
+              // console.log("element: ", element);
               const rentStartTimestamp = element.rentStartTimestamp
                 ? element.rentStartTimestamp.toNumber()
                 : 0;
+              // console.log("rentStartTimestamp: ", rentStartTimestamp);
 
-              // * Get rent duration display string for own case.
+              //* Get rent duration display string for own case.
               const durationTimestampDisplay = `${moment
-                .unix(element.rentDuration.toNumber())
-                .diff(0, "days", true)} day`;
+                .duration(Number(element.rentDuration), "seconds")
+                .humanize()}`;
               // console.log("durationTimestampDisplay: ", durationTimestampDisplay);
 
-              // * Get end rent time display string for rent case.
+              //* Get end rent time display string for rent case.
               const endRentTimestamp =
                 rentStartTimestamp + element.rentDuration.toNumber();
               // console.log("endRentTimestamp: ", endRentTimestamp);
-              const currentTimestamp = new Date().getTime() / 1000;
+              // console.log("currentTimestamp: ", currentTimestamp);
               let endRentTimestampDisplay;
               if (currentTimestamp >= endRentTimestamp) {
                 endRentTimestampDisplay = "finished";
@@ -212,34 +233,41 @@ const My = ({
                   .unix(endRentTimestamp)
                   .fromNow(true);
               }
-              // console.log("currentTimestamp: ", currentTimestamp);
               // console.log("endRentTimestampDisplay: ", endRentTimestampDisplay);
 
               return (
                 <TableRow
                   key={getUniqueKey()}
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: theme.palette.success.light,
-                    },
-                    "&:hover .MuiTableCell-root": {
-                      color: "white",
-                    },
-                  }}
-                  style={{
-                    cursor: "pointer",
-                  }}
+                  // sx={{
+                  //   "&:hover": {
+                  //     backgroundColor: theme.palette.success.light,
+                  //   },
+                  //   "&:hover .MuiTableCell-root": {
+                  //     color: "white",
+                  //   },
+                  // }}
+                  // style={{
+                  //   cursor: "pointer",
+                  // }}
                 >
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                    <Avatar
-                      alt="image"
-                      src={
-                        element.metadata
-                          ? changeIPFSToGateway(element.metadata.image)
-                          : ""
-                      }
-                      sx={{ width: RBSize.big, height: RBSize.big }}
-                    />
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Avatar
+                        alt="image"
+                        src={
+                          element.metadata
+                            ? changeIPFSToGateway(element.metadata.image)
+                            : ""
+                        }
+                        sx={{ width: RBSize.big, height: RBSize.big }}
+                      />
+                    </Box>
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
                     {element.metadata ? element.metadata.name : "N/A"}
@@ -247,12 +275,15 @@ const My = ({
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
                     {element.rentFee / Math.pow(10, 18)}
                   </TableCell>
-                  {/* <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
+                  <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
+                    {element.rentFeeByToken / Math.pow(10, 18)}
+                  </TableCell>
+                  <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
                     {type === MyMenu.own
                       ? durationTimestampDisplay
                       : endRentTimestampDisplay}
-                  </TableCell> */}
-                  <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
+                  </TableCell>
+                  {/* <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
                     <Button
                       color="primary"
                       variant="contained"
@@ -273,7 +304,7 @@ const My = ({
                     >
                       SELECT
                     </Button>
-                  </TableCell>
+                  </TableCell> */}
                 </TableRow>
               );
             })}
@@ -285,11 +316,12 @@ const My = ({
     return (
       <TableHead>
         <TableRow key={getUniqueKey()}>
-          <TableCell align="center">Avatar</TableCell>
+          <TableCell align="center">Content</TableCell>
           <TableCell align="center">Name</TableCell>
-          <TableCell align="center">Fee</TableCell>
-          {/* <TableCell align="center">Duration</TableCell> */}
-          <TableCell align="center">Select</TableCell>
+          <TableCell align="center">Rent Fee</TableCell>
+          <TableCell align="center">Rent Fee By Token</TableCell>
+          <TableCell align="center">Rent Duration</TableCell>
+          {/* <TableCell align="center">Select</TableCell> */}
         </TableRow>
       </TableHead>
     );
@@ -570,7 +602,9 @@ const My = ({
             justifyContent: "center",
           }}
         >
-          <Button variant="text">Click the connect wallet button</Button>
+          <Button variant="text" onClick={openWeb3Modal}>
+            Click the connect wallet button
+          </Button>
         </Box>
       );
     }
@@ -629,22 +663,24 @@ const My = ({
             let type = MyMenu.own;
 
             if (selectedItem === MyMenu.own) {
-              elementArray =
-                inputMyRegisteredNFTArray &&
-                inputMyRegisteredNFTArray.filter(
-                  (nftElement) =>
-                    nftElement.nftAddress === element.collectionAddress
-                );
+              elementArray = inputMyRegisteredNFTArray?.filter(
+                (nftElement) =>
+                  nftElement.nftAddress === element.collectionAddress
+              );
               type = MyMenu.own;
             } else {
-              elementArray =
-                myRentNFTArray &&
-                myRentNFTArray.filter(
-                  (nftElement) =>
-                    nftElement.nftAddress === element.collectionAddress
-                );
+              elementArray = myRentNFTArray?.filter(
+                (nftElement) =>
+                  nftElement.nftAddress === element.collectionAddress
+              );
               type = MyMenu.rent;
             }
+            // console.log(
+            //   "inputMyRegisteredNFTArray: ",
+            //   inputMyRegisteredNFTArray
+            // );
+            // console.log("myRentNFTArray: ", myRentNFTArray);
+            // console.log("elementArray: ", elementArray);
 
             return buildMyTable({
               collection: element,
