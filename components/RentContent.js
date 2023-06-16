@@ -133,7 +133,7 @@ const RentContent = ({
   const MONITOR_PENDING_RENT_FEE_MENU_INDEX = 8;
   const MONITOR_RENT_NFT_MENU_INDEX = 9;
 
-  const DEFAULT_MENU_INDEX = MY_MENU_INDEX;
+  const DEFAULT_MENU_INDEX = MONITOR_TOKEN_MENU_INDEX;
 
   //*---------------------------------------------------------------------------
   //* Set MUI theme.
@@ -523,7 +523,7 @@ const RentContent = ({
             <Chip label="Monitor" />
           </Divider>
 
-          {/* {
+          {
             <ListItem key="Monitor-Token" disablePadding>
               <ListItemButton
                 selected={selectedIndex === MONITOR_TOKEN_MENU_INDEX}
@@ -537,7 +537,7 @@ const RentContent = ({
                 <ListItemText primary="Token" />
               </ListItemButton>
             </ListItem>
-          } */}
+          }
           {
             <ListItem key="Monitor-AccountBalance" disablePadding>
               <ListItemButton

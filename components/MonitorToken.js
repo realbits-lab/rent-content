@@ -24,33 +24,32 @@ import {
   getChainName,
 } from "./RentContentUtil";
 
-// https://docs.alchemy.com/docs/deep-dive-into-eth_getlogs
 const MonitorToken = ({
   inputRentMarket,
   rentMarketAddress,
   inputBlockchainNetwork,
 }) => {
-  //----------------------------------------------------------------------------
-  // Define rent market class.
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Define rent market class.
+  //*---------------------------------------------------------------------------
   const rentMarket = React.useRef();
   const [tokenArray, setTokenArray] = React.useState([]);
   const [tokenEventArray, setTokenEventArray] = React.useState([]);
 
   const POLYGON_SCAN_URL = "https://mumbai.polygonscan.com/address/";
 
-  //----------------------------------------------------------------------------
-  // Define alchemy configuration.
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Define alchemy configuration.
+  //*---------------------------------------------------------------------------
   const settings = {
     apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
     network: Network.MATIC_MUMBAI,
   };
   const alchemy = new Alchemy(settings);
 
-  //----------------------------------------------------------------------------
-  // Handle toast message.
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Handle toast message.
+  //*---------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
   const writeToastMessage = React.useMemo(() => {
@@ -140,36 +139,34 @@ const MonitorToken = ({
 
   return (
     <div>
-      {/*--------------------------------------------------------------------*/}
-      {/* Show registered tokens.                                            */}
-      {/*--------------------------------------------------------------------*/}
-
-      <p />
-      <Divider>
-        <Chip label="Registered Token" />
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Token                                                           */}
+      {/*//*-----------------------------------------------------------------*/}
+      <Divider sx={{ marginTop: "20px", marginBottom: "20px" }}>
+        <Chip label="Token List" />
       </Divider>
-      <p />
 
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <Table>
           <TableHead>
             <TableRow>
-              <TableCell align="right">Name</TableCell>
-              <TableCell align="right">Address</TableCell>
+              <TableCell align="center">Token Name</TableCell>
+              <TableCell align="center">Token Address</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {tokenArray.map((row) => {
-              const polygonScanUrl = `${POLYGON_SCAN_URL}${row.tokenAddress}`;
-
+            {tokenArray.map((row, idx) => {
               return (
                 <TableRow
-                  key={`registeredToken-${row.tokenAddress}`}
+                  key={idx}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
-                  <TableCell align="right">{row.name}</TableCell>
-                  <TableCell align="right">
-                    {shortenAddress({ address: tow.tokenAddress, number: 4 })}
+                  <TableCell align="center">{row.name}</TableCell>
+                  <TableCell align="center">
+                    {shortenAddress({
+                      address: row.tokenAddress,
+                      withLink: "scan",
+                    })}
                   </TableCell>
                 </TableRow>
               );
@@ -178,33 +175,30 @@ const MonitorToken = ({
         </Table>
       </TableContainer>
 
-      {/*--------------------------------------------------------------------*/}
-      {/* Show register token event.                                         */}
-      {/*--------------------------------------------------------------------*/}
-
-      <p />
-      <Divider>
-        <Chip label="RegisterToken Event" />
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Event                                                           */}
+      {/*//*-----------------------------------------------------------------*/}
+      <Divider sx={{ marginTop: "20px", marginBottom: "20px" }}>
+        <Chip label="Token Event" />
       </Divider>
-      <p />
 
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <Table>
           <TableHead>
             <TableRow>
-              <TableCell align="right">Token Address</TableCell>
-              <TableCell align="right">Token Name</TableCell>
+              <TableCell align="center">Token Address</TableCell>
+              <TableCell align="center">Token Name</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {tokenEventArray.map((row) => {
+            {tokenEventArray.map((row, idx) => {
               return (
                 <TableRow
-                  key={row.key}
+                  key={idx}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
-                  <TableCell align="right">{row.tokenAddress}</TableCell>
-                  <TableCell align="right">{row.name}</TableCell>
+                  <TableCell align="center">{row.tokenAddress}</TableCell>
+                  <TableCell align="center">{row.name}</TableCell>
                 </TableRow>
               );
             })}
