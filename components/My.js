@@ -1,4 +1,5 @@
 import React from "react";
+import { useWeb3Modal } from "@web3modal/react";
 import moment from "moment";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
@@ -47,14 +48,14 @@ const My = ({
   web3modalSelectedChain,
   wagmiIsConnected,
 }) => {
-  // * -------------------------------------------------------------------------
-  // * Hook variables.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Hook variables.
+  //*---------------------------------------------------------------------------
   const theme = useTheme();
 
-  // * -------------------------------------------------------------------------
-  // * Define copied local varialbe from input data.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Define copied local varialbe from input data.
+  //*---------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
   const [collectionArray, setCollectionArray] = React.useState([]);
   const [serviceAddress, setServiceAddress] = React.useState("");
@@ -62,10 +63,10 @@ const My = ({
   const [myRentNFTArray, setMyRentNFTArray] = React.useState([]);
   const [blockchainNetwork, setBlockchainNetwork] = React.useState("");
 
-  // * -------------------------------------------------------------------------
-  // * Handle selected collection.
-  // * Default is own menu.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Handle selected collection.
+  //* Default is own menu.
+  //*---------------------------------------------------------------------------
   const [selectedItem, setSelectedItem] = React.useState(MyMenu.own);
   const [myNftStatus, setMyNftStatus] = React.useState({
     myNftType: MyMenu.own,
@@ -87,15 +88,22 @@ const My = ({
     }
   };
 
-  // * -------------------------------------------------------------------------
-  // * Table pagination data.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Wagmi hook functions.
+  //*---------------------------------------------------------------------------
+  const {
+    isOpen: isOpenWeb3Modal,
+    open: openWeb3Modal,
+    close: closeWeb3Modal,
+    setDefaultChain: setDefaultChainWeb3Modal,
+  } = useWeb3Modal();
+
+  //*---------------------------------------------------------------------------
+  //* Table pagination data.
+  //*---------------------------------------------------------------------------
   const [page, setPage] = React.useState([]);
   const [rowsPerPage, setRowsPerPage] = React.useState([]);
 
-  // * -------------------------------------------------------------------------
-  // * Initialize data.
-  // * -------------------------------------------------------------------------
   React.useEffect(() => {
     // console.log("call React.useEffect()");
     // console.log("inputRentMarket: ", inputRentMarket);
@@ -570,7 +578,9 @@ const My = ({
             justifyContent: "center",
           }}
         >
-          <Button variant="text">Click the connect wallet button</Button>
+          <Button variant="text" onClick={openWeb3Modal}>
+            Click the connect wallet button
+          </Button>
         </Box>
       );
     }
