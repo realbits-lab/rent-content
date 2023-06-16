@@ -3,6 +3,7 @@ import {
   useAccount,
   useNetwork,
   useContractRead,
+  useContractReads,
   useContractWrite,
   useWaitForTransaction,
   useWalletClient,
@@ -12,6 +13,7 @@ import { Network, Alchemy } from "alchemy-sdk";
 import keccak256 from "keccak256";
 import { Buffer } from "buffer";
 import moment from "moment";
+import momentDurationFormatSetup from "moment-duration-format";
 import {
   Divider,
   Chip,
@@ -41,6 +43,7 @@ export default function MonitorReward() {
     process.env.NEXT_PUBLIC_REWARD_TOKEN_CONTRACT_ADDRESS;
   const REWARD_TOKEN_SHARE_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_REWARD_TOKEN_SHARE_CONTRACT_ADDRESS;
+  const BLOCKCHAIN_NETWORK = process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK;
   const [tokenEventArray, setTokenEventArray] = React.useState([]);
 
   //*---------------------------------------------------------------------------
@@ -74,34 +77,112 @@ export default function MonitorReward() {
   const RENT_MARKET_CONTRACT_ADDRES =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
 
+  const rewardTokenContract = {
+    address: REWARD_TOKEN_CONTRACT_ADDRESS,
+    abi:
+      BLOCKCHAIN_NETWORK === "matic" ? rewardTokenABI.abi : faucetTokenABI.abi,
+  };
+  const rewardTokenContractFunctions = [
+    {
+      ...rewardTokenContract,
+      functionName: "name",
+    },
+    {
+      ...rewardTokenContract,
+      functionName: "symbol",
+    },
+    {
+      ...rewardTokenContract,
+      functionName: "totalSupply",
+    },
+    {
+      ...rewardTokenContract,
+      functionName: "rewardTokenShareContractAddress",
+    },
+    {
+      ...rewardTokenContract,
+      functionName: "start",
+    },
+    {
+      ...rewardTokenContract,
+      functionName: "duration",
+    },
+    {
+      ...rewardTokenContract,
+      functionName: "frequency",
+    },
+    {
+      ...rewardTokenContract,
+      functionName: "totalReleased",
+    },
+    {
+      ...rewardTokenContract,
+      functionName: "currentReleasable",
+    },
+    {
+      ...rewardTokenContract,
+      functionName: "totalAllocation",
+    },
+    {
+      ...rewardTokenContract,
+      functionName: "minimumReleasable",
+    },
+    {
+      ...rewardTokenContract,
+      functionName: "remainingTimestampToNextVesting",
+    },
+    {
+      ...rewardTokenContract,
+      functionName: "totalVestedAmount",
+    },
+  ];
   const {
-    data: dataAllToken,
-    isError: isErrorAllToken,
-    isLoading: isLoadingAllToken,
-    status: statusAllToken,
-  } = useContractRead({
-    address: RENT_MARKET_CONTRACT_ADDRES,
-    abi: rentmarketABI.abi,
-    functionName: "getAllToken",
+    data: dataRewardToken,
+    isError: isErrorRewardToken,
+    isLoading: isLoadingRewardToken,
+    status: statusRewardToken,
+  } = useContractReads({
+    contracts: rewardTokenContractFunctions,
     watch: true,
-    onSuccess(data) {
-      // console.log("call onSuccess()");
-      // console.log("data: ", data);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
-    },
   });
-  // console.log("dataAllToken: ", dataAllToken);
+  console.log("dataRewardToken: ", dataRewardToken);
+
+  const rewardTokenShareContract = {
+    address: REWARD_TOKEN_SHARE_CONTRACT_ADDRESS,
+    abi: rewardTokenShareABI.abi,
+  };
+  const rewardTokenShareContractFunctions = [
+    {
+      ...rewardTokenShareContract,
+      functionName: "getRewardTokenBalance",
+    },
+    {
+      ...rewardTokenShareContract,
+      functionName: "getRewardTokenContractAddress",
+    },
+    {
+      ...rewardTokenShareContract,
+      functionName: "getProjectTeamAccountAddress",
+    },
+    {
+      ...rewardTokenShareContract,
+      functionName: "getRentMarketContractAddressArray",
+    },
+  ];
+  const {
+    data: dataRewardTokenShare,
+    isError: isErrorRewardTokenShare,
+    isLoading: isLoadingRewardTokenShare,
+    status: statusRewardTokenShare,
+  } = useContractReads({
+    contracts: rewardTokenShareContractFunctions,
+  });
+  console.log("dataRewardTokenShare: ", dataRewardTokenShare);
 
   React.useEffect(() => {
     // console.log("call useEffect()");
+
+    momentDurationFormatSetup(moment);
 
     const eventHash = keccak256("RegisterToken(address,name)");
     const topicHash = `0x${Buffer.from(eventHash).toString("hex")}`;
@@ -153,28 +234,61 @@ export default function MonitorReward() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell align="center">Name</TableCell>
-              <TableCell align="center">Address</TableCell>
+              <TableCell align="center">Key</TableCell>
+              <TableCell align="center">Value</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {dataAllToken?.map((token, idx) => {
-              console.log("token: ", token);
-              return (
-                <TableRow
-                  key={idx}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell align="center">{token.name}</TableCell>
-                  <TableCell align="center">
-                    {shortenAddress({
-                      address: token.tokenAddress,
-                      withLink: "scan",
-                    })}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+            {dataRewardToken &&
+              Object.entries(rewardTokenContractFunctions).map((func, idx) => {
+                const functionName = func[1].functionName;
+                // console.log("func: ", func);
+                if (dataRewardToken[idx].status === "success") {
+                  let value;
+                  if (dataRewardToken[idx].status === "success") {
+                    // if (typeof dataRewardToken[idx].result === "bigint") {
+                    if (
+                      functionName === "totalSupply" ||
+                      functionName === "currentReleasable" ||
+                      functionName === "totalAllocation" ||
+                      functionName === "minimumReleasable"
+                    ) {
+                      value = (
+                        dataRewardToken[idx].result / BigInt(Math.pow(10, 18))
+                      ).toLocaleString();
+                    } else if (functionName === "start") {
+                      value = moment
+                        .unix(Number(dataRewardToken[idx].result), "seconds")
+                        .format();
+                    } else if (functionName === "duration") {
+                      value = moment
+                        .duration(
+                          Number(dataRewardToken[idx].result),
+                          "seconds"
+                        )
+                        .format();
+                    } else if (
+                      functionName === "remainingTimestampToNextVesting"
+                    ) {
+                      value = moment
+                        .duration(
+                          Number(dataRewardToken[idx].result),
+                          "seconds"
+                        )
+                        .format();
+                    } else {
+                      value = dataRewardToken[idx].result.toString();
+                    }
+                  }
+
+                  return (
+                    <TableRow key={idx}>
+                      <TableCell align="left">{func[1].functionName}</TableCell>
+                      <TableCell align="left">{value}</TableCell>
+                    </TableRow>
+                  );
+                }
+              })}
           </TableBody>
         </Table>
       </TableContainer>
