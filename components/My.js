@@ -239,15 +239,23 @@ const My = ({
                   }}
                 >
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                    <Avatar
-                      alt="image"
-                      src={
-                        element.metadata
-                          ? changeIPFSToGateway(element.metadata.image)
-                          : ""
-                      }
-                      sx={{ width: RBSize.big, height: RBSize.big }}
-                    />
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Avatar
+                        alt="image"
+                        src={
+                          element.metadata
+                            ? changeIPFSToGateway(element.metadata.image)
+                            : ""
+                        }
+                        sx={{ width: RBSize.big, height: RBSize.big }}
+                      />
+                    </Box>
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
                     {element.metadata ? element.metadata.name : "N/A"}
