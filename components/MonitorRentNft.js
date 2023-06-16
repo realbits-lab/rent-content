@@ -175,14 +175,16 @@ const MonitorRentNft = ({
       const rentFee =
         ethers.BigNumber.from(`0x${event.data.slice(startIndex, endIndex)}`) /
         Math.pow(10, 18);
+      // console.log("rentFee: ", rentFee);
       const feeTokenAddress = `0x${event.data.slice(
         startIndex + 64 + 24,
         endIndex + 64
       )}`;
       const rentFeeByToken =
         ethers.BigNumber.from(
-          event.data.slice(startIndex + 128, endIndex + 128)
+          `0x${event.data.slice(startIndex + 128, endIndex + 128)}`
         ) / Math.pow(10, 18);
+      // console.log("rentFeeByToken: ", rentFeeByToken);
       const isRentByToken = new Boolean(
         Number(`0x${event.data.slice(startIndex + 192, endIndex + 192)}`)
       ).toString();
@@ -249,10 +251,10 @@ const MonitorRentNft = ({
 
   return (
     <div>
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Show current all rent data.                                   */}
-      {/* // * --------------------------------------------------------------*/}
-      <Divider sx={{ margin: "5px" }}>
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* All current rent data.                                          */}
+      {/*//*-----------------------------------------------------------------*/}
+      <Divider sx={{ marginTop: "20px", marginBottom: "20px" }}>
         <Chip label="Current Rent Data" />
       </Divider>
 
@@ -264,9 +266,9 @@ const MonitorRentNft = ({
               width: "max-content",
             }}
           >
-            {/* // * ----------------------------------------------------------*/}
-            {/* // * Current rent data table head.                                               */}
-            {/* // * ----------------------------------------------------------*/}
+            {/*//*-------------------------------------------------------------*/}
+            {/*//* Current rent data table head.                               */}
+            {/*//*-------------------------------------------------------------*/}
             <TableHead>
               <TableRow
                 sx={{
@@ -290,9 +292,9 @@ const MonitorRentNft = ({
               </TableRow>
             </TableHead>
 
-            {/* // * ----------------------------------------------------------*/}
-            {/* // * Current rent data table body.                                               */}
-            {/* // * ----------------------------------------------------------*/}
+            {/*//*-------------------------------------------------------------*/}
+            {/*//* Current rent data table body.                               */}
+            {/*//*-------------------------------------------------------------*/}
             <TableBody>
               {rentArray.map((data) => {
                 // console.log("data: ", data);
@@ -310,16 +312,15 @@ const MonitorRentNft = ({
                 //     uint256 rentStartTimestamp;
                 // }
 
-                // * Get display timestamp string.
+                //* Get display timestamp string.
                 const durationTimestampDisplay = `${moment
-                  .unix(data.rentDuration.toNumber())
-                  .diff(0, "days", true)} day`;
-                // * https://momentjs.com/docs/#/displaying/format/
+                  .duration(Number(data.rentDuration), "seconds")
+                  .humanize()}`;
                 const rentStartTimestampDisplay = moment
                   .unix(data.rentStartTimestamp.toNumber())
                   .format("YYYY/MM/DD-kk:mm:ss");
 
-                // * Get remain timestamp.
+                //* Get remain timestamp.
                 const currentTimestamp = Math.round(
                   new Date().getTime() / 1000
                 );
@@ -362,7 +363,7 @@ const MonitorRentNft = ({
                           infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
                         });
 
-                        // * Enable session (triggers QR Code modal).
+                        //* Enable session (triggers QR Code modal).
                         await provider.enable();
                         // console.log("provider: ", provider);
                       }
@@ -422,7 +423,7 @@ const MonitorRentNft = ({
                       })}
                     </TableCell>
                     <TableCell align="center">
-                      {data.rentFeeByToken.toNumber()}
+                      {Number(data.rentFeeByToken / Math.pow(10, 18))}
                     </TableCell>
                     <TableCell align="center">
                       {data.isRentByToken.toString()}
@@ -460,10 +461,10 @@ const MonitorRentNft = ({
         </Box>
       )}
 
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Show all rent event history.                                  */}
-      {/* // * --------------------------------------------------------------*/}
-      <Divider sx={{ margin: "5px" }}>
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* All rent event history.                                         */}
+      {/*//*-----------------------------------------------------------------*/}
+      <Divider sx={{ marginTop: "20px", marginBottom: "20px" }}>
         <Chip label="Rent Event History" />
       </Divider>
 
@@ -475,9 +476,9 @@ const MonitorRentNft = ({
               width: "max-content",
             }}
           >
-            {/* // * ----------------------------------------------------------*/}
-            {/* // * Rent event history table head.                                               */}
-            {/* // * ----------------------------------------------------------*/}
+            {/*//*-------------------------------------------------------------*/}
+            {/*//* Rent event history table head.                              */}
+            {/*//*-------------------------------------------------------------*/}
             <TableHead>
               <TableRow
                 sx={{
@@ -504,18 +505,17 @@ const MonitorRentNft = ({
               </TableRow>
             </TableHead>
 
-            {/* // * ----------------------------------------------------------*/}
-            {/* // * Rent event history table body.                                               */}
-            {/* // * ----------------------------------------------------------*/}
+            {/*//*-------------------------------------------------------------*/}
+            {/*//* Rent event history table body.                              */}
+            {/*//*-------------------------------------------------------------*/}
             <TableBody>
               {rentEventArray.map((event) => {
                 // console.log("event: ", event);
 
-                // * Get display timestamp string.
+                //* Get display timestamp string.
                 const durationTimestampDisplay = `${moment
-                  .unix(event.rentDuration)
-                  .diff(0, "days", true)} day`;
-                // * https://momentjs.com/docs/#/displaying/format/
+                  .duration(Number(event.rentDuration), "seconds")
+                  .humanize()}`;
                 const rentStartTimestampDisplay = moment
                   .unix(event.rentStartTimestamp)
                   .format("YYYY/MM/DD-kk:mm:ss");
