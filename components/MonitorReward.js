@@ -141,7 +141,7 @@ export default function MonitorReward() {
     contracts: rewardTokenContractFunctions,
     watch: true,
   });
-  console.log("dataRewardToken: ", dataRewardToken);
+  // console.log("dataRewardToken: ", dataRewardToken);
 
   const rewardTokenShareContract = {
     address: REWARD_TOKEN_SHARE_CONTRACT_ADDRESS,
@@ -173,7 +173,7 @@ export default function MonitorReward() {
   } = useContractReads({
     contracts: rewardTokenShareContractFunctions,
   });
-  console.log("dataRewardTokenShare: ", dataRewardTokenShare);
+  // console.log("dataRewardTokenShare: ", dataRewardTokenShare);
 
   React.useEffect(() => {
     // console.log("call useEffect()");
@@ -300,9 +300,9 @@ export default function MonitorReward() {
             {dataRewardTokenShare &&
               Object.entries(rewardTokenShareContractFunctions).map(
                 (func, idx) => {
-                  console.log("func: ", func);
+                  // console.log("func: ", func);
                   const functionName = func[1].functionName;
-                  console.log("functionName: ", functionName);
+                  // console.log("functionName: ", functionName);
                   if (dataRewardTokenShare[idx].status === "success") {
                     let value;
                     if (functionName === "getRewardTokenBalance") {
