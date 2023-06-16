@@ -22,7 +22,7 @@ import {
   AlertSeverity,
   writeToastMessageState,
   getChainName,
-} from "./RentContentUtil";
+} from "@/components/RentContentUtil";
 
 const MonitorToken = ({
   inputRentMarket,
@@ -35,8 +35,6 @@ const MonitorToken = ({
   const rentMarket = React.useRef();
   const [tokenArray, setTokenArray] = React.useState([]);
   const [tokenEventArray, setTokenEventArray] = React.useState([]);
-
-  const POLYGON_SCAN_URL = "https://mumbai.polygonscan.com/address/";
 
   //*---------------------------------------------------------------------------
   //* Define alchemy configuration.
