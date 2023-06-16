@@ -1,4 +1,12 @@
 import React from "react";
+import {
+  useAccount,
+  useNetwork,
+  useContractRead,
+  useContractWrite,
+  useWaitForTransaction,
+  useWalletClient,
+} from "wagmi";
 import { ethers } from "ethers";
 import { Network, Alchemy } from "alchemy-sdk";
 import keccak256 from "keccak256";
@@ -23,17 +31,9 @@ import {
   writeToastMessageState,
   getChainName,
 } from "@/components/RentContentUtil";
+import rentmarketABI from "@/contracts/rentMarket.json";
 
-const MonitorToken = ({
-  inputRentMarket,
-  rentMarketAddress,
-  inputBlockchainNetwork,
-}) => {
-  //*---------------------------------------------------------------------------
-  //* Define rent market class.
-  //*---------------------------------------------------------------------------
-  const rentMarket = React.useRef();
-  const [tokenArray, setTokenArray] = React.useState([]);
+export default function MonitorToken() {
   const [tokenEventArray, setTokenEventArray] = React.useState([]);
 
   //*---------------------------------------------------------------------------
@@ -61,42 +61,41 @@ const MonitorToken = ({
         };
   });
 
+  //*---------------------------------------------------------------------------
+  //* Wagmi hook functions.
+  //*---------------------------------------------------------------------------
+  const RENT_MARKET_CONTRACT_ADDRES =
+    process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
+  const [unregisterTokenAddress, setUnregisterTokenAddress] = React.useState();
+
+  const {
+    data: dataAllToken,
+    isError: isErrorAllToken,
+    isLoading: isLoadingAllToken,
+    status: statusAllToken,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "getAllToken",
+    watch: true,
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+  // console.log("dataAllToken: ", dataAllToken);
+
   React.useEffect(() => {
-    // console.log("call React.useEffect()");
-
-    // console.log("inputRentMarket: ", inputRentMarket);
-    // console.log(
-    //   "inputRentMarket.rentMarketContract: ",
-    //   inputRentMarket?.rentMarketContract
-    // );
-
-    window.Buffer = window.Buffer || Buffer;
-
-    if (
-      inputRentMarket !== undefined &&
-      inputRentMarket?.rentMarketContract !== undefined
-    ) {
-      rentMarket.current = inputRentMarket;
-      rentMarket.current.getAllToken().then(
-        (resultTokenArray) => setTokenArray(resultTokenArray),
-        (error) => {
-          setWriteToastMessage({
-            snackbarSeverity: AlertSeverity.error,
-            snackbarMessage: error?.message,
-            snackbarTime: new Date(),
-            snackbarOpen: true,
-          });
-        }
-      );
-    } else {
-      const chainName = getChainName({ chainId: inputBlockchainNetwork });
-      setWriteToastMessage({
-        snackbarSeverity: AlertSeverity.error,
-        snackbarMessage: `Metamask is not connect or not connected to ${chainName}.`,
-        snackbarTime: new Date(),
-        snackbarOpen: true,
-      });
-    }
+    // console.log("call useEffect()");
 
     const eventHash = keccak256("RegisterToken(address,name)");
     const topicHash = `0x${Buffer.from(eventHash).toString("hex")}`;
@@ -104,7 +103,7 @@ const MonitorToken = ({
       .getLogs({
         fromBlock: 27956165,
         toBlock: "latest",
-        address: rentMarketAddress,
+        address: RENT_MARKET_CONTRACT_ADDRES,
         topics: [topicHash],
       })
       .then((response) => {
@@ -133,7 +132,7 @@ const MonitorToken = ({
 
         setTokenEventArray(eventArray);
       });
-  }, [inputRentMarket]);
+  }, []);
 
   return (
     <div>
@@ -148,21 +147,25 @@ const MonitorToken = ({
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell align="center">Token Name</TableCell>
-              <TableCell align="center">Token Address</TableCell>
+              <TableCell align="center">Name</TableCell>
+              <TableCell align="center">Symbol</TableCell>
+              <TableCell align="center">Address</TableCell>
+              <TableCell align="center">Total Supply</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {tokenArray.map((row, idx) => {
+            {/* {tokenArray.map((token, idx) => { */}
+            {dataAllToken.map((token, idx) => {
+              console.log("token: ", token);
               return (
                 <TableRow
                   key={idx}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
-                  <TableCell align="center">{row.name}</TableCell>
+                  <TableCell align="center">{token.name}</TableCell>
                   <TableCell align="center">
                     {shortenAddress({
-                      address: row.tokenAddress,
+                      address: token.tokenAddress,
                       withLink: "scan",
                     })}
                   </TableCell>
@@ -205,6 +208,4 @@ const MonitorToken = ({
       </TableContainer>
     </div>
   );
-};
-
-export default MonitorToken;
+}

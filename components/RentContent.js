@@ -653,13 +653,7 @@ const RentContent = ({
         ) : selectedIndex === TOKEN_MENU_INDEX ? (
           inputRentMarket && <Token />
         ) : selectedIndex === MONITOR_TOKEN_MENU_INDEX ? (
-          inputRentMarket && (
-            <MonitorToken
-              inputRentMarket={inputRentMarket}
-              rentMarketAddress={rentMarketAddress}
-              inputBlockchainNetwork={blockchainNetwork}
-            />
-          )
+          inputRentMarket && <MonitorToken />
         ) : selectedIndex === MONITOR_ACCOUNT_BALANCE_MENU_INDEX ? (
           inputRentMarket && (
             <MonitorAccountBalance
