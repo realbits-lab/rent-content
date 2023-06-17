@@ -39,6 +39,7 @@ import MonitorToken from "@/components/MonitorToken";
 import MonitorRentNft from "@/components/MonitorRentNft";
 import MonitorPendingRentFee from "@/components/MonitorPendingRentFee";
 import MonitorAccountBalance from "@/components/MonitorAccountBalance";
+import MonitorReward from "@/components/MonitorReward";
 import {
   AlertSeverity,
   RBSnackbar,
@@ -100,9 +101,9 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
   justifyContent: "flex-end",
+  //* Necessary for content to be below app bar.
+  ...theme.mixins.toolbar,
 }));
 
 const RentContent = ({
@@ -132,8 +133,9 @@ const RentContent = ({
   const MONITOR_ACCOUNT_BALANCE_MENU_INDEX = 7;
   const MONITOR_PENDING_RENT_FEE_MENU_INDEX = 8;
   const MONITOR_RENT_NFT_MENU_INDEX = 9;
+  const MONITOR_REWARD_MENU_INDEX = 10;
 
-  const DEFAULT_MENU_INDEX = MY_MENU_INDEX;
+  const DEFAULT_MENU_INDEX = MONITOR_REWARD_MENU_INDEX;
 
   //*---------------------------------------------------------------------------
   //* Set MUI theme.
@@ -370,6 +372,8 @@ const RentContent = ({
               ? "Monitor - Pending Rent Fee"
               : selectedIndex === MONITOR_RENT_NFT_MENU_INDEX
               ? "Monitor - Rent NFT"
+              : selectedIndex === MONITOR_REWARD_MENU_INDEX
+              ? "Monitor - Reward"
               : "Rent Market"}
           </Typography>
           <div color={"ffffff"}>
@@ -382,9 +386,9 @@ const RentContent = ({
         </Toolbar>
       </AppBar>
 
-      {/* //*----------------------------------------------------------------*/}
-      {/* //* Drawer part.                                                   */}
-      {/* //*----------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Drawer part                                                     */}
+      {/*//*-----------------------------------------------------------------*/}
       <Drawer
         sx={{
           width: RENT_CONTENT_COMPONENT_DRAWER_WIDTH,
@@ -409,9 +413,9 @@ const RentContent = ({
         </DrawerHeader>
         <Divider />
         <List>
-          {/* //*------------------------------------------------------------*/}
-          {/* //* Market menu.                                               */}
-          {/* //*------------------------------------------------------------*/}
+          {/*//*------------------------------------------------------------*/}
+          {/*//* Market menu                                                */}
+          {/*//*------------------------------------------------------------*/}
 
           <Divider sx={{ margin: "5px" }}>
             <Chip label="User" />
@@ -461,9 +465,9 @@ const RentContent = ({
             </ListItem>
           }
 
-          {/* //*------------------------------------------------------------*/}
-          {/* //* Market menu.                                               */}
-          {/* //*------------------------------------------------------------*/}
+          {/*//*-------------------------------------------------------------*/}
+          {/*//* Market menu                                                 */}
+          {/*//*-------------------------------------------------------------*/}
 
           <Divider sx={{ margin: "5px" }}>
             <Chip label="Market" />
@@ -515,15 +519,15 @@ const RentContent = ({
             </ListItem>
           }
 
-          {/* //*------------------------------------------------------------*/}
-          {/* //* Monitor menu.                                              */}
-          {/* //*------------------------------------------------------------*/}
+          {/*//*-------------------------------------------------------------*/}
+          {/*//* Monitor menu                                                */}
+          {/*//*-------------------------------------------------------------*/}
 
           <Divider sx={{ margin: "5px" }}>
             <Chip label="Monitor" />
           </Divider>
 
-          {/* {
+          {
             <ListItem key="Monitor-Token" disablePadding>
               <ListItemButton
                 selected={selectedIndex === MONITOR_TOKEN_MENU_INDEX}
@@ -537,7 +541,7 @@ const RentContent = ({
                 <ListItemText primary="Token" />
               </ListItemButton>
             </ListItem>
-          } */}
+          }
           {
             <ListItem key="Monitor-AccountBalance" disablePadding>
               <ListItemButton
@@ -586,20 +590,35 @@ const RentContent = ({
               </ListItemButton>
             </ListItem>
           }
+          {
+            <ListItem key="Monitor-Reward" disablePadding>
+              <ListItemButton
+                selected={selectedIndex === MONITOR_REWARD_MENU_INDEX}
+                onClick={(event) =>
+                  handleListItemClick(event, MONITOR_REWARD_MENU_INDEX)
+                }
+              >
+                <ListItemIcon>
+                  <CircleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Reward" />
+              </ListItemButton>
+            </ListItem>
+          }
         </List>
         <Divider />
       </Drawer>
 
-      {/* //*----------------------------------------------------------------*/}
-      {/* //* Right content page.                                            */}
-      {/* //*----------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Right content page                                              */}
+      {/*//*-----------------------------------------------------------------*/}
       <Main open={openDrawer}>
         <DrawerHeader />
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
+        <Grid container justifyContent="end" spacing={2}>
+          <Grid item>
             <Web3Button />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item>
             <Web3NetworkSwitch />
           </Grid>
         </Grid>
@@ -653,13 +672,7 @@ const RentContent = ({
         ) : selectedIndex === TOKEN_MENU_INDEX ? (
           inputRentMarket && <Token />
         ) : selectedIndex === MONITOR_TOKEN_MENU_INDEX ? (
-          inputRentMarket && (
-            <MonitorToken
-              inputRentMarket={inputRentMarket}
-              rentMarketAddress={rentMarketAddress}
-              inputBlockchainNetwork={blockchainNetwork}
-            />
-          )
+          inputRentMarket && <MonitorToken />
         ) : selectedIndex === MONITOR_ACCOUNT_BALANCE_MENU_INDEX ? (
           inputRentMarket && (
             <MonitorAccountBalance
@@ -684,14 +697,16 @@ const RentContent = ({
               inputBlockchainNetwork={blockchainNetwork}
             />
           )
+        ) : selectedIndex === MONITOR_REWARD_MENU_INDEX ? (
+          <MonitorReward />
         ) : (
           <></>
         )}
       </Main>
 
-      {/* //*----------------------------------------------------------------*/}
-      {/* //* Toast message.                                                 */}
-      {/* //*----------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Toast message                                                   */}
+      {/*//*-----------------------------------------------------------------*/}
       <RBSnackbar
         open={readToastMessage.snackbarOpen}
         message={readToastMessage.snackbarMessage}
