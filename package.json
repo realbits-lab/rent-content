@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node server.js",
     "lint": "next lint"
   },
   "dependencies": {
@@ -31,6 +31,8 @@
     "eslint-config-next": "13.3.0",
     "ethereumjs-util": "^7.1.5",
     "ethers": "^5.7.2",
+    "express": "^4.18.2",
+    "heroku-ssl-redirect": "^0.1.1",
     "keccak256": "^1.0.6",
     "moment": "^2.29.4",
     "moment-duration-format": "^2.3.2",
