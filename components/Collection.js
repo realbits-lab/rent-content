@@ -1,6 +1,5 @@
 import React from "react";
 import axios from "axios";
-import { ethers } from "ethers";
 import {
   useAccount,
   useNetwork,
@@ -22,16 +21,16 @@ import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
 import {
   AlertSeverity,
   writeToastMessageState,
   shortenAddress,
-  getUniqueKey,
 } from "@/components/RentContentUtil";
 import rentmarketABI from "@/contracts/rentMarket.json";
 import rentNFTABI from "@/contracts/rentNFT.json";
 
-const Collection = ({ blockchainNetwork }) => {
+export default function Collection() {
   //*---------------------------------------------------------------------------
   //* Handle text input change.
   //*---------------------------------------------------------------------------
@@ -141,6 +140,37 @@ const Collection = ({ blockchainNetwork }) => {
     onSuccess(data) {
       // console.log("call onSuccess()");
       // console.log("data: ", data);
+
+      Promise.all(
+        data.map(async (collection) => {
+          // console.log("collection: ", collection);
+          let response;
+          try {
+            response = await axios.get(collection.uri, {
+              headers: {
+                "Cache-Control": "no-cache",
+                Pragma: "no-cache",
+                Expires: "0",
+              },
+            });
+          } catch (error) {
+            console.error(error);
+          }
+          // console.log("response: ", response);
+
+          return {
+            key: collection.key,
+            collectionAddress: collection.collectionAddress,
+            uri: collection.uri,
+            name: response.data.name,
+            description: response.data.description,
+            image: response.data.image,
+          };
+        })
+      ).then((collectionArray) => {
+        // console.log("collectionArray: ", collectionArray);
+        setCollectionArray(collectionArray);
+      });
     },
     onError(error) {
       // console.log("call onError()");
@@ -150,196 +180,21 @@ const Collection = ({ blockchainNetwork }) => {
       // console.log("call onSettled()");
       // console.log("data: ", data);
       // console.log("error: ", error);
-    },
-  });
-
-  const {
-    data: dataAllRegisterData,
-    isError: isErrorAllRegisterData,
-    isLoading: isLoadingAllRegisterData,
-    status: statusAllRegisterData,
-  } = useContractRead({
-    address: RENT_MARKET_CONTRACT_ADDRES,
-    abi: rentmarketABI.abi,
-    functionName: "getAllRegisterData",
-    watch: true,
-    onSuccess(data) {
-      // console.log("call onSuccess()");
-      // console.log("data: ", data);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
-    },
-  });
-
-  //*---------------------------------------------------------------------------
-  //* Initialize data.
-  //*---------------------------------------------------------------------------
-  React.useEffect(() => {
-    // console.log("call useEffect()");
-
-    if (dataAllCollection) {
-      getCollectionMetadata(dataAllCollection);
-    }
-  }, [dataAllCollection, blockchainNetwork]);
-
-  async function getCollectionMetadata(collections) {
-    if (collections === undefined) {
-      return;
-    }
-
-    const collectionArray = await Promise.all(
-      collections.map(async (collection) => {
-        // console.log("collection: ", collection);
-        let response;
-        try {
-          response = await axios.get(collection.uri, {
-            headers: {
-              "Cache-Control": "no-cache",
-              Pragma: "no-cache",
-              Expires: "0",
-            },
-          });
-        } catch (error) {
-          console.error(error);
-        }
-        // console.log("response: ", response);
-
+      setFormValue((prevState) => {
         return {
-          key: collection.key,
-          collectionAddress: collection.collectionAddress,
-          uri: collection.uri,
-          name: response.data.name,
-          description: response.data.description,
-          image: response.data.image,
+          collectionAddress: "",
+          collectionUri: "",
         };
-      })
-    );
-    // console.log("collectionArray: ", collectionArray);
-    setCollectionArray(collectionArray);
-  }
-
-  async function handleSignMessage() {
-    // console.log("call handleSignMessage()");
-    // console.log("chain: ", chain);
-    // console.log("chain.id: ", chain.id);
-    // console.log("address: ", address);
-
-    const msgParams = JSON.stringify({
-      domain: {
-        chainId: chain.id,
-        name: "Realbits",
-      },
-
-      //* Defining the message signing data content.
-      message: {
-        contents: "Authenticate user with signature.",
-      },
-      //* Refers to the keys of the *types* object below.
-      primaryType: "Login",
-
-      types: {
-        EIP712Domain: [
-          { name: "name", type: "string" },
-          { name: "chainId", type: "uint256" },
-        ],
-        //* Refer to PrimaryType
-        Login: [{ name: "contents", type: "string" }],
-      },
-    });
-
-    const params = [address, msgParams];
-    const method = "eth_signTypedData_v4";
-    // console.log("params: ", params);
-    // console.log("method: ", method);
-
-    const requestResult = await ethereum.request({
-      method,
-      params,
-    });
-    // console.log("requestResult: ", requestResult);
-
-    return requestResult;
-  }
-
-  async function updateMetadataDatabase() {
-    // console.log("dataAllRegisterData: ", dataAllRegisterData);
-    //* Check data validation.
-    if (!dataAllRegisterData) {
-      // console.log("Not yet received all registered nft data.");
-      return;
-    }
-
-    //* Get metadata from each nft token uri.
-    let metadataArray = [];
-    const promises = dataAllRegisterData.map(async (element) => {
-      // console.log("element: ", element);
-
-      //* Get nft contract.
-      const nftContract = new ethers.Contract(
-        element.nftAddress,
-        rentNFTABI.abi,
-        walletClient
-      );
-
-      //* Get token uri.
-      let tokenUri;
-      try {
-        tokenUri = await nftContract.tokenURI(element.tokenId.toNumber());
-      } catch (error) {
-        console.error(error);
-      }
-
-      //* Get metadata.
-      let metadata;
-      try {
-        metadata = await axios.get(tokenUri);
-      } catch (error) {
-        console.error(error);
-      }
-
-      if (metadata.status === 200) {
-        metadataArray.push({
-          ...metadata.data,
-          nftAddress: element.nftAddress,
-          tokenId: element.tokenId.toNumber(),
-        });
-      }
-    });
-    await Promise.all(promises);
-    // console.log("metadataArray: ", metadataArray);
-
-    //* Get signature.
-    const signMessageResult = await handleSignMessage();
-    // console.log("signMessageResult: ", signMessageResult);
-
-    //* Update metadata database.
-    const responseUpdateMetadata = await fetch(UPDATE_METADATA_API_URL, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        jsonList: metadataArray,
-        signature: signMessageResult,
-      }),
-    });
-    // console.log("responseUpdateMetadata: ", responseUpdateMetadata);
-  }
+      });
+    },
+  });
+  console.log("isLoadingAllCollection: ", isLoadingAllCollection);
 
   return (
     <div>
       {/* //*----------------------------------------------------------------*/}
       {/* //* Show request register collection.                              */}
       {/* //*----------------------------------------------------------------*/}
-      {/* //* Don't use database for fetching metadata, use alchemy API or SDK instead of database. */}
       <Divider sx={{ margin: "5px", marginTop: "20px" }}>
         <Chip label="Input" />
       </Divider>
@@ -405,107 +260,117 @@ const Collection = ({ blockchainNetwork }) => {
       <Divider sx={{ margin: "5px", marginTop: "20px", marginBottom: "20px" }}>
         <Chip label="Collection" />
       </Divider>
+      {isLoadingAllCollection ? (
+        <Box
+          sx={{
+            marginTop: "20px",
+            display: "flex",
+            width: "100vw",
+            height: "10vh",
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Grid container spacing={2}>
+          {collectionArray?.map(function (element, idx) {
+            // console.log("element: ", element);
 
-      <Grid container spacing={2}>
-        {collectionArray.map(function (element, idx) {
-          // console.log("element: ", element);
-
-          return (
-            <Grid item key={idx} xs={6}>
-              <Card>
-                <CardMedia
-                  component="img"
-                  alt="image"
-                  height="140px"
-                  image={element.image}
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="div">
-                    {element.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    PolygonScan:{" "}
-                    {shortenAddress({
-                      address: element.collectionAddress,
-                      number: 4,
-                      withLink: "scan",
-                    })}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Opensea:{" "}
-                    {shortenAddress({
-                      address: element.collectionAddress,
-                      number: 4,
-                      withLink: "opensea",
-                    })}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <Typography noWrap>
-                      Uri:
+            return (
+              <Grid item key={idx} xs={6}>
+                <Card>
+                  <CardMedia
+                    component="img"
+                    alt="image"
+                    height="140px"
+                    image={element.image}
+                  />
+                  <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                      {element.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      PolygonScan:{" "}
+                      {shortenAddress({
+                        address: element.collectionAddress,
+                        number: 4,
+                        withLink: "scan",
+                      })}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Opensea:{" "}
+                      {shortenAddress({
+                        address: element.collectionAddress,
+                        number: 4,
+                        withLink: "opensea",
+                      })}
+                    </Typography>
+                    <Typography noWrap variant="body2" color="text.secondary">
+                      Uri:{" "}
                       <Link href={element.uri} target="_blank">
                         {element.uri}
                       </Link>
                     </Typography>
-                  </Typography>
-                </CardContent>
-                <CardActions
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    sx={{ m: 1 }}
-                    disabled={
-                      element.collectionAddress ===
-                        unregisterCollectionAddress &&
-                      isLoadingTransactionUnregisterCollection
-                    }
-                    onClick={async () => {
-                      try {
-                        setUnregisterCollectionAddress(
-                          element.collectionAddress
-                        );
-                        writeUnregisterCollection?.({
-                          args: [element.collectionAddress],
-                        });
-                      } catch (error) {
-                        console.error(error);
+                  </CardContent>
+                  <CardActions
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      sx={{ m: 1 }}
+                      disabled={
+                        element.collectionAddress ===
+                          unregisterCollectionAddress &&
+                        isLoadingTransactionUnregisterCollection
+                      }
+                      onClick={async () => {
+                        try {
+                          setUnregisterCollectionAddress(
+                            element.collectionAddress
+                          );
+                          writeUnregisterCollection?.({
+                            args: [element.collectionAddress],
+                          });
+                        } catch (error) {
+                          console.error(error);
+                          setWriteToastMessage({
+                            snackbarSeverity: AlertSeverity.error,
+                            snackbarMessage: error.reason,
+                            snackbarTime: new Date(),
+                            snackbarOpen: true,
+                          });
+                        }
+
                         setWriteToastMessage({
-                          snackbarSeverity: AlertSeverity.error,
-                          snackbarMessage: error.reason,
+                          snackbarSeverity: AlertSeverity.info,
+                          snackbarMessage:
+                            "Make transaction for unregistering collection.",
                           snackbarTime: new Date(),
                           snackbarOpen: true,
                         });
-                      }
-
-                      setWriteToastMessage({
-                        snackbarSeverity: AlertSeverity.info,
-                        snackbarMessage:
-                          "Make transaction for unregistering collection.",
-                        snackbarTime: new Date(),
-                        snackbarOpen: true,
-                      });
-                    }}
-                  >
-                    {element.collectionAddress ===
-                      unregisterCollectionAddress &&
-                    isLoadingTransactionUnregisterCollection ? (
-                      <Typography>Unregistering...</Typography>
-                    ) : (
-                      <Typography>Unregister</Typography>
-                    )}
-                  </Button>
-                </CardActions>
-              </Card>
-            </Grid>
-          );
-        })}
-      </Grid>
+                      }}
+                    >
+                      {element.collectionAddress ===
+                        unregisterCollectionAddress &&
+                      isLoadingTransactionUnregisterCollection ? (
+                        <Typography>Unregistering...</Typography>
+                      ) : (
+                        <Typography>Unregister</Typography>
+                      )}
+                    </Button>
+                  </CardActions>
+                </Card>
+              </Grid>
+            );
+          })}
+        </Grid>
+      )}
     </div>
   );
-};
-
-export default Collection;
+}
