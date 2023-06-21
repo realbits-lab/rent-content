@@ -103,6 +103,17 @@ export default function Collection() {
         snackbarOpen: true,
       });
     },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+      setFormValue((prevState) => {
+        return {
+          collectionAddress: "",
+          collectionUri: "",
+        };
+      });
+    },
   });
 
   const { data: dataUnregisterCollection, write: writeUnregisterCollection } =
@@ -180,15 +191,9 @@ export default function Collection() {
       // console.log("call onSettled()");
       // console.log("data: ", data);
       // console.log("error: ", error);
-      setFormValue((prevState) => {
-        return {
-          collectionAddress: "",
-          collectionUri: "",
-        };
-      });
     },
   });
-  console.log("isLoadingAllCollection: ", isLoadingAllCollection);
+  // console.log("isLoadingAllCollection: ", isLoadingAllCollection);
 
   return (
     <div>

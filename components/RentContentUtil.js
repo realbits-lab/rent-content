@@ -275,10 +275,11 @@ export const shortenAddress = ({
     (typeof address === "string" || address instanceof String) &&
     address.length > 0
   ) {
-    const addressString = `${address.substring(
-      0,
-      number + 2
-    )}${middleString}${address.substring(address.length - number)}`;
+    const addressString = `${address
+      .toLowerCase()
+      .substring(0, number + 2)}${middleString}${address
+      .toLowerCase()
+      .substring(address.length - number)}`;
 
     switch (withLink) {
       case "maticscan":
