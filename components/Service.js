@@ -18,12 +18,16 @@ import {
   shortenAddress,
   writeToastMessageState,
   getUniqueKey,
-} from "./RentContentUtil";
+} from "@/components/RentContentUtil";
 
-const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
-  // * -------------------------------------------------------------------------
-  // * Handle text input change.
-  // * -------------------------------------------------------------------------
+export default function Service({
+  inputServiceArray,
+  inputRentMarket,
+  blockchainNetwork,
+}) {
+  //*---------------------------------------------------------------------------
+  //* Handle text input change.
+  //*---------------------------------------------------------------------------
   const [formValue, setFormValue] = React.useState({
     serviceAddress: "",
     serviceUri: "",
@@ -40,19 +44,19 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
     });
   };
 
-  // * -------------------------------------------------------------------------
-  // * Define rent market class.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Define rent market class.
+  //*---------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
 
-  // * -------------------------------------------------------------------------
-  // * Data list.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Data list.
+  //*---------------------------------------------------------------------------
   const [serviceArray, setServiceArray] = React.useState([]);
 
-  // * -------------------------------------------------------------------------
-  // * Handle toast mesage.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Handle toast mesage.
+  //*---------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
   const writeToastMessage =
@@ -65,9 +69,9 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
           snackbarOpen: true,
         };
 
-  // * -------------------------------------------------------------------------
-  // * Initialize data.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Initialize data.
+  //*---------------------------------------------------------------------------
   React.useEffect(() => {
     // console.log("React.useEffect");
     if (inputServiceArray && inputRentMarket) {
@@ -104,9 +108,9 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
 
   return (
     <div>
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Show request register service.                                */}
-      {/* // * --------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Show request register service.                                  */}
+      {/*//*-----------------------------------------------------------------*/}
       <Divider sx={{ margin: "5px" }}>
         <Chip label="Input" />
       </Divider>
@@ -162,9 +166,9 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
         </Button>
       </Box>
 
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Show service array.                                           */}
-      {/* // * --------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Show service array.                                             */}
+      {/*//*-----------------------------------------------------------------*/}
       <Divider sx={{ margin: "5px" }}>
         <Chip label="Service" />
       </Divider>
@@ -221,6 +225,4 @@ const Service = ({ inputServiceArray, inputRentMarket, blockchainNetwork }) => {
       </Grid>
     </div>
   );
-};
-
-export default Service;
+}

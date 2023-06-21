@@ -10,6 +10,7 @@ import {
   useWalletClient,
 } from "wagmi";
 import { useRecoilStateLoadable } from "recoil";
+import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -398,9 +399,9 @@ const Collection = ({ blockchainNetwork }) => {
         </Button>
       </Box>
 
-      {/* //*----------------------------------------------------------------*/}
-      {/* //* Show collection array.                                         */}
-      {/* //*----------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Show collection array.                                          */}
+      {/*//*-----------------------------------------------------------------*/}
       <Divider sx={{ margin: "5px", marginTop: "20px", marginBottom: "20px" }}>
         <Chip label="Collection" />
       </Divider>
@@ -437,6 +438,14 @@ const Collection = ({ blockchainNetwork }) => {
                       number: 4,
                       withLink: "opensea",
                     })}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    <Typography noWrap>
+                      Uri:
+                      <Link href={element.uri} target="_blank">
+                        {element.uri}
+                      </Link>
+                    </Typography>
                   </Typography>
                 </CardContent>
                 <CardActions
