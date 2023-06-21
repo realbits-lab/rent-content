@@ -112,7 +112,7 @@ export default function Service({
       {/*//*-----------------------------------------------------------------*/}
       {/*//* Show request register service.                                  */}
       {/*//*-----------------------------------------------------------------*/}
-      <Divider sx={{ margin: "5px" }}>
+      <Divider sx={{ margin: "5px", marginTop: "20px", marginBottom: "20px" }}>
         <Chip label="Input" />
       </Divider>
 
@@ -170,16 +170,16 @@ export default function Service({
       {/*//*-----------------------------------------------------------------*/}
       {/*//* Show service array.                                             */}
       {/*//*-----------------------------------------------------------------*/}
-      <Divider sx={{ margin: "5px" }}>
+      <Divider sx={{ margin: "5px", marginTop: "20px", marginBottom: "20px" }}>
         <Chip label="Service" />
       </Divider>
 
       <Grid container spacing={2}>
-        {serviceArray.map(function (element) {
+        {serviceArray.map(function (element, idx) {
           // console.log("element: ", element);
 
           return (
-            <Grid item width={"45%"} key={getUniqueKey()}>
+            <Grid item key={idx} xs={6}>
               <Card>
                 <CardMedia
                   component="img"
@@ -209,7 +209,9 @@ export default function Service({
                 </CardContent>
                 <CardActions>
                   <Button
-                    size="small"
+                    variant="contained"
+                    fullWidth
+                    sx={{ m: 1 }}
                     onClick={async () => {
                       try {
                         await rentMarketRef.current.unregisterService(element);

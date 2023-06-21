@@ -9,6 +9,7 @@ import {
 } from "wagmi";
 import { useRecoilStateLoadable } from "recoil";
 import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -309,8 +310,8 @@ export default function Token() {
         <Chip label="Token" />
       </Divider>
       <Grid container spacing={2}>
-        {dataAllToken.map(function (token, idx) {
-          // console.log("token: ", token);
+        {dataAllToken?.map(function (token, idx) {
+          console.log("token: ", token);
 
           return (
             <Grid item key={idx}>

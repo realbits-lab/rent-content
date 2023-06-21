@@ -407,11 +407,11 @@ const Collection = ({ blockchainNetwork }) => {
       </Divider>
 
       <Grid container spacing={2}>
-        {collectionArray.map(function (element) {
+        {collectionArray.map(function (element, idx) {
           // console.log("element: ", element);
 
           return (
-            <Grid item width={"45%"} key={getUniqueKey()}>
+            <Grid item key={idx} xs={6}>
               <Card>
                 <CardMedia
                   component="img"
@@ -456,7 +456,8 @@ const Collection = ({ blockchainNetwork }) => {
                 >
                   <Button
                     variant="contained"
-                    sx={{ m: 1, width: "80%" }}
+                    fullWidth
+                    sx={{ m: 1 }}
                     disabled={
                       element.collectionAddress ===
                         unregisterCollectionAddress &&
