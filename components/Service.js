@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -178,7 +179,7 @@ export default function Service({
           // console.log("element: ", element);
 
           return (
-            <Grid item width={"180px"} key={getUniqueKey()}>
+            <Grid item width={"45%"} key={getUniqueKey()}>
               <Card>
                 <CardMedia
                   component="img"
@@ -196,6 +197,14 @@ export default function Service({
                       address: element.serviceAddress,
                       withLink: "scan",
                     })}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    <Typography noWrap>
+                      Uri:
+                      <Link href={element.uri} target="_blank">
+                        {element.uri}
+                      </Link>
+                    </Typography>
                   </Typography>
                 </CardContent>
                 <CardActions>
