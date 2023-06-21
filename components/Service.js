@@ -1,12 +1,9 @@
 import React from "react";
 import axios from "axios";
 import {
-  useAccount,
-  useNetwork,
   useContractRead,
   useContractWrite,
   useWaitForTransaction,
-  useWalletClient,
 } from "wagmi";
 import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
@@ -22,18 +19,13 @@ import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import { useRecoilStateLoadable } from "recoil";
 import {
-  RBSnackbar,
   AlertSeverity,
   shortenAddress,
   writeToastMessageState,
 } from "@/components/RentContentUtil";
 import rentmarketABI from "@/contracts/rentMarket.json";
 
-export default function Service({
-  inputServiceArray,
-  inputRentMarket,
-  blockchainNetwork,
-}) {
+export default function Service() {
   //*---------------------------------------------------------------------------
   //* Handle text input change.
   //*---------------------------------------------------------------------------
@@ -54,14 +46,11 @@ export default function Service({
   };
 
   //*---------------------------------------------------------------------------
-  //* Define rent market class.
-  //*---------------------------------------------------------------------------
-  const rentMarketRef = React.useRef();
-
-  //*---------------------------------------------------------------------------
   //* Data list.
   //*---------------------------------------------------------------------------
   const [serviceArray, setServiceArray] = React.useState([]);
+  const [unregisterServiceAddress, setUnregisterServiceAddress] =
+    React.useState();
 
   //*---------------------------------------------------------------------------
   //* Handle toast mesage.
@@ -81,44 +70,45 @@ export default function Service({
   //*---------------------------------------------------------------------------
   //* Wagmi hook functions.
   //*---------------------------------------------------------------------------
-  const [unregisterServiceAddress, setUnregisterServiceAddress] =
-    React.useState();
   const RENT_MARKET_CONTRACT_ADDRES =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
 
-  const { data: dataRegisterService, write: writeRegisterService } =
-    useContractWrite({
-      address: RENT_MARKET_CONTRACT_ADDRES,
-      abi: rentmarketABI.abi,
-      functionName: "registerService",
-      onSuccess(data) {
-        setWriteToastMessage({
-          snackbarSeverity: AlertSeverity.info,
-          snackbarMessage: "Registering service is made successfully.",
-          snackbarTime: new Date(),
-          snackbarOpen: true,
-        });
-      },
-      onError(error) {
-        setWriteToastMessage({
-          snackbarSeverity: AlertSeverity.error,
-          snackbarMessage: "Registering service is failed.",
-          snackbarTime: new Date(),
-          snackbarOpen: true,
-        });
-        setFormValue((prevState) => {
-          return {
-            serviceAddress: "",
-            serviceUri: "",
-          };
-        });
-      },
-      onSettled(data, error) {
-        // console.log("call onSettled()");
-        // console.log("data: ", data);
-        // console.log("error: ", error);
-      },
-    });
+  const {
+    data: dataRegisterService,
+    write: writeRegisterService,
+    isLoading: isLoadingRegisterService,
+  } = useContractWrite({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "registerService",
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage: "Registering service is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Registering service is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+      setFormValue((prevState) => {
+        return {
+          serviceAddress: "",
+          serviceUri: "",
+        };
+      });
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
   const {
     isLoading: isLoadingTransactionRegisterService,
     isSuccess: isSuccessTransactionRegisterService,
@@ -154,33 +144,37 @@ export default function Service({
     },
   });
 
-  const { data: dataUnregisterService, write: writeUnregisterService } =
-    useContractWrite({
-      address: RENT_MARKET_CONTRACT_ADDRES,
-      abi: rentmarketABI.abi,
-      functionName: "unregisterService",
-      onSuccess(data) {
-        setWriteToastMessage({
-          snackbarSeverity: AlertSeverity.info,
-          snackbarMessage: "Unregistering service is made successfully.",
-          snackbarTime: new Date(),
-          snackbarOpen: true,
-        });
-      },
-      onError(error) {
-        setWriteToastMessage({
-          snackbarSeverity: AlertSeverity.error,
-          snackbarMessage: "Unregistering service is failed.",
-          snackbarTime: new Date(),
-          snackbarOpen: true,
-        });
-      },
-      onSettled(data, error) {
-        // console.log("call onSettled()");
-        // console.log("data: ", data);
-        // console.log("error: ", error);
-      },
-    });
+  const {
+    data: dataUnregisterService,
+    write: writeUnregisterService,
+    isLoading: isLoadingUnregisterService,
+  } = useContractWrite({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "unregisterService",
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage: "Unregistering service is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Unregistering service is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+      setUnregisterServiceAddress(undefined);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
   const {
     isLoading: isLoadingTransactionUnregisterService,
     isSuccess: isSuccessTransactionUnregisterService,
@@ -207,6 +201,7 @@ export default function Service({
       // console.log("call onSettled()");
       // console.log("data: ", data);
       // console.log("error: ", error);
+      setUnregisterServiceAddress(undefined);
     },
   });
 
@@ -253,41 +248,6 @@ export default function Service({
     },
   });
 
-  //* Initialize data.
-  React.useEffect(() => {
-    // console.log("React.useEffect");
-    // if (inputServiceArray && inputRentMarket) {
-    //   // console.log("Set from argument");
-    //   // setServiceArray(inputServiceArray);
-    //   getServiceMetadata(inputServiceArray);
-    //   rentMarketRef.current = inputRentMarket;
-    // }
-  }, [inputServiceArray, inputRentMarket]);
-
-  async function getServiceMetadata(services) {
-    if (services == undefined) {
-      return;
-    }
-
-    const serviceArray = await Promise.all(
-      services.map(async (service) => {
-        // console.log("service: ", service);
-        const response = await axios.get(service.uri);
-        // console.log("response: ", response);
-        return {
-          key: service.key,
-          serviceAddress: service.serviceAddress,
-          uri: service.uri,
-          name: response.data.name,
-          description: response.data.description,
-          image: response.data.image,
-        };
-      })
-    );
-    // console.log("serviceArray: ", serviceArray);
-    setServiceArray(serviceArray);
-  }
-
   return (
     <div>
       {/*//*-----------------------------------------------------------------*/}
@@ -325,14 +285,14 @@ export default function Service({
           onChange={handleChange}
         />
         <Button
+          disabled={
+            isLoadingRegisterService || isLoadingTransactionRegisterService
+          }
           margin={"normal"}
           variant="contained"
           onClick={async () => {
             try {
-              await rentMarketRef.current.registerService(
-                serviceAddress,
-                serviceUri
-              );
+              writeRegisterService?.({ args: [serviceAddress, serviceUri] });
             } catch (error) {
               console.error(error);
               setWriteToastMessage({
@@ -344,7 +304,11 @@ export default function Service({
             }
           }}
         >
-          Register
+          {isLoadingRegisterService || isLoadingTransactionRegisterService ? (
+            <Typography>Registering...</Typography>
+          ) : (
+            <Typography>Register</Typography>
+          )}
         </Button>
       </Box>
 
@@ -391,11 +355,19 @@ export default function Service({
                 <CardActions>
                   <Button
                     variant="contained"
+                    disabled={
+                      unregisterServiceAddress === element.serviceAddress &&
+                      (isLoadingUnregisterService ||
+                        isLoadingTransactionUnregisterService)
+                    }
                     fullWidth
                     sx={{ m: 1 }}
                     onClick={async () => {
                       try {
-                        await rentMarketRef.current.unregisterService(element);
+                        setUnregisterServiceAddress(element.serviceAddress);
+                        writeUnregisterService?.({
+                          args: [element.serviceAddress],
+                        });
                       } catch (error) {
                         console.error(error);
                         setWriteToastMessage({
@@ -407,7 +379,13 @@ export default function Service({
                       }
                     }}
                   >
-                    Unregister
+                    {unregisterServiceAddress === element.serviceAddress &&
+                    (isLoadingUnregisterService ||
+                      isLoadingTransactionUnregisterService) ? (
+                      <Typography>Unregistering...</Typography>
+                    ) : (
+                      <Typography>Unregister</Typography>
+                    )}
                   </Button>
                 </CardActions>
               </Card>

@@ -82,12 +82,42 @@ export default function Collection() {
   const { chain, chains } = useNetwork();
   const { address, isConnected } = useAccount();
 
-  const { data: dataRegisterCollection, write: writeRegisterCollection } =
-    useContractWrite({
-      address: RENT_MARKET_CONTRACT_ADDRES,
-      abi: rentmarketABI.abi,
-      functionName: "registerCollection",
-    });
+  const {
+    data: dataRegisterCollection,
+    write: writeRegisterCollection,
+    isLoading: isLoadingRegisterCollection,
+  } = useContractWrite({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "registerCollection",
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage: "Registering collection is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Registering collection is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+      setFormValue((prevState) => {
+        return {
+          collectionAddress: "",
+          collectionUri: "",
+        };
+      });
+    },
+  });
   const {
     isLoading: isLoadingTransactionRegisterCollection,
     isSuccess: isSuccessTransactionRegisterCollection,
@@ -98,6 +128,14 @@ export default function Collection() {
         snackbarSeverity: AlertSeverity.info,
         snackbarMessage:
           "Registering collection transaction is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Registering collection transaction is failed.",
         snackbarTime: new Date(),
         snackbarOpen: true,
       });
@@ -115,12 +153,37 @@ export default function Collection() {
     },
   });
 
-  const { data: dataUnregisterCollection, write: writeUnregisterCollection } =
-    useContractWrite({
-      address: RENT_MARKET_CONTRACT_ADDRES,
-      abi: rentmarketABI.abi,
-      functionName: "unregisterCollection",
-    });
+  const {
+    data: dataUnregisterCollection,
+    write: writeUnregisterCollection,
+    isLoading: isLoadingUnregisterCollection,
+  } = useContractWrite({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "unregisterCollection",
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage: "Unregistering collection is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Unregistering collection is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+      setUnregisterCollectionAddress(undefined);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
   const {
     isLoading: isLoadingTransactionUnregisterCollection,
     isSuccess: isSuccessTransactionUnregisterCollection,
@@ -134,6 +197,20 @@ export default function Collection() {
         snackbarTime: new Date(),
         snackbarOpen: true,
       });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Unregistering collection transaction is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+      setUnregisterCollectionAddress(undefined);
     },
   });
 
@@ -233,7 +310,10 @@ export default function Collection() {
         <Button
           margin={"normal"}
           variant="contained"
-          disabled={isLoadingTransactionRegisterCollection}
+          disabled={
+            isLoadingRegisterCollection ||
+            isLoadingTransactionRegisterCollection
+          }
           onClick={async () => {
             try {
               writeRegisterCollection?.({
@@ -250,7 +330,8 @@ export default function Collection() {
             }
           }}
         >
-          {isLoadingTransactionRegisterCollection ? (
+          {isLoadingRegisterCollection ||
+          isLoadingTransactionRegisterCollection ? (
             <Typography>Registering...</Typography>
           ) : (
             <Typography>Register</Typography>
@@ -331,7 +412,8 @@ export default function Collection() {
                       disabled={
                         element.collectionAddress ===
                           unregisterCollectionAddress &&
-                        isLoadingTransactionUnregisterCollection
+                        (isLoadingTransactionUnregisterCollection ||
+                          isLoadingUnregisterCollection)
                       }
                       onClick={async () => {
                         try {
@@ -362,7 +444,8 @@ export default function Collection() {
                     >
                       {element.collectionAddress ===
                         unregisterCollectionAddress &&
-                      isLoadingTransactionUnregisterCollection ? (
+                      (isLoadingTransactionUnregisterCollection ||
+                        isLoadingUnregisterCollection) ? (
                         <Typography>Unregistering...</Typography>
                       ) : (
                         <Typography>Unregister</Typography>
