@@ -311,7 +311,7 @@ export default function Token() {
       </Divider>
       <Grid container spacing={2}>
         {dataAllToken?.map(function (token, idx) {
-          console.log("token: ", token);
+          // console.log("token: ", token);
 
           return (
             <Grid item key={idx} xs={6}>
