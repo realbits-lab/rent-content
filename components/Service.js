@@ -1,5 +1,13 @@
 import React from "react";
 import axios from "axios";
+import {
+  useAccount,
+  useNetwork,
+  useContractRead,
+  useContractWrite,
+  useWaitForTransaction,
+  useWalletClient,
+} from "wagmi";
 import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
 import Card from "@mui/material/Card";
@@ -18,8 +26,8 @@ import {
   AlertSeverity,
   shortenAddress,
   writeToastMessageState,
-  getUniqueKey,
 } from "@/components/RentContentUtil";
+import rentmarketABI from "@/contracts/rentMarket.json";
 
 export default function Service({
   inputServiceArray,
@@ -71,16 +79,189 @@ export default function Service({
         };
 
   //*---------------------------------------------------------------------------
-  //* Initialize data.
+  //* Wagmi hook functions.
   //*---------------------------------------------------------------------------
+  const [unregisterServiceAddress, setUnregisterServiceAddress] =
+    React.useState();
+  const RENT_MARKET_CONTRACT_ADDRES =
+    process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
+
+  const { data: dataRegisterService, write: writeRegisterService } =
+    useContractWrite({
+      address: RENT_MARKET_CONTRACT_ADDRES,
+      abi: rentmarketABI.abi,
+      functionName: "registerService",
+      onSuccess(data) {
+        setWriteToastMessage({
+          snackbarSeverity: AlertSeverity.info,
+          snackbarMessage: "Registering service is made successfully.",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        });
+      },
+      onError(error) {
+        setWriteToastMessage({
+          snackbarSeverity: AlertSeverity.error,
+          snackbarMessage: "Registering service is failed.",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        });
+        setFormValue((prevState) => {
+          return {
+            serviceAddress: "",
+            serviceUri: "",
+          };
+        });
+      },
+      onSettled(data, error) {
+        // console.log("call onSettled()");
+        // console.log("data: ", data);
+        // console.log("error: ", error);
+      },
+    });
+  const {
+    isLoading: isLoadingTransactionRegisterService,
+    isSuccess: isSuccessTransactionRegisterService,
+  } = useWaitForTransaction({
+    hash: dataRegisterService?.hash,
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Registering service transaction is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Registering service transaction is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+      setFormValue((prevState) => {
+        return {
+          serviceAddress: "",
+          serviceUri: "",
+        };
+      });
+    },
+  });
+
+  const { data: dataUnregisterService, write: writeUnregisterService } =
+    useContractWrite({
+      address: RENT_MARKET_CONTRACT_ADDRES,
+      abi: rentmarketABI.abi,
+      functionName: "unregisterService",
+      onSuccess(data) {
+        setWriteToastMessage({
+          snackbarSeverity: AlertSeverity.info,
+          snackbarMessage: "Unregistering service is made successfully.",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        });
+      },
+      onError(error) {
+        setWriteToastMessage({
+          snackbarSeverity: AlertSeverity.error,
+          snackbarMessage: "Unregistering service is failed.",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        });
+      },
+      onSettled(data, error) {
+        // console.log("call onSettled()");
+        // console.log("data: ", data);
+        // console.log("error: ", error);
+      },
+    });
+  const {
+    isLoading: isLoadingTransactionUnregisterService,
+    isSuccess: isSuccessTransactionUnregisterService,
+  } = useWaitForTransaction({
+    hash: dataUnregisterService?.hash,
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Unregistering service transaction is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Unregistering service transaction is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+
+  const {
+    data: dataAllService,
+    isError: isErrorAllService,
+    isLoading: isLoadingAllService,
+    status: statusAllService,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "getAllService",
+    watch: true,
+    onSuccess(data) {
+      console.log("call onSuccess()");
+      console.log("data: ", data);
+
+      Promise.all(
+        data.map(async (service) => {
+          // console.log("service: ", service);
+          const response = await axios.get(service.uri);
+          // console.log("response: ", response);
+          return {
+            serviceAddress: service.serviceAddress,
+            uri: service.uri,
+            name: response.data.name,
+            description: response.data.description,
+            image: response.data.image,
+          };
+        })
+      ).then((serviceArray) => {
+        // console.log("serviceArray: ", serviceArray);
+        setServiceArray(serviceArray);
+      });
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+
+  //* Initialize data.
   React.useEffect(() => {
     // console.log("React.useEffect");
-    if (inputServiceArray && inputRentMarket) {
-      // console.log("Set from argument");
-      // setServiceArray(inputServiceArray);
-      getServiceMetadata(inputServiceArray);
-      rentMarketRef.current = inputRentMarket;
-    }
+    // if (inputServiceArray && inputRentMarket) {
+    //   // console.log("Set from argument");
+    //   // setServiceArray(inputServiceArray);
+    //   getServiceMetadata(inputServiceArray);
+    //   rentMarketRef.current = inputRentMarket;
+    // }
   }, [inputServiceArray, inputRentMarket]);
 
   async function getServiceMetadata(services) {
@@ -175,7 +356,7 @@ export default function Service({
       </Divider>
 
       <Grid container spacing={2}>
-        {serviceArray.map(function (element, idx) {
+        {serviceArray?.map(function (element, idx) {
           // console.log("element: ", element);
 
           return (

@@ -75,7 +75,6 @@ export default function Collection() {
   //*---------------------------------------------------------------------------
   const [unregisterCollectionAddress, setUnregisterCollectionAddress] =
     React.useState();
-  const UPDATE_METADATA_API_URL = "/api/update-metadata";
   const RENT_MARKET_CONTRACT_ADDRES =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
 
@@ -197,9 +196,9 @@ export default function Collection() {
 
   return (
     <div>
-      {/* //*----------------------------------------------------------------*/}
-      {/* //* Show request register collection.                              */}
-      {/* //*----------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Show request register collection.                               */}
+      {/*//*-----------------------------------------------------------------*/}
       <Divider sx={{ margin: "5px", marginTop: "20px" }}>
         <Chip label="Input" />
       </Divider>
