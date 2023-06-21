@@ -314,7 +314,7 @@ export default function Token() {
           console.log("token: ", token);
 
           return (
-            <Grid item key={idx}>
+            <Grid item key={idx} xs={6}>
               <Card>
                 <CardContent>
                   <Typography gutterBottom variant="h5" component="div">
@@ -331,7 +331,9 @@ export default function Token() {
                 </CardContent>
                 <CardActions>
                   <Button
-                    size="small"
+                    variant="contained"
+                    fullWidth
+                    sx={{ m: 1 }}
                     disabled={
                       token.tokenAddress === unregisterTokenAddress &&
                       isLoadingTransactionUnregisterToken
