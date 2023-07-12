@@ -151,7 +151,7 @@ export default function MonitorToken() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {dataAllToken.map((token, idx) => {
+            {dataAllToken?.map((token, idx) => {
               console.log("token: ", token);
               return (
                 <TableRow
