@@ -10,8 +10,8 @@ export default async function handler(req, res) {
   const NEXT_PUBLIC_ALCHEMY_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
   const NEXT_PUBLIC_BLOCKCHAIN_NETWORK =
     process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK;
-  const NETXT_PUBLIC_SETTLE_PRIVATE_KEY =
-    process.env.NETXT_PUBLIC_SETTLE_PRIVATE_KEY;
+  const NEXT_PUBLIC_SETTLE_PRIVATE_KEY =
+    process.env.NEXT_PUBLIC_SETTLE_PRIVATE_KEY;
   const NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
 
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
 
   //* Get signer.
   const signer = new ethers.Wallet(
-    NETXT_PUBLIC_SETTLE_PRIVATE_KEY,
+    NEXT_PUBLIC_SETTLE_PRIVATE_KEY,
     alchemyProvider
   );
 

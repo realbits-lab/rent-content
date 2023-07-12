@@ -1,34 +1,52 @@
-# Install npm
+# Rent Market
 
-```console
+## Install npm
+
+```sh
 foo@bar:~$ npm i
 ```
 
-# Create .env
+## Create .env
 
-```console
+```sh
 foo@bar:~$ cp .env.example .env
 ```
 
-# Add alchemy api key in .env
+## Add alchemy api key in .env
 
-```console
+```sh
 foo@bar:~$ echo NEXT_PUBLIC_ALCHEMY_KEY={alchemy_api_key} >> .env
 ```
 
-# Run
+## Run server
 
-```console
+```sh
 foo@bar:~$ npm run dev
 ```
 
-# Build
+## Build server
 
-```console
+```sh
 foo@bar:~$ npm run build
 ```
 
-# ethers npm version
+## Install heroku crontogo addon
+
+```sh
+heroku addons:create crontogo
+```
+
+## Open crontogo addon
+
+```sh
+heroku addons:open crontogo
+```
+
+## Request settle-rent-data API
+
+- curl -d '{"auth_key":AUTH_KEY_VALUE}' -H "Content-Type: application/json" -X POST http://API_SERVER_URL/api/settle-rent-data
+
+## ethers npm version
 
 - Use ethers@^5.7.2
 
@@ -39,7 +57,3 @@ npm ERR!   peer @wagmi/core@">=0.10" from @web3modal/ethereum@2.3.0
 npm ERR!   node_modules/@web3modal/ethereum
 npm ERR!     @web3modal/ethereum@"^2.3.0" from the root project
 ```
-
-## Request settle-rent-data API
-
-- curl -d '{"auth_key":AUTH_KEY_VALUE}' -H "Content-Type: application/json" -X POST http://API_SERVER_URL/api/settle-rent-data
