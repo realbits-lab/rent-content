@@ -1,7 +1,7 @@
 import { Network, Alchemy } from "alchemy-sdk";
 import { ethers } from "ethers";
 import keccak256 from "keccak256";
-import rentmarketABI from "../../contracts/rentMarket.json";
+import rentmarketABI from "@/contracts/rentMarket.json";
 
 export default async function handler(req, res) {
   // console.log("call /api/settle-rent-data");
