@@ -9,6 +9,7 @@ import {
 } from "wagmi";
 import { useRecoilStateLoadable } from "recoil";
 import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -64,9 +65,34 @@ export default function Token() {
   });
   // console.log("dataAllToken: ", dataAllToken);
 
-  const { data: dataFaucetToken, write: writeFaucetToken } = useContractWrite({
+  const {
+    data: dataFaucetToken,
+    write: writeFaucetToken,
+    isLoading: isLoadingFaucetToken,
+  } = useContractWrite({
     abi: faucetTokenABI.abi,
     functionName: "faucet",
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage: "Fauceting token is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Fauceting token is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
   });
   const {
     isLoading: isLoadingTransactionFaucetToken,
@@ -81,14 +107,58 @@ export default function Token() {
         snackbarOpen: true,
       });
     },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Fauceting token transaction is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
   });
 
-  const { data: dataRegisterToken, write: writeRegisterToken } =
-    useContractWrite({
-      address: RENT_MARKET_CONTRACT_ADDRES,
-      abi: rentmarketABI.abi,
-      functionName: "registerToken",
-    });
+  const {
+    data: dataRegisterToken,
+    write: writeRegisterToken,
+    isLoading: isLoadingRegisterToken,
+  } = useContractWrite({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "registerToken",
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage: "Registering token is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Registering token is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+      setFormValue((prevState) => {
+        return {
+          tokenAddress: "",
+          tokenName: "",
+          inputFeeTokenAddress: ZERO_ADDRESS_STRING,
+        };
+      });
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
   const {
     isLoading: isLoadingTransactionRegisterToken,
     isSuccess: isSuccessTransactionRegisterToken,
@@ -102,14 +172,58 @@ export default function Token() {
         snackbarOpen: true,
       });
     },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Registering token transaction is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+      setFormValue((prevState) => {
+        return {
+          tokenAddress: "",
+          tokenName: "",
+          inputFeeTokenAddress: ZERO_ADDRESS_STRING,
+        };
+      });
+    },
   });
 
-  const { data: dataUnregisterToken, write: writeUnregisterToken } =
-    useContractWrite({
-      address: RENT_MARKET_CONTRACT_ADDRES,
-      abi: rentmarketABI.abi,
-      functionName: "unregisterToken",
-    });
+  const {
+    data: dataUnregisterToken,
+    write: writeUnregisterToken,
+    isLoading: isLoadingUnregisterToken,
+  } = useContractWrite({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "unregisterToken",
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage: "Unregistering token is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Unregistering token is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
   const {
     isLoading: isLoadingTransactionUnregisterToken,
     isSuccess: isSuccessTransactionUnregisterToken,
@@ -123,6 +237,19 @@ export default function Token() {
         snackbarTime: new Date(),
         snackbarOpen: true,
       });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Unregistering token transaction is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
     },
   });
 
@@ -196,7 +323,7 @@ export default function Token() {
             fullWidth
             margin={"normal"}
             sx={{ marginTop: "10px" }}
-            disabled={isLoadingTransactionFaucetToken}
+            disabled={isLoadingFaucetToken || isLoadingTransactionFaucetToken}
             variant="contained"
             onClick={async () => {
               if (inputFeeTokenAddress === ZERO_ADDRESS_STRING) return;
@@ -223,7 +350,7 @@ export default function Token() {
               });
             }}
           >
-            {isLoadingTransactionFaucetToken ? (
+            {isLoadingFaucetToken || isLoadingTransactionFaucetToken ? (
               <Typography>Fauceting...</Typography>
             ) : (
               <Typography>Faucet</Typography>
@@ -269,7 +396,7 @@ export default function Token() {
         <Button
           margin={"normal"}
           sx={{ marginTop: "10px" }}
-          disabled={isLoadingTransactionRegisterToken}
+          disabled={isLoadingRegisterToken || isLoadingTransactionRegisterToken}
           variant="contained"
           onClick={async () => {
             try {
@@ -294,7 +421,7 @@ export default function Token() {
             });
           }}
         >
-          {isLoadingTransactionRegisterToken ? (
+          {isLoadingRegisterToken || isLoadingTransactionRegisterToken ? (
             <Typography>Registering...</Typography>
           ) : (
             <Typography>Register</Typography>
@@ -309,11 +436,11 @@ export default function Token() {
         <Chip label="Token" />
       </Divider>
       <Grid container spacing={2}>
-        {dataAllToken.map(function (token, idx) {
+        {dataAllToken?.map(function (token, idx) {
           // console.log("token: ", token);
 
           return (
-            <Grid item key={idx}>
+            <Grid item key={idx} xs={6}>
               <Card>
                 <CardContent>
                   <Typography gutterBottom variant="h5" component="div">
@@ -330,10 +457,13 @@ export default function Token() {
                 </CardContent>
                 <CardActions>
                   <Button
-                    size="small"
+                    variant="contained"
+                    fullWidth
+                    sx={{ m: 1 }}
                     disabled={
                       token.tokenAddress === unregisterTokenAddress &&
-                      isLoadingTransactionUnregisterToken
+                      (isLoadingUnregisterToken ||
+                        isLoadingTransactionUnregisterToken)
                     }
                     onClick={async () => {
                       try {
@@ -361,7 +491,8 @@ export default function Token() {
                     }}
                   >
                     {token.tokenAddress === unregisterTokenAddress &&
-                    isLoadingTransactionUnregisterToken ? (
+                    (isLoadingUnregisterToken ||
+                      isLoadingTransactionUnregisterToken) ? (
                       <Typography>Unregistering...</Typography>
                     ) : (
                       <Typography>Unregister</Typography>

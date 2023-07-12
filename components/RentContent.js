@@ -135,7 +135,7 @@ const RentContent = ({
   const MONITOR_RENT_NFT_MENU_INDEX = 9;
   const MONITOR_REWARD_MENU_INDEX = 10;
 
-  const DEFAULT_MENU_INDEX = MONITOR_REWARD_MENU_INDEX;
+  const DEFAULT_MENU_INDEX = SERVICE_MENU_INDEX;
 
   //*---------------------------------------------------------------------------
   //* Set MUI theme.
@@ -658,17 +658,9 @@ const RentContent = ({
             />
           )
         ) : selectedIndex === COLLECTION_MENU_INDEX ? (
-          inputRentMarket && (
-            <Collection blockchainNetwork={blockchainNetwork} />
-          )
+          inputRentMarket && <Collection />
         ) : selectedIndex === SERVICE_MENU_INDEX ? (
-          inputRentMarket && (
-            <Service
-              blockchainNetwork={blockchainNetwork}
-              inputServiceArray={serviceArray}
-              inputRentMarket={inputRentMarket}
-            />
-          )
+          inputRentMarket && <Service />
         ) : selectedIndex === TOKEN_MENU_INDEX ? (
           inputRentMarket && <Token />
         ) : selectedIndex === MONITOR_TOKEN_MENU_INDEX ? (

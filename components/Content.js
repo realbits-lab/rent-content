@@ -420,7 +420,7 @@ export default function Content({
   //*---------------------------------------------------------------------------
   function buildRegisterRowList({ element }) {
     // console.log("element: ", element);
-    const found = dataAllToken.find((token) => {
+    const found = dataAllToken?.find((token) => {
       // console.log("token: ", token);
       return (
         token.tokenAddress.toLowerCase() ===
