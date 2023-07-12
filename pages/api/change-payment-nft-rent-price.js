@@ -13,6 +13,8 @@ export default async function handler(req, res) {
     process.env.NEXT_PUBLIC_SETTLE_PRIVATE_KEY;
   const NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
+  const PAYMENT_NFT_ADDRESS = process.env.NEXT_PUBLIC_PAYMENT_NFT_ADDRESS;
+  const PAYMENT_NFT_TOKEN = process.env.NEXT_PUBLIC_PAYMENT_NFT_TOKEN;
   const COIN_MARKET_CAP_API_KEY =
     process.env.NEXT_PUBLIC_COIN_MARKET_CAP_API_KEY;
   const COIN_MARKET_CAP_PRICE_CONVERSION_API_URL =
@@ -84,8 +86,8 @@ export default async function handler(req, res) {
   if (maticPricePerUSD) {
     //* Change NFT price.
     const registerData = await rentMarketContract.getRegisterData(
-      rentData.nftAddress,
-      rentData.tokenId
+      PAYMENT_NFT_ADDRESS,
+      PAYMENT_NFT_TOKEN
     );
     console.log("registerData: ", registerData);
 
@@ -97,8 +99,8 @@ export default async function handler(req, res) {
     // uint256 rentFeeByToken
     // uint256 rentDuration
     const tx = await rentMarketContract.changeNFT(
-      rentData.nftAddress,
-      rentData.tokenId,
+      PAYMENT_NFT_ADDRESS,
+      PAYMENT_NFT_TOKEN,
       ethers.utils.parseUnits(maticPricePerUSD.toFixed(2), 18),
       registerData.feeTokenAddress,
       registerData.rentFeeByToken,
