@@ -60,23 +60,6 @@ export default async function handler(req, res) {
     return;
   }
 
-  //* TODO: Prevent DoS attack.
-  // //* Check 1 hour passed since the last check from SettleRentData event.
-  // const eventHash = keccak256(
-  //   "SettleRentData(address,uint256,uint256,address,uint256,bool,uint256,address,address,address,uint256)"
-  // );
-  // const topicHash = `0x${Buffer.from(eventHash).toString("hex")}`;
-  // const responseGetLogs = await alchemy.core.getLogs({
-  //   fromBlock: 27956165,
-  //   toBlock: "latest",
-  //   address: NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS,
-  //   topics: [topicHash],
-  // });
-  // console.log("responseGetLogs: ", responseGetLogs);
-  // const eventArray = responseGetLogs.map((event) => {
-  //   console.log("event: ", event);
-  // });
-
   //* Get all rent data.
   // struct rentData {
   //     address nftAddress;
@@ -91,18 +74,22 @@ export default async function handler(req, res) {
   //     address serviceAddress;
   //     uint256 rentStartTimestamp;
   // }
-  const resultRentArray = await rentMarketContract.getAllRentData();
-  console.log("resultRentArray: ", resultRentArray);
+  const rentDataArray = await rentMarketContract.getAllRentData();
+  console.log("rentDataArray: ", rentDataArray);
 
-	//* TODO: Handle error: replacement fee too low.
+  //* TODO: Handle error: replacement fee too low.
   //* TODO: Handle gas prices.
-  //* If we found one of which rent duration is finished, settle that.
-  const promises = resultRentArray.map(async function (element) {
-    console.log("element: ", element);
+  //* If we found rent-finished one, settle that.
+  const promises = rentDataArray.map(async function (rentData) {
+    console.log("rentData: ", rentData);
+
+		//* Get current time.
     const currentSeconds = new Date().getTime() / 1000;
     console.log("currentSeconds: ", currentSeconds);
-    const rentEndSeconds = element.rentStartTimestamp
-      .add(element.rentDuration)
+
+		//* Get rent finish time.
+    const rentEndSeconds = rentData.rentStartTimestamp
+      .add(rentData.rentDuration)
       .toNumber();
     console.log("rentEndSeconds: ", rentEndSeconds);
 
@@ -111,17 +98,19 @@ export default async function handler(req, res) {
 
       //* Call settleRentData function.
       const tx = await rentMarketContract.settleRentData(
-        element.nftAddress,
-        element.tokenId
+        rentData.nftAddress,
+        rentData.tokenId
       );
       console.log("tx: ", tx);
-      await tx.wait();
+      const receipt = await tx.wait();
+      console.log("receipt: ", receipt);
     }
   });
-  console.log("try to call Promise.all()");
-  await Promise.all(promises);
-  console.log("finish to call Promise.all()");
+  // console.log("try to call Promise.all()");
 
-  //* Send ok.
+  await Promise.all(promises);
+  // console.log("finish to call Promise.all()");
+
+  //* Send 200 status.
   res.status(200).json({ data: "ok" });
 }

@@ -39,3 +39,7 @@ npm ERR!   peer @wagmi/core@">=0.10" from @web3modal/ethereum@2.3.0
 npm ERR!   node_modules/@web3modal/ethereum
 npm ERR!     @web3modal/ethereum@"^2.3.0" from the root project
 ```
+
+## Request settle-rent-data API
+
+- curl -d '{"auth_key":AUTH_KEY_VALUE}' -H "Content-Type: application/json" -X POST http://API_SERVER_URL/api/settle-rent-data
