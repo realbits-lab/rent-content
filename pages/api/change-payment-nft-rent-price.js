@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   const COIN_MARKET_CAP_PRICE_CONVERSION_API_URL =
     "https://pro-api.coinmarketcap.com/v2/tools/price-conversion";
   const USD_ID = 2781;
-  const USD_AMOUNT = 1;
+  const USD_AMOUNT = 0.01;
   const MATIC_SYMBOL = "MATIC";
 
   //* Get alchemy provider.
