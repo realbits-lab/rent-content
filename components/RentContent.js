@@ -1,14 +1,9 @@
 import React from "react";
-import {
-  Web3Button,
-  Web3NetworkSwitch,
-  useWeb3ModalNetwork,
-} from "@web3modal/react";
-import { useAccount, useEnsName } from "wagmi";
+import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
+import { useAccount, useNetwork } from "wagmi";
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
-import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
@@ -23,6 +18,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Chip from "@mui/material/Chip";
 import MuiAppBar from "@mui/material/AppBar";
 import StoreIcon from "@mui/icons-material/Store";
+import TokenIcon from "@mui/icons-material/Token";
 import SellIcon from "@mui/icons-material/Sell";
 import MiscellaneousServicesIcon from "@mui/icons-material/MiscellaneousServices";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -32,15 +28,18 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CollectionsIcon from "@mui/icons-material/Collections";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
-import { My, Market, RentMarket } from "rent-market";
-import Content from "./Content";
-import Collection from "./Collection";
-import Service from "./Service";
-import Token from "./Token";
-import MonitorToken from "./MonitorToken";
-import MonitorRentNft from "./MonitorRentNft";
-import MonitorPendingRentFee from "./MonitorPendingRentFee";
-import MonitorAccountBalance from "./MonitorAccountBalance";
+import My from "@/components/My";
+import Market from "@/components/Market";
+import RentMarket from "@/components/RentMarket";
+import Content from "@/components/Content";
+import Collection from "@/components/Collection";
+import Service from "@/components/Service";
+import Token from "@/components/Token";
+import MonitorToken from "@/components/MonitorToken";
+import MonitorRentNft from "@/components/MonitorRentNft";
+import MonitorPendingRentFee from "@/components/MonitorPendingRentFee";
+import MonitorAccountBalance from "@/components/MonitorAccountBalance";
+import MonitorReward from "@/components/MonitorReward";
 import {
   AlertSeverity,
   RBSnackbar,
@@ -48,13 +47,13 @@ import {
   readToastMessageState,
   checkMobile,
   shortenAddress,
-} from "./RentContentUtil";
+} from "@/components/RentContentUtil";
 
 const RENT_CONTENT_COMPONENT_DRAWER_WIDTH = 180;
 
-// * ---------------------------------------------------------------------------
-// * Define Main component style.
-// * ---------------------------------------------------------------------------
+//*-----------------------------------------------------------------------------
+//* Define Main component style.
+//*-----------------------------------------------------------------------------
 const Main = styled("main", {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
@@ -75,9 +74,9 @@ const Main = styled("main", {
   }),
 }));
 
-// * ---------------------------------------------------------------------------
-// * Define AppBar component style.
-// * ---------------------------------------------------------------------------
+//*-----------------------------------------------------------------------------
+//* Define AppBar component style.
+//*-----------------------------------------------------------------------------
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
@@ -95,16 +94,16 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-// * ---------------------------------------------------------------------------
-// * Define DrawerHeader component style.
-// * ---------------------------------------------------------------------------
+//*-----------------------------------------------------------------------------
+//* Define DrawerHeader component style.
+//*-----------------------------------------------------------------------------
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
   justifyContent: "flex-end",
+  //* Necessary for content to be below app bar.
+  ...theme.mixins.toolbar,
 }));
 
 const RentContent = ({
@@ -113,8 +112,7 @@ const RentContent = ({
   blockchainNetwork,
   serviceAddress,
 }) => {
-  const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
-  // console.log("selectedChain: ", selectedChain);
+  const { chain, chains } = useNetwork();
   const { address, isConnected } = useAccount();
   // console.log("address: ", address);
   // console.log("isConnected: ", isConnected);
@@ -122,11 +120,9 @@ const RentContent = ({
   // const { data: ensName } = useEnsName({ address });
   // console.log("ensName: ", ensName);
 
-  // * -------------------------------------------------------------------------
-  // * Define each menu index.
-  // * -------------------------------------------------------------------------
-  const DEFAULT_MENU_INDEX = 2;
-
+  //*---------------------------------------------------------------------------
+  //* Define each menu index.
+  //*---------------------------------------------------------------------------
   const CONTENT_MENU_INDEX = 0;
   const MY_MENU_INDEX = 1;
   const MARKET_MENU_INDEX = 2;
@@ -137,21 +133,24 @@ const RentContent = ({
   const MONITOR_ACCOUNT_BALANCE_MENU_INDEX = 7;
   const MONITOR_PENDING_RENT_FEE_MENU_INDEX = 8;
   const MONITOR_RENT_NFT_MENU_INDEX = 9;
+  const MONITOR_REWARD_MENU_INDEX = 10;
 
-  // * -------------------------------------------------------------------------
-  // * Set MUI theme.
-  // * -------------------------------------------------------------------------
+  const DEFAULT_MENU_INDEX = SERVICE_MENU_INDEX;
+
+  //*---------------------------------------------------------------------------
+  //* Set MUI theme.
+  //*---------------------------------------------------------------------------
   const theme = useTheme();
 
-  // * -------------------------------------------------------------------------
-  // * Define rent market class.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Define rent market class.
+  //*---------------------------------------------------------------------------
   const rentMarketClassRef = React.useRef();
 
-  // * -------------------------------------------------------------------------
-  // * Data list.
-  // * Undefined varialbe means loading status.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Data list.
+  //* Undefined varialbe means loading status.
+  //*---------------------------------------------------------------------------
   const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState();
   const [myUnregisteredNFTArray, setMyUnregisteredNFTArray] = React.useState();
   const [collectionArray, setCollectionArray] = React.useState();
@@ -160,15 +159,15 @@ const RentContent = ({
   const [inputRentMarket, setInputRentMarket] = React.useState();
   const isMobileRef = React.useRef(false);
 
-  // * -------------------------------------------------------------------------
-  // * If undefined, it'd loading status.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* If undefined, it'd loading status.
+  //*---------------------------------------------------------------------------
   const [registerNFTArray, setRegisterNFTArray] = React.useState();
   const [myRentNFTArray, setMyRentNFTArray] = React.useState();
 
-  // * -------------------------------------------------------------------------
-  // * Handle drawer open.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Handle drawer open.
+  //*---------------------------------------------------------------------------
   const [openDrawer, setOpenDrawer] = React.useState(true);
   const handleDrawerOpen = () => {
     setOpenDrawer(true);
@@ -177,9 +176,9 @@ const RentContent = ({
     setOpenDrawer(false);
   };
 
-  // * -------------------------------------------------------------------------
-  // * Handle drawer selected index.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Handle drawer selected index.
+  //*---------------------------------------------------------------------------
   const [selectedIndex, setSelectedIndex] = React.useState(DEFAULT_MENU_INDEX);
   const handleListItemClick = (event, index) => {
     // * Set selected index.
@@ -191,9 +190,9 @@ const RentContent = ({
     }
   };
 
-  // * -------------------------------------------------------------------------
-  // * Handle toast message.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Handle toast message.
+  //*---------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
   const writeToastMessage =
@@ -219,7 +218,7 @@ const RentContent = ({
           snackbarOpen: true,
         };
 
-  // * Initialize data.
+  //* Initialize data.
   React.useEffect(() => {
     // console.log("call useEffect()");
     // console.log("rentMarketAddress: ", rentMarketAddress);
@@ -240,8 +239,8 @@ const RentContent = ({
       });
       // console.log("rentMarketClassRef.current: ", rentMarketClassRef.current);
 
-      // * Set inputRentMarket for updating component which uses rentMarket.
-      // * For calling function of rentMarket contract.
+      //* Set inputRentMarket for updating component which uses rentMarket.
+      //* For calling function of rentMarket contract.
       // console.log("call setInputRentMarket()");
       setInputRentMarket(rentMarketClassRef.current);
 
@@ -259,7 +258,7 @@ const RentContent = ({
         });
       }
 
-      // * Close drawer in mobile browser.
+      //* Close drawer in mobile browser.
       isMobileRef.current = checkMobile();
       // console.log("isMobileRef.current: ", isMobileRef.current);
       if (isMobileRef.current === true) {
@@ -267,10 +266,10 @@ const RentContent = ({
       }
     }
 
-    // * -----------------------------------------------------------------------
-    // * Fetch token, collection, service, request/register data,
-    // * and rent data to interconnect them.
-    // * -----------------------------------------------------------------------
+    //*-------------------------------------------------------------------------
+    //* Fetch token, collection, service, request/register data,
+    //* and rent data to interconnect them.
+    //*-------------------------------------------------------------------------
     initRentMarket().catch(console.error);
   }, [rentMarketAddress, testNftAddress, blockchainNetwork, serviceAddress]);
 
@@ -329,18 +328,18 @@ const RentContent = ({
     }
   }
 
-  // * -------------------------------------------------------------------------
-  // * Rendering function.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Rendering function.
+  //*---------------------------------------------------------------------------
   return (
     <Box
       sx={{
         display: "flex",
       }}
     >
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * App bar title part.                                           */}
-      {/* // * --------------------------------------------------------------*/}
+      {/* //*----------------------------------------------------------------*/}
+      {/* //* App bar title part.                                            */}
+      {/* //*----------------------------------------------------------------*/}
       <AppBar position="fixed" open={openDrawer}>
         <Toolbar>
           <IconButton
@@ -373,6 +372,8 @@ const RentContent = ({
               ? "Monitor - Pending Rent Fee"
               : selectedIndex === MONITOR_RENT_NFT_MENU_INDEX
               ? "Monitor - Rent NFT"
+              : selectedIndex === MONITOR_REWARD_MENU_INDEX
+              ? "Monitor - Reward"
               : "Rent Market"}
           </Typography>
           <div color={"ffffff"}>
@@ -385,9 +386,9 @@ const RentContent = ({
         </Toolbar>
       </AppBar>
 
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Drawer part.                                                  */}
-      {/* // * --------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Drawer part                                                     */}
+      {/*//*-----------------------------------------------------------------*/}
       <Drawer
         sx={{
           width: RENT_CONTENT_COMPONENT_DRAWER_WIDTH,
@@ -412,9 +413,9 @@ const RentContent = ({
         </DrawerHeader>
         <Divider />
         <List>
-          {/* // * ----------------------------------------------------------*/}
-          {/* // * Market menu.                                             */}
-          {/* // * ----------------------------------------------------------*/}
+          {/*//*------------------------------------------------------------*/}
+          {/*//* Market menu                                                */}
+          {/*//*------------------------------------------------------------*/}
 
           <Divider sx={{ margin: "5px" }}>
             <Chip label="User" />
@@ -448,15 +449,6 @@ const RentContent = ({
               </ListItemButton>
             </ListItem>
           }
-
-          {/* // * ----------------------------------------------------------*/}
-          {/* // * Content menu.                                             */}
-          {/* // * ----------------------------------------------------------*/}
-
-          <Divider sx={{ margin: "5px" }}>
-            <Chip label="Content" />
-          </Divider>
-
           {
             <ListItem key="Content" disablePadding>
               <ListItemButton
@@ -473,9 +465,9 @@ const RentContent = ({
             </ListItem>
           }
 
-          {/* // * ----------------------------------------------------------*/}
-          {/* // * Market menu.                                              */}
-          {/* // * ----------------------------------------------------------*/}
+          {/*//*-------------------------------------------------------------*/}
+          {/*//* Market menu                                                 */}
+          {/*//*-------------------------------------------------------------*/}
 
           <Divider sx={{ margin: "5px" }}>
             <Chip label="Market" />
@@ -511,11 +503,13 @@ const RentContent = ({
               </ListItemButton>
             </ListItem>
           }
-          {/* {
+          {
             <ListItem key="Token" disablePadding>
               <ListItemButton
                 selected={selectedIndex === TOKEN_MENU_INDEX}
-                onClick={(event) => handleListItemClick(event, TOKEN_MENU_INDEX)}
+                onClick={(event) =>
+                  handleListItemClick(event, TOKEN_MENU_INDEX)
+                }
               >
                 <ListItemIcon>
                   <TokenIcon />
@@ -523,17 +517,17 @@ const RentContent = ({
                 <ListItemText primary="Token" />
               </ListItemButton>
             </ListItem>
-          } */}
+          }
 
-          {/* // * ----------------------------------------------------------*/}
-          {/* // * Monitor menu.                                             */}
-          {/* // * ----------------------------------------------------------*/}
+          {/*//*-------------------------------------------------------------*/}
+          {/*//* Monitor menu                                                */}
+          {/*//*-------------------------------------------------------------*/}
 
           <Divider sx={{ margin: "5px" }}>
             <Chip label="Monitor" />
           </Divider>
 
-          {/* {
+          {
             <ListItem key="Monitor-Token" disablePadding>
               <ListItemButton
                 selected={selectedIndex === MONITOR_TOKEN_MENU_INDEX}
@@ -547,7 +541,7 @@ const RentContent = ({
                 <ListItemText primary="Token" />
               </ListItemButton>
             </ListItem>
-          } */}
+          }
           {
             <ListItem key="Monitor-AccountBalance" disablePadding>
               <ListItemButton
@@ -596,20 +590,35 @@ const RentContent = ({
               </ListItemButton>
             </ListItem>
           }
+          {
+            <ListItem key="Monitor-Reward" disablePadding>
+              <ListItemButton
+                selected={selectedIndex === MONITOR_REWARD_MENU_INDEX}
+                onClick={(event) =>
+                  handleListItemClick(event, MONITOR_REWARD_MENU_INDEX)
+                }
+              >
+                <ListItemIcon>
+                  <CircleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Reward" />
+              </ListItemButton>
+            </ListItem>
+          }
         </List>
         <Divider />
       </Drawer>
 
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Right content page.                                           */}
-      {/* // * --------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Right content page                                              */}
+      {/*//*-----------------------------------------------------------------*/}
       <Main open={openDrawer}>
         <DrawerHeader />
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
+        <Grid container justifyContent="end" spacing={2}>
+          <Grid item>
             <Web3Button />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item>
             <Web3NetworkSwitch />
           </Grid>
         </Grid>
@@ -635,7 +644,7 @@ const RentContent = ({
               inputMyRentNFTArray={myRentNFTArray}
               inputBlockchainNetwork={blockchainNetwork}
               setWriteToastMessage={setWriteToastMessage}
-              web3modalSelectedChain={selectedChain}
+              web3modalSelectedChain={chain}
               wagmiIsConnected={address}
             />
           )
@@ -649,38 +658,13 @@ const RentContent = ({
             />
           )
         ) : selectedIndex === COLLECTION_MENU_INDEX ? (
-          inputRentMarket && (
-            <Collection
-              blockchainNetwork={blockchainNetwork}
-              inputCollectionArray={collectionArray}
-              inputRentMarket={inputRentMarket}
-            />
-          )
+          inputRentMarket && <Collection />
         ) : selectedIndex === SERVICE_MENU_INDEX ? (
-          inputRentMarket && (
-            <Service
-              blockchainNetwork={blockchainNetwork}
-              inputServiceArray={serviceArray}
-              inputRentMarket={inputRentMarket}
-            />
-          )
+          inputRentMarket && <Service />
         ) : selectedIndex === TOKEN_MENU_INDEX ? (
-          inputRentMarket && (
-            <Token
-              blockchainNetwork={blockchainNetwork}
-              inputTokenArray={tokenArray}
-              inputRentMarket={inputRentMarket}
-              inputBlockchainNetwork={blockchainNetwork}
-            />
-          )
+          inputRentMarket && <Token />
         ) : selectedIndex === MONITOR_TOKEN_MENU_INDEX ? (
-          inputRentMarket && (
-            <MonitorToken
-              inputRentMarket={inputRentMarket}
-              rentMarketAddress={rentMarketAddress}
-              inputBlockchainNetwork={blockchainNetwork}
-            />
-          )
+          inputRentMarket && <MonitorToken />
         ) : selectedIndex === MONITOR_ACCOUNT_BALANCE_MENU_INDEX ? (
           inputRentMarket && (
             <MonitorAccountBalance
@@ -705,15 +689,16 @@ const RentContent = ({
               inputBlockchainNetwork={blockchainNetwork}
             />
           )
+        ) : selectedIndex === MONITOR_REWARD_MENU_INDEX ? (
+          <MonitorReward />
         ) : (
           <></>
         )}
-        <Box></Box>
       </Main>
 
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * Toast message.                                                */}
-      {/* // * --------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Toast message                                                   */}
+      {/*//*-----------------------------------------------------------------*/}
       <RBSnackbar
         open={readToastMessage.snackbarOpen}
         message={readToastMessage.snackbarMessage}

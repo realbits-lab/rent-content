@@ -9,16 +9,32 @@ import {
   useRecoilValue,
 } from "recoil";
 
-/**
- * Format bytes as human-readable text.
- *
- * @param bytes Number of bytes.
- * @param si True to use metric (SI) units, aka powers of 1000. False to use
- *           binary (IEC), aka powers of 1024.
- * @param dp Number of decimal places to display.
- *
- * @return Formatted string.
- */
+export const ConnectStatus = {
+  connect: "connect",
+  loading: "loading",
+  disconnect: "disconnect",
+};
+
+export const MyMenu = {
+  own: "own",
+  rent: "rent",
+};
+
+export const RBSize = {
+  small: 24,
+  middle: 40,
+  big: 56,
+  double: 112,
+  triple: 168,
+};
+
+export const AlertSeverity = {
+  error: "error",
+  warning: "warning",
+  info: "info",
+  success: "success",
+};
+
 // https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string
 export const humanFileSize = (bytes, si = false, dp = 1) => {
   const thresh = si ? 1000 : 1024;
@@ -219,8 +235,9 @@ export const shortenAddress = ({
   address,
   number = 4,
   withLink = "",
-  color = "#ffffff",
+  color = "#0000FF",
 }) => {
+  // console.log("call shortenAddress()");
   // console.log("address: ", address);
   // console.log("withLink: ", withLink);
 
@@ -258,15 +275,18 @@ export const shortenAddress = ({
     (typeof address === "string" || address instanceof String) &&
     address.length > 0
   ) {
+    const addressString = `${address
+      .toLowerCase()
+      .substring(0, number + 2)}${middleString}${address
+      .toLowerCase()
+      .substring(address.length - number)}`;
+
     switch (withLink) {
       case "maticscan":
       case "scan":
         return (
           <Link href={polygonScanUrl} target="_blank" color={color}>
-            {`${address.substring(
-              0,
-              number + 2
-            )}${middleString}${address.substring(address.length - number)}`}
+            {addressString}
           </Link>
         );
 
@@ -275,56 +295,20 @@ export const shortenAddress = ({
       case "opensea":
         return (
           <Link href={`${openseaUrl}${address}`} target="_blank" color={color}>
-            {`${address.substring(
-              0,
-              number + 2
-            )}${middleString}${address.substring(address.length - number)}`}
+            {addressString}
           </Link>
         );
 
       default:
-        return `${address.substring(
-          0,
-          number + 2
-        )}${middleString}${address.substring(address.length - number)}`;
+        return addressString;
     }
   } else {
-    return "";
+    return "n/a";
   }
 };
 
-export const ConnectStatus = {
-  connect: "connect",
-  loading: "loading",
-  disconnect: "disconnect",
-};
-
-export const MyMenu = {
-  own: "own",
-  rent: "rent",
-};
-
-export const RBSize = {
-  small: 24,
-  middle: 40,
-  big: 56,
-  double: 112,
-  triple: 168,
-};
-
-export const AlertSeverity = {
-  error: "error",
-  warning: "warning",
-  info: "info",
-  success: "success",
-};
-
-export const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
-// TODO: Stack the queue message.
-// RealBits Snackbar message component.
+//* TODO: Stack the queue message.
+//* RealBits Snackbar message component.
 export function RBSnackbar({ open, message, severity, currentTime }) {
   const [openToast, setOpenToast] = React.useState(false);
   const handleToastClose = (event, reason) => {
@@ -514,3 +498,125 @@ export const readToastMessageState = selector({
     return toastMessageState;
   },
 });
+
+// * Switch to polygon network.
+export async function switchNetworkPolygon(provider) {
+  // console.log("call switchNetworkPolygon()");
+
+  let response;
+  try {
+    response = await provider.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: "0x89" }],
+    });
+    if (response === null) {
+      // Switch chain success.
+      // console.log("wallet_switchEthereumChain success");
+      return null;
+    } else {
+      return response;
+    }
+  } catch (switchError) {
+    // Switch chain fail.
+    // console.log("wallet_switchEthereumChain fail.");
+    // console.log("wallet_switchEthereumChain response: ", switchError);
+
+    if (switchError.code === 4902 || switchError.code === -32603) {
+      // console.log("Try to wallet_addEthereumChain");
+
+      try {
+        response = await provider.request({
+          method: "wallet_addEthereumChain",
+          params: [
+            {
+              chainId: "0x89",
+              chainName: "Polygon",
+              rpcUrls: ["https://polygon-rpc.com"],
+              nativeCurrency: {
+                // https://etherscan.io/token/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0#readContract
+                name: "Matic Token",
+                symbol: "MATIC",
+                decimals: 18,
+              },
+              blockExplorerUrls: ["https://www.polygonscan.com"],
+            },
+          ],
+        });
+
+        if (response === null) {
+          // Add chain success.
+          // console.log("wallet_addEthereumChain success");
+          return null;
+        } else {
+          // Add chain fail.
+          // console.log("wallet_addEthereumChain fail");
+          // console.log("wallet_addEthereumChain response: ", response);
+          return response;
+        }
+      } catch (addError) {
+        throw addError;
+      }
+    }
+
+    throw switchError;
+  }
+}
+
+export const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+export async function signMessage({ rentMarket, message }) {
+  // console.log("call signMessage()");
+  // console.log("rentMarket: ", rentMarket);
+  // console.log("message: ", message);
+
+  if (rentMarket === undefined) {
+    return false;
+  }
+
+  // console.log("rentMarket.signer: ", rentMarket.signer);
+  let response;
+  try {
+    response = await rentMarket.signer.signMessage(message || "");
+  } catch (error) {
+    throw error;
+  }
+  // console.log("response: ", response);
+
+  return response;
+}
+
+export async function isUserAllowed({ rentMarket, address }) {
+  console.log("call isUserAllowed()");
+  console.log("rentMarket: ", rentMarket);
+  console.log("address: ", address);
+
+  // if (rentMarket === undefined || address === undefined) {
+  //   return false;
+  // }
+
+  let checkAddress;
+  if (address) {
+    checkAddress = address;
+  } else {
+    checkAddress = rentMarket.signerAddress;
+  }
+  console.log("checkAddress: ", checkAddress);
+
+  // console.log("rentMarket.signerAddress: ", rentMarket.signerAddress);
+  let response;
+  try {
+    // response = await rentMarket.isOwnerOrRenter(checkAddress);
+    response = await rentMarket.isOwnerOrRenter(
+      "0x3851dacd8fA9F3eB64D69151A3597F33E5960A2F"
+    );
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+  console.log("response: ", response);
+
+  // * response type is bool (success or failure).
+  return response;
+}

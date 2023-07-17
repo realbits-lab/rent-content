@@ -1,16 +1,23 @@
 import React from "react";
 import {
   EthereumClient,
-  modalConnectors,
-  walletConnectProvider,
+  w3mConnectors,
+  w3mProvider,
 } from "@web3modal/ethereum";
 import { Web3Modal } from "@web3modal/react";
-import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { configureChains, WagmiConfig, createConfig } from "wagmi";
+import { alchemyProvider } from "wagmi/providers/alchemy";
+import { publicProvider } from "wagmi/providers/public";
 import { polygon, polygonMumbai, localhost } from "wagmi/chains";
-import RentContent from "../components/RentContent";
-import { getChainName } from "../components/RentContentUtil";
+import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
+import RentContent from "@/components/RentContent";
+import { getChainName } from "@/components/RentContentUtil";
 
 function App() {
+  const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY || "";
+  const WALLET_CONNECT_PROJECT_ID =
+    process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "";
+
   // console.log(
   //   "process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS: ",
   //   process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS
@@ -28,44 +35,58 @@ function App() {
   //   process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS
   // );
 
-  let chains = [];
+  let wagmiBlockchainNetworks = [];
   if (
     getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
     "matic"
   ) {
-    chains = [polygon];
+    wagmiBlockchainNetworks = [polygon];
   } else if (
     getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
     "maticmum"
   ) {
-    chains = [polygonMumbai];
+    wagmiBlockchainNetworks = [polygonMumbai];
   } else if (
     getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
     "localhost"
   ) {
-    chains = [localhost];
+    wagmiBlockchainNetworks = [localhost];
   } else {
-    chains = [];
+    wagmiBlockchainNetworks = [];
   }
 
-  // * Wagmi client
-  const { provider } = configureChains(chains, [
-    walletConnectProvider({
-      projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
+  //* Set wagmi config.
+  const {
+    chains: wagmiChains,
+    publicClient: wagmiPublicClient,
+    webSocketPublicClient: wagmiWebSocketPublicClient,
+  } = configureChains(wagmiBlockchainNetworks, [
+    w3mProvider({
+      projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? "",
     }),
   ]);
-  const wagmiClient = createClient({
+  const wagmiConfig = createConfig({
     autoConnect: true,
-    connectors: modalConnectors({ appName: "web3Modal", chains }),
-    provider,
+    connectors: [
+      ...w3mConnectors({
+        projectId: WALLET_CONNECT_PROJECT_ID,
+        version: 2,
+        chains: wagmiBlockchainNetworks,
+      }),
+    ],
+    publicClient: wagmiPublicClient,
+    webSocketPublicClient: wagmiWebSocketPublicClient,
   });
 
-  // * Web3Modal Ethereum Client
-  const ethereumClient = new EthereumClient(wagmiClient, chains);
+  //* Set Web3Modal Ethereum Client.
+  const ethereumClient = new EthereumClient(
+    wagmiConfig,
+    wagmiBlockchainNetworks
+  );
 
   return (
     <>
-      <WagmiConfig client={wagmiClient}>
+      <WagmiConfig config={wagmiConfig}>
         <RentContent
           rentMarketAddress={
             process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS
