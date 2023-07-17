@@ -2,47 +2,59 @@
 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
+## Getting Started
+
 ## Install npm
 
-```sh
+```bash
 foo@bar:~$ npm i
 ```
 
 ## Create .env
 
-```sh
+```bash
 foo@bar:~$ cp .env.example .env
 ```
 
 ## Add alchemy api key in .env
 
-```sh
+```bash
 foo@bar:~$ echo NEXT_PUBLIC_ALCHEMY_KEY={alchemy_api_key} >> .env
 ```
 
 ## Run server
 
-```sh
+```bash
 foo@bar:~$ npm run dev
 ```
 
 ## Build server
 
-```sh
+```bash
 foo@bar:~$ npm run build
 ```
 
 ## Install heroku crontogo addon
 
-```sh
+```bash
 heroku addons:create crontogo
 ```
 
 ## Open crontogo addon
 
-```sh
+```bash
 heroku addons:open crontogo
 ```
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+## Acknowledgments
 
 ## Request settle-rent-data API
 
