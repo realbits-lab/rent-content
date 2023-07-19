@@ -3,10 +3,10 @@ import { RecoilRoot } from "recoil";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material";
 import { CacheProvider, EmotionCache } from "@emotion/react";
-import "../styles/globals.css";
-import "../styles/globals.css";
-import { theme } from "../utils/theme";
-import createEmotionCache from "../utils/createEmotionCache";
+import "@/styles/globals.css";
+import "@/styles/globals.css";
+import { theme } from "@/utils/theme";
+import createEmotionCache from "@/utils/createEmotionCache";
 
 interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
@@ -24,7 +24,7 @@ const MyApp: React.FunctionComponent<MyAppProps> = (props) => {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <RecoilRoot>
-            <Component {...pageProps} />
+          <Component {...pageProps} />
         </RecoilRoot>
       </ThemeProvider>
     </CacheProvider>

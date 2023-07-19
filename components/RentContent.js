@@ -285,7 +285,7 @@ const RentContent = ({
   function onEventFunc(
     { event, message } = { event: undefined, message: undefined }
   ) {
-    // console.log("call onEventFunc()");
+    console.log("call onEventFunc()");
 
     // console.log(
     //   "rentMarketClassRef.current.registerNFTArray: ",
