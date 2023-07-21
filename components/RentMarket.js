@@ -802,6 +802,8 @@ class RentMarket {
 
     try {
       const allTokenArray = await this.getAllToken();
+      // console.log("allTokenArray: ", allTokenArray);
+
       this.tokenArray = allTokenArray;
     } catch (error) {
       throw error;
@@ -896,6 +898,8 @@ class RentMarket {
   }
 
   async fetchPendingRentFee() {
+    // console.log("call fetchPendingRentFee()");
+
     //* Data type.
     // struct pendingRentFee {
     //     address renterAddress;
@@ -946,6 +950,7 @@ class RentMarket {
       });
     });
     await Promise.all(promises);
+    // console.log("tokenArray: ", tokenArray);
 
     //* Return token data.
     return tokenArray;

@@ -130,7 +130,11 @@ export default function Token() {
     address: RENT_MARKET_CONTRACT_ADDRES,
     abi: rentmarketABI.abi,
     functionName: "registerToken",
+
     onSuccess(data) {
+      console.log("call onSettled()");
+      console.log("data: ", data);
+
       setWriteToastMessage({
         snackbarSeverity: AlertSeverity.info,
         snackbarMessage: "Registering token is made successfully.",
@@ -139,6 +143,9 @@ export default function Token() {
       });
     },
     onError(error) {
+      console.log("call onError()");
+      console.log("error: ", error);
+
       setWriteToastMessage({
         snackbarSeverity: AlertSeverity.error,
         snackbarMessage: "Registering token is failed.",
@@ -154,16 +161,18 @@ export default function Token() {
       });
     },
     onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
+      console.log("call onSettled()");
+      console.log("data: ", data);
+      console.log("error: ", error);
     },
   });
+
   const {
     isLoading: isLoadingTransactionRegisterToken,
     isSuccess: isSuccessTransactionRegisterToken,
   } = useWaitForTransaction({
     hash: dataRegisterToken?.hash,
+
     onSuccess(data) {
       setWriteToastMessage({
         snackbarSeverity: AlertSeverity.info,

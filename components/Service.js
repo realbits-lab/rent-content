@@ -216,8 +216,8 @@ export default function Service() {
     functionName: "getAllService",
     watch: true,
     onSuccess(data) {
-      console.log("call onSuccess()");
-      console.log("data: ", data);
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
 
       Promise.all(
         data.map(async (service) => {
@@ -343,13 +343,11 @@ export default function Service() {
                       withLink: "scan",
                     })}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <Typography noWrap>
-                      Uri:
-                      <Link href={element.uri} target="_blank">
-                        {element.uri}
-                      </Link>
-                    </Typography>
+                  <Typography variant="body2" color="text.secondary" noWrap>
+                    Uri:
+                    <Link href={element.uri} target="_blank">
+                      {element.uri}
+                    </Link>
                   </Typography>
                 </CardContent>
                 <CardActions>

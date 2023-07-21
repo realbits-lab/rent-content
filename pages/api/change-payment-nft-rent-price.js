@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   const COIN_MARKET_CAP_PRICE_CONVERSION_API_URL =
     "https://pro-api.coinmarketcap.com/v2/tools/price-conversion";
   const USD_ID = 2781;
-  const USD_AMOUNT = 0.01;
+  const DEFAULT_USD_AMOUNT = 1;
   const MATIC_SYMBOL = "MATIC";
 
   //* Get alchemy provider.
@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     rentmarketABI.abi,
     signer
   );
-  console.log("rentMarketContract: ", rentMarketContract);
+  // console.log("rentMarketContract: ", rentMarketContract);
 
   //* Check method.
   if (req.method !== "POST") {
@@ -51,8 +51,18 @@ export default async function handler(req, res) {
   }
 
   //* Check auth key.
-  const { auth_key } = req.body;
+  let { auth_key, usd_amount } = req.body;
   console.log("auth_key: ", auth_key);
+  if (!usd_amount) {
+    usd_amount = DEFAULT_USD_AMOUNT;
+  }
+
+  usd_amount = Number(usd_amount);
+  if (isNaN(usd_amount) === true) {
+    usd_amount = DEFAULT_USD_AMOUNT;
+  }
+  console.log("usd_amount: ", usd_amount);
+
   if (auth_key !== NEXT_PUBLIC_SETTLE_AUTH_KEY) {
     res.status(500).json({ error: "Invalid auth key." });
     return;
@@ -64,7 +74,7 @@ export default async function handler(req, res) {
   let response;
   try {
     response = await fetch(
-      `${COIN_MARKET_CAP_PRICE_CONVERSION_API_URL}?id=${USD_ID}&amount=${USD_AMOUNT}&convert=${MATIC_SYMBOL}`,
+      `${COIN_MARKET_CAP_PRICE_CONVERSION_API_URL}?id=${USD_ID}&amount=${usd_amount}&convert=${MATIC_SYMBOL}`,
       {
         method: "GET",
         headers: {
@@ -82,6 +92,7 @@ export default async function handler(req, res) {
 
   const maticPricePerUSD = responseJson.data.quote.MATIC.price;
   console.log("maticPricePerUSD: ", maticPricePerUSD);
+  console.log("maticPricePerUSD.toFixed(2): ", maticPricePerUSD.toFixed(2));
 
   if (maticPricePerUSD) {
     //* Change NFT price.
@@ -106,9 +117,9 @@ export default async function handler(req, res) {
       registerData.rentFeeByToken,
       registerData.rentDuration
     );
-    console.log("tx: ", tx);
+    // console.log("tx: ", tx);
     const receipt = await tx.wait();
-    console.log("receipt: ", receipt);
+    // console.log("receipt: ", receipt);
   } else {
     return res
       .status(500)
