@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import dynamic from "next/dynamic";
 import { useAccount, useNetwork } from "wagmi";
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
@@ -26,7 +27,6 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CollectionsIcon from "@mui/icons-material/Collections";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
-import LoginWrapper from "@/components/LoginWrapper";
 import My from "@/components/My";
 import Market from "@/components/Market";
 import RentMarket from "@/components/RentMarket";
@@ -48,6 +48,9 @@ import {
   checkMobile,
   shortenAddress,
 } from "@/components/RentContentUtil";
+const LoginWrapper = dynamic(() => import("./LoginWrapper"), {
+  ssr: false,
+});
 
 const RENT_CONTENT_COMPONENT_DRAWER_WIDTH = 180;
 
