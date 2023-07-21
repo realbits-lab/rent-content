@@ -1,6 +1,5 @@
 import React from "react";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { useWeb3Modal } from "@web3modal/react";
 import {
   useAccount,
   useNetwork,
@@ -143,12 +142,6 @@ export default function Content({
   //*---------------------------------------------------------------------------
   //* Wagmi hook functions.
   //*---------------------------------------------------------------------------
-  const {
-    isOpen: isOpenWeb3Modal,
-    open: openWeb3Modal,
-    close: closeWeb3Modal,
-    setDefaultChain: setDefaultChainWeb3Modal,
-  } = useWeb3Modal();
   const RENT_MARKET_CONTRACT_ADDRES =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
   const [unregisterTokenAddress, setUnregisterTokenAddress] = React.useState();
@@ -620,23 +613,6 @@ export default function Content({
       openseaMode = "";
     }
 
-    if (isConnected === false) {
-      return (
-        <Box
-          sx={{
-            marginTop: "20px",
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-          }}
-        >
-          <Button variant="text" onClick={openWeb3Modal}>
-            Click the connect wallet button
-          </Button>
-        </Box>
-      );
-    }
-
     if (myRegisteredUniqueNFTAddressArray === undefined) {
       return (
         <Box
@@ -801,23 +777,6 @@ export default function Content({
     // console.log("call showMyUnregisteredNFTElementTable()");
     // https://mui.com/material-ui/react-table/
     // https://medium.com/@freshmilkdev/reactjs-render-optimization-for-collapsible-material-ui-long-list-with-checkboxes-231b36892e20
-
-    if (isConnected === false) {
-      return (
-        <Box
-          sx={{
-            marginTop: "20px",
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-          }}
-        >
-          <Button variant="text" onClick={openWeb3Modal}>
-            Click the connect wallet button
-          </Button>
-        </Box>
-      );
-    }
 
     if (myUnregisteredUniqueNFTAddressArray === undefined) {
       return (

@@ -1,11 +1,5 @@
 import React from "react";
 import dynamic from "next/dynamic";
-import {
-  EthereumClient,
-  w3mConnectors,
-  w3mProvider,
-} from "@web3modal/ethereum";
-import { Web3Modal } from "@web3modal/react";
 import { configureChains, WagmiConfig, createConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
@@ -72,31 +66,26 @@ function App() {
     publicClient: wagmiPublicClient,
     webSocketPublicClient: wagmiWebSocketPublicClient,
   } = configureChains(wagmiBlockchainNetworks, [
-    w3mProvider({
-      projectId: WALLET_CONNECT_PROJECT_ID,
-    }),
+    // w3mProvider({
+    //   projectId: WALLET_CONNECT_PROJECT_ID,
+    // }),
+    alchemyProvider({ apiKey: ALCHEMY_API_KEY }),
   ]);
   // console.log("wagmiChains: ", wagmiChains);
 
   const wagmiConfig = createConfig({
     autoConnect: true,
     connectors: [
-      ...w3mConnectors({
-        projectId: WALLET_CONNECT_PROJECT_ID,
-        chains: wagmiBlockchainNetworks,
-      }),
+      // ...w3mConnectors({
+      //   projectId: WALLET_CONNECT_PROJECT_ID,
+      //   chains: wagmiBlockchainNetworks,
+      // }),
+      new MetaMaskConnector({ chains: wagmiBlockchainNetworks }),
     ],
     publicClient: wagmiPublicClient,
     webSocketPublicClient: wagmiWebSocketPublicClient,
   });
   // console.log("wagmiConfig: ", wagmiConfig);
-
-  //* Set Web3Modal Ethereum Client.
-  const ethereumClient = new EthereumClient(
-    wagmiConfig,
-    wagmiBlockchainNetworks
-  );
-  // console.log("ethereumClient: ", ethereumClient);
 
   return (
     <>
@@ -108,11 +97,6 @@ function App() {
           serviceAddress={SERVICE_OWNER_ADDRESS}
         />
       </WagmiConfig>
-
-      <Web3Modal
-        projectId={WALLET_CONNECT_PROJECT_ID}
-        ethereumClient={ethereumClient}
-      />
     </>
   );
 }

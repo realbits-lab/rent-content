@@ -1,5 +1,5 @@
 import React from "react";
-import { useWeb3Modal } from "@web3modal/react";
+import { useNetwork, useAccount } from "wagmi";
 import moment from "moment";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
@@ -45,11 +45,15 @@ const My = ({
   inputMyRentNFTArray,
   inputBlockchainNetwork,
   setWriteToastMessage,
-  web3modalSelectedChain,
-  wagmiIsConnected,
 }) => {
   //*---------------------------------------------------------------------------
-  //* Hook variables.
+  //* Wagmi.
+  //*---------------------------------------------------------------------------
+  const { connector: activeConnector, isConnected } = useAccount();
+  const { chain, chains } = useNetwork();
+
+  //*---------------------------------------------------------------------------
+  //* Theme.
   //*---------------------------------------------------------------------------
   const theme = useTheme();
 
@@ -90,16 +94,6 @@ const My = ({
   };
 
   //*---------------------------------------------------------------------------
-  //* Wagmi hook functions.
-  //*---------------------------------------------------------------------------
-  const {
-    isOpen: isOpenWeb3Modal,
-    open: openWeb3Modal,
-    close: closeWeb3Modal,
-    setDefaultChain: setDefaultChainWeb3Modal,
-  } = useWeb3Modal();
-
-  //*---------------------------------------------------------------------------
   //* Table pagination data.
   //*---------------------------------------------------------------------------
   const [page, setPage] = React.useState([]);
@@ -123,8 +117,6 @@ const My = ({
     // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
     // console.log("inputMyRentNFTArray: ", inputMyRentNFTArray);
     // console.log("inputBlockchainNetwork: ", inputBlockchainNetwork);
-    // console.log("web3modalSelectedChain: ", web3modalSelectedChain);
-    // console.log("wagmiIsConnected: ", wagmiIsConnected);
 
     if (inputRentMarket) {
       setMyRentNFTArray(inputMyRentNFTArray);
@@ -580,39 +572,15 @@ const My = ({
     // console.log("collectionArray: ", collectionArray);
     // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
     // console.log("myRentNFTArray: ", myRentNFTArray);
-    // console.log("web3modalSelectedChain: ", web3modalSelectedChain);
     // console.log(
     //   "getChainName({ chainId: inputBlockchainNetwork }): ",
     //   getChainName({ chainId: inputBlockchainNetwork })
     // );
-    // console.log("wagmiIsConnected: ", wagmiIsConnected);
 
     if (
-      wagmiIsConnected === false ||
-      web3modalSelectedChain === undefined ||
-      getChainName({ chainId: web3modalSelectedChain.id }) !==
-        getChainName({ chainId: inputBlockchainNetwork })
-    ) {
-      return (
-        <Box
-          sx={{
-            marginTop: "20px",
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-          }}
-        >
-          <Button variant="text" onClick={openWeb3Modal}>
-            Click the connect wallet button
-          </Button>
-        </Box>
-      );
-    }
-
-    if (
-      wagmiIsConnected === true &&
-      web3modalSelectedChain &&
-      getChainName({ chainId: web3modalSelectedChain.id }) ===
+      isConnected === true &&
+      chain &&
+      getChainName({ chainId: chain.id }) ===
         getChainName({ chainId: inputBlockchainNetwork })
     ) {
       if (

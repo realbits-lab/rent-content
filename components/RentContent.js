@@ -672,8 +672,6 @@ const RentContent = ({
                 inputMyRentNFTArray={myRentNFTArray}
                 inputBlockchainNetwork={blockchainNetwork}
                 setWriteToastMessage={setWriteToastMessage}
-                web3modalSelectedChain={chain}
-                wagmiIsConnected={address}
               />
             )
           ) : selectedIndex === CONTENT_MENU_INDEX ? (
