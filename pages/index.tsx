@@ -10,6 +10,7 @@ import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import { polygon, polygonMumbai, localhost } from "wagmi/chains";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
+import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import RentContent from "@/components/RentContent";
 import { getChainName } from "@/components/RentContentUtil";
 
@@ -60,7 +61,7 @@ function App() {
   } else {
     wagmiBlockchainNetworks = [];
   }
-  console.log("wagmiBlockchainNetworks: ", wagmiBlockchainNetworks);
+  // console.log("wagmiBlockchainNetworks: ", wagmiBlockchainNetworks);
 
   //* Set wagmi config.
   const {
@@ -72,26 +73,27 @@ function App() {
       projectId: WALLET_CONNECT_PROJECT_ID,
     }),
   ]);
-  console.log("wagmiChains: ", wagmiChains);
+  // console.log("wagmiChains: ", wagmiChains);
 
   const wagmiConfig = createConfig({
     autoConnect: true,
     connectors: [
       ...w3mConnectors({
         projectId: WALLET_CONNECT_PROJECT_ID,
-        version: 1,
         chains: wagmiBlockchainNetworks,
       }),
     ],
     publicClient: wagmiPublicClient,
     webSocketPublicClient: wagmiWebSocketPublicClient,
   });
+  // console.log("wagmiConfig: ", wagmiConfig);
 
   //* Set Web3Modal Ethereum Client.
   const ethereumClient = new EthereumClient(
     wagmiConfig,
     wagmiBlockchainNetworks
   );
+  // console.log("ethereumClient: ", ethereumClient);
 
   return (
     <>

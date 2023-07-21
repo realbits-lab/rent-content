@@ -130,7 +130,7 @@ class RentMarket {
     this.metamaskProvider = await detectEthereumProvider({
       mustBeMetaMask: true,
     });
-    console.log("this.metamaskProvider: ", this.metamaskProvider);
+    // console.log("this.metamaskProvider: ", this.metamaskProvider);
 
     // * Check metamask is installed.
     if (this.metamaskProvider !== null) {
@@ -143,7 +143,7 @@ class RentMarket {
 
       // * Get signer.
       this.signer = this.provider.getSigner();
-      console.log("this.signer: ", this.signer);
+      // console.log("this.signer: ", this.signer);
       try {
         this.signerAddress = await this.signer.getAddress();
       } catch (error) {
@@ -160,11 +160,11 @@ class RentMarket {
       });
 
       //* Show error, if block chain is not the same as setting.
-      console.log("this.inputBlockchainNetworkName: ", this.inputBlockchainNetworkName);
-      console.log(
-        "this.currentBlockchainNetworkName: ",
-        this.currentBlockchainNetworkName
-      );
+      // console.log("this.inputBlockchainNetworkName: ", this.inputBlockchainNetworkName);
+      // console.log(
+      //   "this.currentBlockchainNetworkName: ",
+      //   this.currentBlockchainNetworkName
+      // );
       if (
         this.inputBlockchainNetworkName !== this.currentBlockchainNetworkName
       ) {
@@ -181,7 +181,7 @@ class RentMarket {
     } else {
       await this.setAlchemyProvider();
     }
-    console.log("this.provider: ", this.provider);
+    // console.log("this.provider: ", this.provider);
   }
 
   async setAlchemyProvider() {
@@ -798,11 +798,11 @@ class RentMarket {
   }
 
   async fetchToken() {
-    console.log("call fetchToken()");
+    // console.log("call fetchToken()");
 
     try {
       const allTokenArray = await this.getAllToken();
-      console.log("allTokenArray: ", allTokenArray);
+      // console.log("allTokenArray: ", allTokenArray);
 
       this.tokenArray = allTokenArray;
     } catch (error) {
@@ -811,7 +811,7 @@ class RentMarket {
   }
 
   async fetchCollection() {
-    console.log("call fetchCollection()");
+    // console.log("call fetchCollection()");
 
     //* Get request collection array.
     let allCollectionArray;
@@ -898,7 +898,7 @@ class RentMarket {
   }
 
   async fetchPendingRentFee() {
-    console.log("call fetchPendingRentFee()");
+    // console.log("call fetchPendingRentFee()");
 
     //* Data type.
     // struct pendingRentFee {
@@ -929,16 +929,16 @@ class RentMarket {
   }
 
   async getAllToken() {
-    console.log("call getAllToken()");
+    // console.log("call getAllToken()");
 
     //* Call rentMarket getAllToken function.
-    console.log("this.rentMarketContract: ", this.rentMarketContract);
+    // console.log("this.rentMarketContract: ", this.rentMarketContract);
     if (isObject(this.rentMarketContract) === false) {
       throw new Error("Rent market contract is not defined.");
     }
 
     const tokenList = await this.rentMarketContract.getAllToken();
-    console.log("tokenList: ", tokenList);
+    // console.log("tokenList: ", tokenList);
 
     //* Get register data from smart contract.
     let tokenArray = [];
@@ -950,7 +950,7 @@ class RentMarket {
       });
     });
     await Promise.all(promises);
-    console.log("tokenArray: ", tokenArray);
+    // console.log("tokenArray: ", tokenArray);
 
     //* Return token data.
     return tokenArray;
@@ -1142,7 +1142,7 @@ class RentMarket {
   }
 
   async getMyContentData() {
-    console.log("call getMyContentData()");
+    // console.log("call getMyContentData()");
 
     //* Get my all minted NFT.
     // console.log(
