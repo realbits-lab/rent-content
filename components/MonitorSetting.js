@@ -7,7 +7,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { shortenAddress } from "@/components/RentContentUtil";
 
-export default function MonitorConfig() {
+export default function MonitorSetting() {
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
