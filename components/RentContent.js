@@ -40,6 +40,7 @@ import MonitorRentNft from "@/components/MonitorRentNft";
 import MonitorPendingRentFee from "@/components/MonitorPendingRentFee";
 import MonitorAccountBalance from "@/components/MonitorAccountBalance";
 import MonitorReward from "@/components/MonitorReward";
+import MonitorConfig from "@/components/MonitorConfig";
 import {
   AlertSeverity,
   RBSnackbar,
@@ -134,6 +135,7 @@ const RentContent = ({
   const MONITOR_PENDING_RENT_FEE_MENU_INDEX = 8;
   const MONITOR_RENT_NFT_MENU_INDEX = 9;
   const MONITOR_REWARD_MENU_INDEX = 10;
+  const MONITOR_CONFIG_MENU_INDEX = 11;
 
   const DEFAULT_MENU_INDEX = SERVICE_MENU_INDEX;
 
@@ -374,6 +376,8 @@ const RentContent = ({
               ? "Monitor - Rent NFT"
               : selectedIndex === MONITOR_REWARD_MENU_INDEX
               ? "Monitor - Reward"
+              : selectedIndex === MONITOR_CONFIG_MENU_INDEX
+              ? "Monitor - Config"
               : "Rent Market"}
           </Typography>
           <div color={"ffffff"}>
@@ -605,6 +609,21 @@ const RentContent = ({
               </ListItemButton>
             </ListItem>
           }
+          {
+            <ListItem key="Monitor-Config" disablePadding>
+              <ListItemButton
+                selected={selectedIndex === MONITOR_CONFIG_MENU_INDEX}
+                onClick={(event) =>
+                  handleListItemClick(event, MONITOR_CONFIG_MENU_INDEX)
+                }
+              >
+                <ListItemIcon>
+                  <CircleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Config" />
+              </ListItemButton>
+            </ListItem>
+          }
         </List>
         <Divider />
       </Drawer>
@@ -691,6 +710,8 @@ const RentContent = ({
           )
         ) : selectedIndex === MONITOR_REWARD_MENU_INDEX ? (
           <MonitorReward />
+        ) : selectedIndex === MONITOR_CONFIG_MENU_INDEX ? (
+          <MonitorConfig />
         ) : (
           <></>
         )}
