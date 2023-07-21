@@ -17,7 +17,7 @@ import {
   getUniqueKey,
   AlertSeverity,
   writeToastMessageState,
-} from "./RentContentUtil";
+} from "@/components/RentContentUtil";
 
 // https://docs.alchemy.com/docs/deep-dive-into-eth_getlogs
 const MonitorPendingRentFee = ({
@@ -25,7 +25,6 @@ const MonitorPendingRentFee = ({
   rentMarketAddress,
   inputBlockchainNetwork,
 }) => {
-  // * Define rent market class.
   const rentMarket = React.useRef();
   const [pendingRentFeeArray, setPendingRentFeeArray] = React.useState();
 
@@ -34,15 +33,6 @@ const MonitorPendingRentFee = ({
   //----------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
-  const writeToastMessage =
-    writeToastMessageLoadable?.state === "hasValue"
-      ? writeToastMessageLoadable.contents
-      : {
-          snackbarSeverity: AlertSeverity.info,
-          snackbarMessage: "",
-          snackbarTime: new Date(),
-          snackbarOpen: true,
-        };
 
   async function initializeRentMarket() {
     if (
