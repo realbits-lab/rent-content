@@ -49,7 +49,7 @@ export default function My() {
   //*---------------------------------------------------------------------------
   //* Wagmi
   //*---------------------------------------------------------------------------
-  const RENT_MARKET_CONTRACT_ADDRES =
+  const RENT_MARKET_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
   const { address, connector: activeConnector, isConnected } = useAccount();
   const { chain, chains } = useNetwork();
@@ -61,7 +61,7 @@ export default function My() {
     isLoading: isLoadingAllRentData,
     status: statusAllRentData,
   } = useContractRead({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "getAllRentData",
     watch: true,
@@ -87,7 +87,7 @@ export default function My() {
     isLoading: isLoadingAllRegisterData,
     status: statusAllRegisterData,
   } = useContractRead({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "getAllRegisterData",
     watch: true,
@@ -113,7 +113,7 @@ export default function My() {
     isLoading: isLoadingAllCollection,
     status: statusAllCollection,
   } = useContractRead({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "getAllCollection",
     watch: true,

@@ -59,7 +59,7 @@ export default function Content() {
   //*---------------------------------------------------------------------------
   //* Wagmi
   //*---------------------------------------------------------------------------
-  const RENT_MARKET_CONTRACT_ADDRES =
+  const RENT_MARKET_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
   const ALCHEMY_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
   const [unregisterTokenAddress, setUnregisterTokenAddress] = React.useState();
@@ -73,22 +73,9 @@ export default function Content() {
     isLoading: isLoadingUnregisterNFT,
     write: writeUnregisterNFT,
   } = useContractWrite({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "unregisterNFT",
-    onSuccess(data) {
-      // console.log("call onSuccess()");
-      // console.log("data: ", data);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
-    },
   });
   const {
     data: dataUnregisterNFTTx,
@@ -96,19 +83,6 @@ export default function Content() {
     isLoading: isLoadingUnregisterNFTTx,
   } = useWaitForTransaction({
     hash: dataUnregisterNFT?.hash,
-    onSuccess(data) {
-      // console.log("call onSuccess()");
-      // console.log("data: ", data);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
-    },
   });
 
   //* registerNFT function
@@ -118,22 +92,9 @@ export default function Content() {
     isLoading: isLoadingRegisterNFT,
     write: writeRegisterNFT,
   } = useContractWrite({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "registerNFT",
-    onSuccess(data) {
-      // console.log("call onSuccess()");
-      // console.log("data: ", data);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
-    },
   });
   const {
     data: dataRegisterNFTTx,
@@ -141,19 +102,6 @@ export default function Content() {
     isLoading: isLoadingRegisterNFTTx,
   } = useWaitForTransaction({
     hash: dataRegisterNFT?.hash,
-    onSuccess(data) {
-      // console.log("call onSuccess()");
-      // console.log("data: ", data);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
-    },
   });
 
   //* changeNFT function
@@ -163,22 +111,9 @@ export default function Content() {
     isLoading: isLoadingChangeNFT,
     write: writeChangeNFT,
   } = useContractWrite({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "changeNFT",
-    onSuccess(data) {
-      // console.log("call onSuccess()");
-      // console.log("data: ", data);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
-    },
   });
   const {
     data: dataChangeNFTTx,
@@ -186,19 +121,6 @@ export default function Content() {
     isLoading: isLoadingChangeNFTTx,
   } = useWaitForTransaction({
     hash: dataChangeNFT?.hash,
-    onSuccess(data) {
-      // console.log("call onSuccess()");
-      // console.log("data: ", data);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
-    },
   });
 
   //* getAllRegister function
@@ -208,23 +130,10 @@ export default function Content() {
     isLoading: isLoadingAllRegisterData,
     status: statusAllRegisterData,
   } = useContractRead({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "getAllRegisterData",
     watch: true,
-    onSuccess(data) {
-      // console.log("call onSuccess()");
-      // console.log("data: ", data);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
-    },
   });
 
   //* getAllToken function
@@ -234,23 +143,10 @@ export default function Content() {
     isLoading: isLoadingAllToken,
     status: statusAllToken,
   } = useContractRead({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "getAllToken",
     watch: true,
-    onSuccess(data) {
-      // console.log("call onSuccess()");
-      // console.log("data: ", data);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
-    },
   });
   // console.log("dataAllToken: ", dataAllToken);
 
