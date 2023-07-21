@@ -1,3 +1,4 @@
+import { useAccount, useNetwork } from "wagmi";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -8,6 +9,9 @@ import Paper from "@mui/material/Paper";
 import { shortenAddress } from "@/components/RentContentUtil";
 
 export default function MonitorSetting() {
+  const { chain, chains } = useNetwork();
+  const { address, isConnecting, isDisconnected, isConnected } = useAccount();
+
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -18,6 +22,21 @@ export default function MonitorSetting() {
           </TableRow>
         </TableHead>
         <TableBody>
+          <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+            <TableCell align="left">WALLET CONNECTED</TableCell>
+            <TableCell align="left">{isConnected.toString()}</TableCell>
+          </TableRow>
+
+          <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+            <TableCell align="left">WALLET ACCOUNT ADDRESS</TableCell>
+            <TableCell align="left">{address}</TableCell>
+          </TableRow>
+
+          <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+            <TableCell align="left">WALLET CHAIN</TableCell>
+            <TableCell align="left">{chain?.name}</TableCell>
+          </TableRow>
+
           <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
             <TableCell align="left">BLOCKCHAIN_NETWORK</TableCell>
             <TableCell align="left">
