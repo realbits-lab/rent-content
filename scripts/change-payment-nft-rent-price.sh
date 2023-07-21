@@ -11,4 +11,4 @@ done <.env
 
 curl -d "{\"auth_key\":\"${NEXT_PUBLIC_SETTLE_AUTH_KEY}\", \"usd_amount\":\"0.1\"}" \
 	-H "Content-Type: application/json" \
-	-X POST http://localhost:3001/api/change-payment-nft-rent-price
+	-X POST http://localhost:3000/api/change-payment-nft-rent-price
