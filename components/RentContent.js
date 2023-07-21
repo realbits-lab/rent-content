@@ -139,7 +139,7 @@ const RentContent = ({
   const MONITOR_REWARD_MENU_INDEX = 10;
   const MONITOR_SETTING_MENU_INDEX = 11;
 
-  const DEFAULT_MENU_INDEX = SERVICE_MENU_INDEX;
+  const DEFAULT_MENU_INDEX = CONTENT_MENU_INDEX;
 
   //*---------------------------------------------------------------------------
   //* Set MUI theme.
@@ -680,7 +680,6 @@ const RentContent = ({
                 inputRentMarket={inputRentMarket}
                 inputMyRegisteredNFTArray={myRegisteredNFTArray}
                 inputMyUnregisteredNFTArray={myUnregisteredNFTArray}
-                inputBlockchainNetwork={blockchainNetwork}
               />
             )
           ) : selectedIndex === COLLECTION_MENU_INDEX ? (

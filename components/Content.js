@@ -57,7 +57,6 @@ import rentmarketABI from "@/contracts/rentMarket.json";
 
 export default function Content({
   inputRentMarket,
-  inputBlockchainNetwork,
   inputMyRegisteredNFTArray,
   inputMyUnregisteredNFTArray,
 }) {
@@ -140,11 +139,12 @@ export default function Content({
   const [rowsPerPage, setRowsPerPage] = React.useState([]);
 
   //*---------------------------------------------------------------------------
-  //* Wagmi hook functions.
+  //* Wagmi.
   //*---------------------------------------------------------------------------
   const RENT_MARKET_CONTRACT_ADDRES =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
   const [unregisterTokenAddress, setUnregisterTokenAddress] = React.useState();
+  const { chain, chains } = useNetwork();
 
   const {
     data: dataAllToken,
@@ -237,7 +237,6 @@ export default function Content({
   }, [
     inputRentMarket,
     inputRentMarket.rentMarketContract,
-    inputBlockchainNetwork,
     inputMyRegisteredNFTArray,
     inputMyUnregisteredNFTArray,
   ]);
@@ -594,24 +593,12 @@ export default function Content({
     );
   }
 
-  function showMyRegisteredNFTElementTable() {
-    // console.log("call showMyRegisteredNFTElementTable()");
+  function buildMyRegisteredNFTElementTable() {
+    // console.log("call buildMyRegisteredNFTElementTable()");
     // console.log(
     //   "myRegisteredUniqueNFTAddressArray: ",
     //   myRegisteredUniqueNFTAddressArray
     // );
-
-    let openseaMode;
-
-    if (getChainName({ chainId: inputBlockchainNetwork }) === "matic") {
-      openseaMode = "opensea_matic";
-    } else if (
-      getChainName({ chainId: inputBlockchainNetwork }) === "maticmum"
-    ) {
-      openseaMode = "opensea_maticmum";
-    } else {
-      openseaMode = "";
-    }
 
     if (myRegisteredUniqueNFTAddressArray === undefined) {
       return (
@@ -640,7 +627,7 @@ export default function Content({
                 {shortenAddress({
                   address: nftContractAddress,
                   number: 4,
-                  withLink: openseaMode,
+                  withLink: "opensea",
                 })}
               </Typography>
               <RegisterNftDataRowList nftContractAddress={nftContractAddress} />
@@ -830,7 +817,7 @@ export default function Content({
       <Divider sx={{ margin: "5px", marginTop: "20px" }}>
         <Chip label="My Registered NFT" />
       </Divider>
-      {showMyRegisteredNFTElementTable()}
+      {buildMyRegisteredNFTElementTable()}
 
       {/*//*-----------------------------------------------------------------*/}
       {/*//* Show my unregistered NFT with request register button.          */}
