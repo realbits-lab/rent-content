@@ -1,5 +1,14 @@
-import React from "react";
-import { useNetwork, useAccount } from "wagmi";
+import React, { useEffect } from "react";
+import axios from "axios";
+import { Alchemy, Network } from "alchemy-sdk";
+import {
+  useAccount,
+  useNetwork,
+  useContractRead,
+  useContractWrite,
+  useWaitForTransaction,
+  useWalletClient,
+} from "wagmi";
 import moment from "moment";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
@@ -34,22 +43,126 @@ import {
   shortenAddress,
   getUniqueKey,
 } from "@/components/RentContentUtil";
+import rentmarketABI from "@/contracts/rentMarket.json";
 
-const My = ({
-  inputCollectionArray,
-  inputMyRegisteredNFTArray,
-  inputMyRentNFTArray,
-}) => {
+export default function My() {
   //*---------------------------------------------------------------------------
-  //* Wagmi.
+  //* Wagmi
   //*---------------------------------------------------------------------------
-  const { connector: activeConnector, isConnected } = useAccount();
+  const RENT_MARKET_CONTRACT_ADDRES =
+    process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
+  const { address, connector: activeConnector, isConnected } = useAccount();
   const { chain, chains } = useNetwork();
 
+  //* getAllRentData function
+  const {
+    data: dataAllRentData,
+    isError: isErrorAllRentData,
+    isLoading: isLoadingAllRentData,
+    status: statusAllRentData,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI?.abi,
+    functionName: "getAllRentData",
+    watch: true,
+    async onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+
+  //* getAllRegisterData function
+  const {
+    data: dataAllRegisterData,
+    isError: isErrorAllRegisterData,
+    isLoading: isLoadingAllRegisterData,
+    status: statusAllRegisterData,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI?.abi,
+    functionName: "getAllRegisterData",
+    watch: true,
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+
+  //* getAllCollection function
+  const {
+    data: dataAllCollection,
+    isError: isErrorAllCollection,
+    isLoading: isLoadingAllCollection,
+    status: statusAllCollection,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI?.abi,
+    functionName: "getAllCollection",
+    watch: true,
+    async onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+
+      //* Get register data from smart contract.
+      let tempCollectionArray = [];
+      const promises = data.map(async (element) => {
+        // console.log("element: ", element);
+        let response;
+        try {
+          response = await axios.get(element.uri);
+        } catch (error) {
+          console.error(error);
+          throw error;
+        }
+        const metadata = response.data;
+        // console.log("collection metadata: ", metadata);
+
+        //* Add collection array with metadata.
+        tempCollectionArray.push({
+          key: element.collectionAddress,
+          collectionAddress: element.collectionAddress,
+          uri: element.uri,
+          metadata: metadata,
+        });
+      });
+      await Promise.all(promises);
+
+      setCollectionArray(tempCollectionArray);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+
   //*---------------------------------------------------------------------------
-  //* Theme.
+  //* Variable.
   //*---------------------------------------------------------------------------
   const theme = useTheme();
+  const ALCHEMY_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
 
   //*---------------------------------------------------------------------------
   //* Define copied local varialbe from input data.
@@ -90,7 +203,7 @@ const My = ({
   const [page, setPage] = React.useState([]);
   const [rowsPerPage, setRowsPerPage] = React.useState([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // console.log("call useEffect()");
     const countdown = setInterval(() => {
       const timestamp = Math.floor(Date.now() / 1000);
@@ -100,22 +213,78 @@ const My = ({
     return () => clearInterval(countdown);
   }, [currentTimestamp]);
 
-  React.useEffect(() => {
-    // console.log("call React.useEffect()");
-    // console.log("inputCollectionArray: ", inputCollectionArray);
+  async function initialize() {
+    let network;
+    // console.log("chain: ", chain);
+    switch (chain.network) {
+      case "matic":
+        network = Network.MATIC_MAINNET;
+        break;
+
+      case "maticmum":
+        network = Network.MATIC_MUMBAI;
+        break;
+    }
+    const config = {
+      apiKey: ALCHEMY_KEY,
+      network,
+    };
+    // console.log("config: ", config);
+    const alchemy = new Alchemy(config);
+
+    //* Get all NFTs.
+    // console.log("address: ", address);
+    const nfts = await alchemy.nft.getNftsForOwner(address);
+    // console.log("nfts: ", nfts);
+
+    let inputMyRegisteredNFTArray = [];
+    let inputMyRentNFTArray = [];
+
+    nfts["ownedNfts"].map((nft) => {
+      const foundRegisterData = dataAllRegisterData?.find(
+        (registerData) =>
+          registerData.nftAddress.toLowerCase() ===
+            nft?.contract?.address.toLowerCase() &&
+          Number(registerData.tokenId) === Number(nft?.tokenId)
+      );
+      if (foundRegisterData) {
+        //* Find my NFT in register data.
+        inputMyRegisteredNFTArray.push({
+          nftAddress: foundRegisterData.nftAddress,
+          tokenId: foundRegisterData.tokenId,
+          rentFee: foundRegisterData.rentFee,
+          feeTokenAddress: foundRegisterData.feeTokenAddress,
+          rentFeeByToken: foundRegisterData.rentFeeByToken,
+          rentDuration: foundRegisterData.rentDuration,
+          metadata: nft.rawMetadata,
+        });
+      }
+
+      const foundRentData = dataAllRentData?.find(
+        (rentData) =>
+          rentData.nftAddress.toLowerCase() ===
+            nft?.contract?.address.toLowerCase() &&
+          Number(rentData.tokenId) === Number(nft?.tokenId)
+      );
+      if (foundRentData) {
+        //* Find my NFT in register data.
+        inputMyRentNFTArray.push({
+          ...foundRentData,
+          metadata: nft.rawMetadata,
+        });
+      }
+    });
     // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
-    // console.log("inputMyRentNFTArray: ", inputMyRentNFTArray);
 
+    setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
     setMyRentNFTArray(inputMyRentNFTArray);
+  }
 
-    if (Array.isArray(inputCollectionArray) === true) {
-      // TODO: Handle the collection.metadata undefined case.
-      setCollectionArray(inputCollectionArray);
-    }
+  useEffect(() => {
+    initialize();
 
-    if (Array.isArray(inputMyRegisteredNFTArray) === true) {
-      setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
-    }
+    // console.log("call useEffect()");
+    // setMyRentNFTArray(inputMyRentNFTArray);
 
     // * Initialize page and rowsPerPage array.
     page.splice(0, page.length);
@@ -137,7 +306,7 @@ const My = ({
       mode: MyMenu.rent,
       rowsPerPage: 5,
     });
-  }, [inputCollectionArray, inputMyRegisteredNFTArray, inputMyRentNFTArray]);
+  }, []);
 
   function buildNftTableRowBody({ elementArray, type }) {
     // console.log("call buildNftTableRowBody()");
@@ -158,9 +327,9 @@ const My = ({
               tablePage * tableRowsPerPage + tableRowsPerPage
             )
             .map((element) => {
-              // console.log("element: ", element);
+              console.log("element: ", element);
               const rentStartTimestamp = element.rentStartTimestamp
-                ? element.rentStartTimestamp.toNumber()
+                ? Number(element.rentStartTimestamp)
                 : 0;
               // console.log("rentStartTimestamp: ", rentStartTimestamp);
 
@@ -172,7 +341,7 @@ const My = ({
 
               //* Get end rent time display string for rent case.
               const endRentTimestamp =
-                rentStartTimestamp + element.rentDuration.toNumber();
+                rentStartTimestamp + Number(element.rentDuration);
               // console.log("endRentTimestamp: ", endRentTimestamp);
               // console.log("currentTimestamp: ", currentTimestamp);
               let endRentTimestampDisplay;
@@ -223,10 +392,10 @@ const My = ({
                     {element.metadata ? element.metadata.name : "N/A"}
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                    {element.rentFee / Math.pow(10, 18)}
+                    {(element.rentFee / BigInt(10 ** 18)).toString()}
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                    {element.rentFeeByToken / Math.pow(10, 18)}
+                    {(element.rentFeeByToken / BigInt(10 ** 18)).toString()}
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
                     {type === MyMenu.own
@@ -410,8 +579,8 @@ const My = ({
   }
 
   function buildCollectionTableRow({ collection }) {
-    // console.log("call buildCollectionTableRow()");
-    // console.log("collection: ", collection);
+    console.log("call buildCollectionTableRow()");
+    console.log("collection: ", collection);
 
     return (
       <TableRow
@@ -495,46 +664,7 @@ const My = ({
   function buildNftTable() {
     // console.log("call buildNftTable()");
     // console.log("collectionArray: ", collectionArray);
-    // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
     // console.log("myRentNFTArray: ", myRentNFTArray);
-
-    if (
-      selectedItem === MyMenu.own &&
-      inputMyRegisteredNFTArray === undefined
-    ) {
-      // console.log("own loading...");
-      return (
-        <Box
-          sx={{
-            marginTop: "20px",
-            display: "flex",
-            height: "100vh",
-            flexDirection: "row",
-            justifyContent: "center",
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      );
-      if (Array.isArray(inputMyRentNFTArray) === true) {
-        setMyRentNFTArray(inputMyRentNFTArray);
-      }
-    } else if (selectedItem === MyMenu.rent && myRentNFTArray === undefined) {
-      // console.log("rent loading...");
-      return (
-        <Box
-          sx={{
-            marginTop: "20px",
-            display: "flex",
-            height: "100vh",
-            flexDirection: "row",
-            justifyContent: "center",
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      );
-    }
 
     return (
       <Box
@@ -543,32 +673,26 @@ const My = ({
         }}
       >
         <Table>
-          {collectionArray.map((element) => {
+          {collectionArray.map((collection) => {
             let elementArray = [];
             let type = MyMenu.own;
 
             if (selectedItem === MyMenu.own) {
-              elementArray = inputMyRegisteredNFTArray?.filter(
+              elementArray = myRegisteredNFTArray?.filter(
                 (nftElement) =>
-                  nftElement.nftAddress === element.collectionAddress
+                  nftElement.nftAddress === collection.collectionAddress
               );
               type = MyMenu.own;
             } else {
               elementArray = myRentNFTArray?.filter(
                 (nftElement) =>
-                  nftElement.nftAddress === element.collectionAddress
+                  nftElement.nftAddress === collection.collectionAddress
               );
               type = MyMenu.rent;
             }
-            // console.log(
-            //   "inputMyRegisteredNFTArray: ",
-            //   inputMyRegisteredNFTArray
-            // );
-            // console.log("myRentNFTArray: ", myRentNFTArray);
-            // console.log("elementArray: ", elementArray);
 
             return buildMyTable({
-              collection: element,
+              collection: collection,
               elementArray: elementArray,
               type: type,
             });
@@ -653,6 +777,4 @@ const My = ({
       </Grid>
     </div>
   );
-};
-
-export default My;
+}

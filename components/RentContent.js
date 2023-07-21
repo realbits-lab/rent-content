@@ -139,7 +139,7 @@ const RentContent = ({
   const MONITOR_REWARD_MENU_INDEX = 10;
   const MONITOR_SETTING_MENU_INDEX = 11;
 
-  const DEFAULT_MENU_INDEX = CONTENT_MENU_INDEX;
+  const DEFAULT_MENU_INDEX = MY_MENU_INDEX;
 
   //*---------------------------------------------------------------------------
   //* Set MUI theme.
@@ -662,13 +662,7 @@ const RentContent = ({
               />
             )
           ) : selectedIndex === MY_MENU_INDEX ? (
-            inputRentMarket && (
-              <My
-                inputCollectionArray={collectionArray}
-                inputMyRegisteredNFTArray={myRegisteredNFTArray}
-                inputMyRentNFTArray={myRentNFTArray}
-              />
-            )
+            inputRentMarket && <My />
           ) : selectedIndex === CONTENT_MENU_INDEX ? (
             inputRentMarket && <Content />
           ) : selectedIndex === COLLECTION_MENU_INDEX ? (
