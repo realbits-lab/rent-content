@@ -1,10 +1,8 @@
-import React from "react";
-import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
+import React, { useEffect } from "react";
 import { useAccount, useNetwork } from "wagmi";
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
@@ -28,6 +26,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CollectionsIcon from "@mui/icons-material/Collections";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
+import LoginWrapper from "@/components/LoginWrapper";
 import My from "@/components/My";
 import Market from "@/components/Market";
 import RentMarket from "@/components/RentMarket";
@@ -220,8 +219,7 @@ const RentContent = ({
           snackbarOpen: true,
         };
 
-  //* Initialize data.
-  React.useEffect(() => {
+  useEffect(() => {
     // console.log("call useEffect()");
     // console.log("rentMarketAddress: ", rentMarketAddress);
     // console.log("testNftAddress: ", testNftAddress);
@@ -380,6 +378,7 @@ const RentContent = ({
               ? "Monitor - Config"
               : "Rent Market"}
           </Typography>
+
           <div color={"ffffff"}>
             {shortenAddress({
               address: process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS,
@@ -418,7 +417,7 @@ const RentContent = ({
         <Divider />
         <List>
           {/*//*------------------------------------------------------------*/}
-          {/*//* Market menu                                                */}
+          {/*//* User menu list.                                            */}
           {/*//*------------------------------------------------------------*/}
 
           <Divider sx={{ margin: "5px" }}>
@@ -470,7 +469,7 @@ const RentContent = ({
           }
 
           {/*//*-------------------------------------------------------------*/}
-          {/*//* Market menu                                                 */}
+          {/*//* Market menu list.                                           */}
           {/*//*-------------------------------------------------------------*/}
 
           <Divider sx={{ margin: "5px" }}>
@@ -524,7 +523,7 @@ const RentContent = ({
           }
 
           {/*//*-------------------------------------------------------------*/}
-          {/*//* Monitor menu                                                */}
+          {/*//* Monitor menu list.                                          */}
           {/*//*-------------------------------------------------------------*/}
 
           <Divider sx={{ margin: "5px" }}>
@@ -629,96 +628,92 @@ const RentContent = ({
       </Drawer>
 
       {/*//*-----------------------------------------------------------------*/}
-      {/*//* Right content page                                              */}
+      {/*//* Content page.                                                   */}
       {/*//*-----------------------------------------------------------------*/}
+
       <Main open={openDrawer}>
         <DrawerHeader />
-        <Grid container justifyContent="end" spacing={2}>
-          <Grid item>
-            <Web3Button />
-          </Grid>
-          <Grid item>
-            <Web3NetworkSwitch />
-          </Grid>
-        </Grid>
-        {selectedIndex === MARKET_MENU_INDEX ? (
-          inputRentMarket && (
-            <Market
-              inputRentMarketClass={inputRentMarket}
-              inputCollectionArray={collectionArray}
-              inputServiceAddress={serviceAddress}
-              inputRegisterNFTArray={registerNFTArray}
-              inputBlockchainNetwork={blockchainNetwork}
-              setWriteToastMessage={setWriteToastMessage}
-            />
-          )
-        ) : selectedIndex === MY_MENU_INDEX ? (
-          inputRentMarket && (
-            <My
-              // selectAvatarFunc={undefined}
-              inputRentMarket={inputRentMarket}
-              inputCollectionArray={collectionArray}
-              inputServiceAddress={serviceAddress}
-              inputMyRegisteredNFTArray={myRegisteredNFTArray}
-              inputMyRentNFTArray={myRentNFTArray}
-              inputBlockchainNetwork={blockchainNetwork}
-              setWriteToastMessage={setWriteToastMessage}
-              web3modalSelectedChain={chain}
-              wagmiIsConnected={address}
-            />
-          )
-        ) : selectedIndex === CONTENT_MENU_INDEX ? (
-          inputRentMarket && (
-            <Content
-              inputRentMarket={inputRentMarket}
-              inputMyRegisteredNFTArray={myRegisteredNFTArray}
-              inputMyUnregisteredNFTArray={myUnregisteredNFTArray}
-              inputBlockchainNetwork={blockchainNetwork}
-            />
-          )
-        ) : selectedIndex === COLLECTION_MENU_INDEX ? (
-          inputRentMarket && <Collection />
-        ) : selectedIndex === SERVICE_MENU_INDEX ? (
-          inputRentMarket && <Service />
-        ) : selectedIndex === TOKEN_MENU_INDEX ? (
-          inputRentMarket && <Token />
-        ) : selectedIndex === MONITOR_TOKEN_MENU_INDEX ? (
-          inputRentMarket && <MonitorToken />
-        ) : selectedIndex === MONITOR_ACCOUNT_BALANCE_MENU_INDEX ? (
-          inputRentMarket && (
-            <MonitorAccountBalance
-              inputRentMarket={inputRentMarket}
-              rentMarketAddress={rentMarketAddress}
-              inputBlockchainNetwork={blockchainNetwork}
-            />
-          )
-        ) : selectedIndex === MONITOR_PENDING_RENT_FEE_MENU_INDEX ? (
-          inputRentMarket && (
-            <MonitorPendingRentFee
-              inputRentMarket={inputRentMarket}
-              rentMarketAddress={rentMarketAddress}
-              inputBlockchainNetwork={blockchainNetwork}
-            />
-          )
-        ) : selectedIndex === MONITOR_RENT_NFT_MENU_INDEX ? (
-          inputRentMarket && (
-            <MonitorRentNft
-              inputRentMarket={inputRentMarket}
-              rentMarketAddress={rentMarketAddress}
-              inputBlockchainNetwork={blockchainNetwork}
-            />
-          )
-        ) : selectedIndex === MONITOR_REWARD_MENU_INDEX ? (
-          <MonitorReward />
-        ) : selectedIndex === MONITOR_CONFIG_MENU_INDEX ? (
-          <MonitorConfig />
-        ) : (
-          <></>
-        )}
+
+        <LoginWrapper>
+          {selectedIndex === MARKET_MENU_INDEX ? (
+            inputRentMarket && (
+              <Market
+                inputRentMarketClass={inputRentMarket}
+                inputCollectionArray={collectionArray}
+                inputServiceAddress={serviceAddress}
+                inputRegisterNFTArray={registerNFTArray}
+                inputBlockchainNetwork={blockchainNetwork}
+                setWriteToastMessage={setWriteToastMessage}
+              />
+            )
+          ) : selectedIndex === MY_MENU_INDEX ? (
+            inputRentMarket && (
+              <My
+                // selectAvatarFunc={undefined}
+                inputRentMarket={inputRentMarket}
+                inputCollectionArray={collectionArray}
+                inputServiceAddress={serviceAddress}
+                inputMyRegisteredNFTArray={myRegisteredNFTArray}
+                inputMyRentNFTArray={myRentNFTArray}
+                inputBlockchainNetwork={blockchainNetwork}
+                setWriteToastMessage={setWriteToastMessage}
+                web3modalSelectedChain={chain}
+                wagmiIsConnected={address}
+              />
+            )
+          ) : selectedIndex === CONTENT_MENU_INDEX ? (
+            inputRentMarket && (
+              <Content
+                inputRentMarket={inputRentMarket}
+                inputMyRegisteredNFTArray={myRegisteredNFTArray}
+                inputMyUnregisteredNFTArray={myUnregisteredNFTArray}
+                inputBlockchainNetwork={blockchainNetwork}
+              />
+            )
+          ) : selectedIndex === COLLECTION_MENU_INDEX ? (
+            inputRentMarket && <Collection />
+          ) : selectedIndex === SERVICE_MENU_INDEX ? (
+            inputRentMarket && <Service />
+          ) : selectedIndex === TOKEN_MENU_INDEX ? (
+            inputRentMarket && <Token />
+          ) : selectedIndex === MONITOR_TOKEN_MENU_INDEX ? (
+            inputRentMarket && <MonitorToken />
+          ) : selectedIndex === MONITOR_ACCOUNT_BALANCE_MENU_INDEX ? (
+            inputRentMarket && (
+              <MonitorAccountBalance
+                inputRentMarket={inputRentMarket}
+                rentMarketAddress={rentMarketAddress}
+                inputBlockchainNetwork={blockchainNetwork}
+              />
+            )
+          ) : selectedIndex === MONITOR_PENDING_RENT_FEE_MENU_INDEX ? (
+            inputRentMarket && (
+              <MonitorPendingRentFee
+                inputRentMarket={inputRentMarket}
+                rentMarketAddress={rentMarketAddress}
+                inputBlockchainNetwork={blockchainNetwork}
+              />
+            )
+          ) : selectedIndex === MONITOR_RENT_NFT_MENU_INDEX ? (
+            inputRentMarket && (
+              <MonitorRentNft
+                inputRentMarket={inputRentMarket}
+                rentMarketAddress={rentMarketAddress}
+                inputBlockchainNetwork={blockchainNetwork}
+              />
+            )
+          ) : selectedIndex === MONITOR_REWARD_MENU_INDEX ? (
+            <MonitorReward />
+          ) : selectedIndex === MONITOR_CONFIG_MENU_INDEX ? (
+            <MonitorConfig />
+          ) : (
+            <></>
+          )}
+        </LoginWrapper>
       </Main>
 
       {/*//*-----------------------------------------------------------------*/}
-      {/*//* Toast message                                                   */}
+      {/*//* Toast message.                                                  */}
       {/*//*-----------------------------------------------------------------*/}
       <RBSnackbar
         open={readToastMessage.snackbarOpen}
