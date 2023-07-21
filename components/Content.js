@@ -1,4 +1,5 @@
 import React from "react";
+import { parseEther } from "viem";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import {
   useAccount,
@@ -56,19 +57,182 @@ import {
 import rentmarketABI from "@/contracts/rentMarket.json";
 
 export default function Content({
-  inputRentMarket,
   inputMyRegisteredNFTArray,
   inputMyUnregisteredNFTArray,
 }) {
   //*---------------------------------------------------------------------------
-  //* Hook variables.
+  //* Wagmi
   //*---------------------------------------------------------------------------
+  const RENT_MARKET_CONTRACT_ADDRES =
+    process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
+  const [unregisterTokenAddress, setUnregisterTokenAddress] = React.useState();
   const { address, isConnected } = useAccount();
+  const { chain, chains } = useNetwork();
+
+  //* unregisterNFT function
+  const {
+    data: dataUnregisterNFT,
+    isError: isErrorUnregisterNFT,
+    isLoading: isLoadingUnregisterNFT,
+    write: writeUnregisterNFT,
+  } = useContractWrite({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI?.abi,
+    functionName: "unregisterNFT",
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+  const {
+    data: dataUnregisterNFTTx,
+    isError: isErrorUnregisterNFTTx,
+    isLoading: isLoadingUnregisterNFTTx,
+  } = useWaitForTransaction({
+    hash: dataUnregisterNFT?.hash,
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+
+  //* registerNFT function
+  const {
+    data: dataRegisterNFT,
+    isError: isErrorRegisterNFT,
+    isLoading: isLoadingRegisterNFT,
+    write: writeRegisterNFT,
+  } = useContractWrite({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI?.abi,
+    functionName: "registerNFT",
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+  const {
+    data: dataRegisterNFTTx,
+    isError: isErrorRegisterNFTTx,
+    isLoading: isLoadingRegisterNFTTx,
+  } = useWaitForTransaction({
+    hash: dataRegisterNFT?.hash,
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+
+  //* changeNFT function
+  const {
+    data: dataChangeNFT,
+    isError: isErrorChangeNFT,
+    isLoading: isLoadingChangeNFT,
+    write: writeChangeNFT,
+  } = useContractWrite({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI?.abi,
+    functionName: "changeNFT",
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+  const {
+    data: dataChangeNFTTx,
+    isError: isErrorChangeNFTTx,
+    isLoading: isLoadingChangeNFTTx,
+  } = useWaitForTransaction({
+    hash: dataChangeNFT?.hash,
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+
+  const {
+    data: dataAllToken,
+    isError: isErrorAllToken,
+    isLoading: isLoadingAllToken,
+    status: statusAllToken,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "getAllToken",
+    watch: true,
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+  // console.log("dataAllToken: ", dataAllToken);
 
   //*---------------------------------------------------------------------------
   //* Define input copied variables.
   //*---------------------------------------------------------------------------
-  const rentMarketRef = React.useRef();
   const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState();
   const [myUnregisteredNFTArray, setMyUnregisteredNFTArray] = React.useState();
 
@@ -138,46 +302,11 @@ export default function Content({
   const [page, setPage] = React.useState([]);
   const [rowsPerPage, setRowsPerPage] = React.useState([]);
 
-  //*---------------------------------------------------------------------------
-  //* Wagmi.
-  //*---------------------------------------------------------------------------
-  const RENT_MARKET_CONTRACT_ADDRES =
-    process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
-  const [unregisterTokenAddress, setUnregisterTokenAddress] = React.useState();
-  const { chain, chains } = useNetwork();
-
-  const {
-    data: dataAllToken,
-    isError: isErrorAllToken,
-    isLoading: isLoadingAllToken,
-    status: statusAllToken,
-  } = useContractRead({
-    address: RENT_MARKET_CONTRACT_ADDRES,
-    abi: rentmarketABI.abi,
-    functionName: "getAllToken",
-    watch: true,
-    onSuccess(data) {
-      // console.log("call onSuccess()");
-      // console.log("data: ", data);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
-    },
-  });
-  // console.log("dataAllToken: ", dataAllToken);
-
   React.useEffect(() => {
     // console.log("call React.useEffect()");
     // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
     // console.log("inputMyUnregisteredNFTArray: ", inputMyUnregisteredNFTArray);
 
-    rentMarketRef.current = inputRentMarket;
     setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
     setMyUnregisteredNFTArray(inputMyUnregisteredNFTArray);
 
@@ -234,12 +363,7 @@ export default function Content({
         });
       }
     }
-  }, [
-    inputRentMarket,
-    inputRentMarket.rentMarketContract,
-    inputMyRegisteredNFTArray,
-    inputMyUnregisteredNFTArray,
-  ]);
+  }, [inputMyRegisteredNFTArray, inputMyUnregisteredNFTArray]);
 
   function TablePaginationActions(props) {
     const theme = useTheme();
@@ -430,6 +554,7 @@ export default function Content({
       buttonColor = "red";
     }
 
+    //* TODO: Handle isLoadingRegisterNFTTx status.
     return (
       <TableRow key={getUniqueKey()}>
         <TableCell component="th" scope="row" align="center" padding="normal">
@@ -496,9 +621,8 @@ export default function Content({
               }
 
               try {
-                await rentMarketRef.current.unregisterNFT({
-                  provider: provider,
-                  element: element,
+                writeUnregisterNFT?.({
+                  args: [element.nftAddress, element.tokenId],
                 });
               } catch (error) {
                 console.error(error);
@@ -661,6 +785,7 @@ export default function Content({
     );
   }
 
+  //* TODO: Handle isLoadingUnregisterNFTTx status.
   function buildUnregisterRowList({ element }) {
     return (
       // <TableRow key={`TableRow-NFT-${element.nftAddress}-${element.tokenId}`}>
@@ -683,7 +808,9 @@ export default function Content({
             size="small"
             onClick={async () => {
               try {
-                await rentMarketRef.current.registerNFT(element);
+                writeRegisterNFT?.({
+                  args: [element.nftAddress, element.tokenId],
+                });
               } catch (error) {
                 console.error(error);
                 setWriteToastMessage({
@@ -950,14 +1077,15 @@ export default function Content({
                   // console.log("provider: ", provider);
                 }
 
-                //* rent fee and rent fee by token should be an ether unit expression.
-                await rentMarketRef.current.changeNFT({
-                  provider: provider,
-                  element: changeElement,
-                  rentFee: inputRentFee.toString(),
-                  feeTokenAddress: inputFeeTokenAddress,
-                  rentFeeByToken: inputRentFeeByToken.toString(),
-                  rentDuration: inputRentDuration,
+                writeChangeNFT?.({
+                  args: [
+                    changeElement.nftAddress,
+                    changeElement.tokenId,
+                    parseEther(inputRentFee.toString()),
+                    inputFeeTokenAddress,
+                    parseEther(inputRentFeeByToken.toString()),
+                    inputRentDuration,
+                  ],
                 });
               } catch (error) {
                 console.error(error);
