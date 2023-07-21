@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import dynamic from "next/dynamic";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount, useNetwork, useDisconnect } from "wagmi";
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
@@ -115,13 +116,12 @@ const RentContent = ({
   blockchainNetwork,
   serviceAddress,
 }) => {
+  //*---------------------------------------------------------------------------
+  //* Wagmi
+  //*---------------------------------------------------------------------------
+  const { disconnect } = useDisconnect();
   const { chain, chains } = useNetwork();
   const { address, isConnected } = useAccount();
-  // console.log("address: ", address);
-  // console.log("isConnected: ", isConnected);
-
-  // const { data: ensName } = useEnsName({ address });
-  // console.log("ensName: ", ensName);
 
   //*---------------------------------------------------------------------------
   //* Define each menu index.
@@ -382,13 +382,25 @@ const RentContent = ({
               : "Rent Market"}
           </Typography>
 
-          <div color={"ffffff"}>
-            {shortenAddress({
-              address: process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS,
-              number: 5,
-              withLink: "scan",
-            })}
-          </div>
+          {isConnected === true ? (
+            <div>
+              <Typography
+                variant="h6"
+                noWrap
+                component="div"
+                sx={{ flexGrow: 1 }}
+              >
+                <Button
+                  onClick={() => {
+                    disconnect();
+                  }}
+                  sx={{ color: "white" }}
+                >
+                  DISCONNECT
+                </Button>
+              </Typography>
+            </div>
+          ) : null}
         </Toolbar>
       </AppBar>
 

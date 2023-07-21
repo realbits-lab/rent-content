@@ -1,4 +1,5 @@
 import React from "react";
+import dynamic from "next/dynamic";
 import {
   EthereumClient,
   w3mConnectors,
@@ -11,7 +12,9 @@ import { publicProvider } from "wagmi/providers/public";
 import { polygon, polygonMumbai, localhost } from "wagmi/chains";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
-import RentContent from "@/components/RentContent";
+const RentContent = dynamic(() => import("../components/RentContent"), {
+  ssr: false,
+});
 import { getChainName } from "@/components/RentContentUtil";
 
 function App() {

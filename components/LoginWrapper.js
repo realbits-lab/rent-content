@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useAccount, useConnect } from "wagmi";
+import { useState, useEffect } from "react";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import List from "@mui/material/List";
@@ -13,6 +13,7 @@ export default function LoginWrapper({ children }) {
   //* Wagmi
   //*---------------------------------------------------------------------------
   const { connector: activeConnector, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
   const {
     connect,
     connectors,
@@ -21,6 +22,32 @@ export default function LoginWrapper({ children }) {
     pendingConnector,
   } = useConnect();
   const [openConnectorsDialog, setOpenConnectorsDialog] = useState(false);
+
+  //* Listen account change.
+  // useEffect(() => {
+  //   console.log("call useEffect()");
+  //   // console.log("activeConnector: ", activeConnector);
+
+  //   async function handleConnectorUpdate({ account, chain }) {
+  //     console.log("call handleConnectorUpdate()");
+  //     // console.log("account: ", account);
+  //     // console.log("chain: ", chain);
+
+  //     if (isConnected === true) {
+  //       disconnect();
+  //     }
+  //   }
+
+  //   if (activeConnector) {
+  //     activeConnector.on("change", handleConnectorUpdate);
+  //   }
+
+  //   return () => {
+  //     console.log("call activeConnector?.off()");
+
+  //     activeConnector?.off("change", handleConnectorUpdate);
+  //   };
+  // }, []);
 
   if (isConnected === true) {
     return <>{children}</>;
