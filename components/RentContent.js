@@ -664,23 +664,13 @@ const RentContent = ({
           ) : selectedIndex === MY_MENU_INDEX ? (
             inputRentMarket && (
               <My
-                // selectAvatarFunc={undefined}
-                inputRentMarket={inputRentMarket}
                 inputCollectionArray={collectionArray}
-                inputServiceAddress={serviceAddress}
                 inputMyRegisteredNFTArray={myRegisteredNFTArray}
                 inputMyRentNFTArray={myRentNFTArray}
-                inputBlockchainNetwork={blockchainNetwork}
-                setWriteToastMessage={setWriteToastMessage}
               />
             )
           ) : selectedIndex === CONTENT_MENU_INDEX ? (
-            inputRentMarket && (
-              <Content
-                inputMyRegisteredNFTArray={myRegisteredNFTArray}
-                inputMyUnregisteredNFTArray={myUnregisteredNFTArray}
-              />
-            )
+            inputRentMarket && <Content />
           ) : selectedIndex === COLLECTION_MENU_INDEX ? (
             inputRentMarket && <Collection />
           ) : selectedIndex === SERVICE_MENU_INDEX ? (

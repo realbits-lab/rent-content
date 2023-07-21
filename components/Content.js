@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { Alchemy, Network } from "alchemy-sdk";
 import { parseEther } from "viem";
-import WalletConnectProvider from "@walletconnect/web3-provider";
 import {
   useAccount,
   useNetwork,
@@ -9,7 +9,6 @@ import {
   useWaitForTransaction,
   useWalletClient,
 } from "wagmi";
-import { isMobile } from "react-device-detect";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -56,15 +55,13 @@ import {
 } from "@/components/RentContentUtil";
 import rentmarketABI from "@/contracts/rentMarket.json";
 
-export default function Content({
-  inputMyRegisteredNFTArray,
-  inputMyUnregisteredNFTArray,
-}) {
+export default function Content() {
   //*---------------------------------------------------------------------------
   //* Wagmi
   //*---------------------------------------------------------------------------
   const RENT_MARKET_CONTRACT_ADDRES =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
+  const ALCHEMY_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
   const [unregisterTokenAddress, setUnregisterTokenAddress] = React.useState();
   const { address, isConnected } = useAccount();
   const { chain, chains } = useNetwork();
@@ -204,6 +201,33 @@ export default function Content({
     },
   });
 
+  //* getAllRegister function
+  const {
+    data: dataAllRegisterData,
+    isError: isErrorAllRegisterData,
+    isLoading: isLoadingAllRegisterData,
+    status: statusAllRegisterData,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI?.abi,
+    functionName: "getAllRegisterData",
+    watch: true,
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+
+  //* getAllToken function
   const {
     data: dataAllToken,
     isError: isErrorAllToken,
@@ -211,7 +235,7 @@ export default function Content({
     status: statusAllToken,
   } = useContractRead({
     address: RENT_MARKET_CONTRACT_ADDRES,
-    abi: rentmarketABI.abi,
+    abi: rentmarketABI?.abi,
     functionName: "getAllToken",
     watch: true,
     onSuccess(data) {
@@ -302,8 +326,61 @@ export default function Content({
   const [page, setPage] = React.useState([]);
   const [rowsPerPage, setRowsPerPage] = React.useState([]);
 
-  React.useEffect(() => {
-    // console.log("call React.useEffect()");
+  async function initialize() {
+    let network;
+    // console.log("chain: ", chain);
+    switch (chain.network) {
+      case "matic":
+        network = Network.MATIC_MAINNET;
+        break;
+
+      case "maticmum":
+        network = Network.MATIC_MUMBAI;
+        break;
+    }
+    const config = {
+      apiKey: ALCHEMY_KEY,
+      network,
+    };
+    // console.log("config: ", config);
+    const alchemy = new Alchemy(config);
+
+    //* Get all NFTs.
+    // console.log("address: ", address);
+    const nfts = await alchemy.nft.getNftsForOwner(address);
+    // console.log("nfts: ", nfts);
+
+    let inputMyRegisteredNFTArray = [];
+    let inputMyUnregisteredNFTArray = [];
+
+    nfts["ownedNfts"].map((nft) => {
+      const foundRegisterData = dataAllRegisterData?.find(
+        (registerData) =>
+          registerData.nftAddress.toLowerCase() ===
+            nft?.contract?.address.toLowerCase() &&
+          Number(nft?.tokenId) === Number(registerData.tokenId)
+      );
+      if (foundRegisterData) {
+        //* Find my NFT in register data.
+        inputMyRegisteredNFTArray.push({
+          nftAddress: foundRegisterData.nftAddress,
+          tokenId: foundRegisterData.tokenId,
+          rentFee: foundRegisterData.rentFee,
+          feeTokenAddress: foundRegisterData.feeTokenAddress,
+          rentFeeByToken: foundRegisterData.rentFeeByToken,
+          rentDuration: foundRegisterData.rentDuration,
+          metadata: nft.rawMetadata,
+        });
+      } else {
+        // console.log("nft: ", nft);
+        //* Not find my NFT in register data.
+        inputMyUnregisteredNFTArray.push({
+          nftAddress: nft.contract.address,
+          tokenId: nft.tokenId,
+          metadata: nft.rawMetadata,
+        });
+      }
+    });
     // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
     // console.log("inputMyUnregisteredNFTArray: ", inputMyUnregisteredNFTArray);
 
@@ -363,7 +440,72 @@ export default function Content({
         });
       }
     }
-  }, [inputMyRegisteredNFTArray, inputMyUnregisteredNFTArray]);
+  }
+
+  useEffect(() => {
+    // console.log("call React.useEffect()");
+    // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
+    // console.log("inputMyUnregisteredNFTArray: ", inputMyUnregisteredNFTArray);
+
+    initialize();
+
+    // setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
+    // setMyUnregisteredNFTArray(inputMyUnregisteredNFTArray);
+
+    // // Set unique data.
+    // let uniqueRegisterNFTAddressSet;
+    // if (inputMyRegisteredNFTArray) {
+    //   uniqueRegisterNFTAddressSet = new Set(
+    //     inputMyRegisteredNFTArray.map((element) => element.nftAddress)
+    //   );
+    //   setMyRegisteredUniqueNFTAddressArray([...uniqueRegisterNFTAddressSet]);
+    // }
+
+    // let uniqueUnregisterNFTAddressSet;
+    // if (inputMyUnregisteredNFTArray) {
+    //   uniqueUnregisterNFTAddressSet = new Set(
+    //     inputMyUnregisteredNFTArray.map((element) => element.nftAddress)
+    //   );
+    //   setMyUnregisteredUniqueNFTAddressArray([
+    //     ...uniqueUnregisterNFTAddressSet,
+    //   ]);
+    // }
+
+    // // * Initialize page and rowsPerPage array.
+    // page.splice(0, page.length);
+    // rowsPerPage.splice(0, rowsPerPage.length);
+
+    // // * Add each register and unregister page and rowsPerPage per nft contract address.
+    // if (uniqueRegisterNFTAddressSet) {
+    //   for (const nftAddress of uniqueRegisterNFTAddressSet) {
+    //     page.push({
+    //       address: nftAddress,
+    //       mode: "register",
+    //       page: 0,
+    //     });
+    //     rowsPerPage.push({
+    //       address: nftAddress,
+    //       mode: "register",
+    //       rowsPerPage: 5,
+    //     });
+    //   }
+    // }
+
+    // if (uniqueUnregisterNFTAddressSet) {
+    //   for (const nftAddress of uniqueUnregisterNFTAddressSet) {
+    //     page.push({
+    //       address: nftAddress,
+    //       mode: "unregister",
+    //       page: 0,
+    //     });
+    //     rowsPerPage.push({
+    //       address: nftAddress,
+    //       mode: "unregister",
+    //       rowsPerPage: 5,
+    //     });
+    //   }
+    // }
+  }, []);
 
   function TablePaginationActions(props) {
     const theme = useTheme();
@@ -534,15 +676,16 @@ export default function Content({
   //*---------------------------------------------------------------------------
   //* Draw each register data row list in table.
   //*---------------------------------------------------------------------------
-  function buildRegisterRowList({ element }) {
-    // console.log("element: ", element);
+  function buildRegisterNFTRow({ nft }) {
+    // console.log("call buildRegisterRowList()");
+    // console.log("nft: ", nft);
+
     const found = dataAllToken?.find((token) => {
       // console.log("token: ", token);
       return (
         token.tokenAddress.toLowerCase() ===
-          element.feeTokenAddress.toLowerCase() ||
-        element.feeTokenAddress.toLowerCase() ===
-          ZERO_ADDRESS_STRING.toLowerCase()
+          nft.feeTokenAddress.toLowerCase() ||
+        nft.feeTokenAddress.toLowerCase() === ZERO_ADDRESS_STRING.toLowerCase()
       );
     });
     // console.log("found: ", found);
@@ -560,38 +703,33 @@ export default function Content({
         <TableCell component="th" scope="row" align="center" padding="normal">
           <Avatar
             alt="image"
-            src={
-              element.metadata
-                ? changeIPFSToGateway(element.metadata.image)
-                : ""
-            }
+            src={nft.metadata ? changeIPFSToGateway(nft.metadata.image) : ""}
             sx={{ width: RBSize.middle, height: RBSize.middle }}
           />
         </TableCell>
         <TableCell align="center" padding="none">
-          {element.metadata ? element.metadata.name : "N/A"}
+          {nft.metadata ? nft.metadata.name : "N/A"}
         </TableCell>
-        <TableCell align="center">{element.tokenId.toNumber()}</TableCell>
+        <TableCell align="center">{nft.tokenId.toString()}</TableCell>
         <TableCell align="center">
-          {element.rentFee / Math.pow(10, 18)}
+          {(nft.rentFee / BigInt(10 ** 18)).toString()}
         </TableCell>
         <TableCell align="center">
-          {element.rentFeeByToken / Math.pow(10, 18)}
+          {(nft.rentFeeByToken / BigInt(10 ** 18)).toString()}
         </TableCell>
-        <TableCell align="center">{element.rentDuration.toNumber()}</TableCell>
+        <TableCell align="center">{nft.rentDuration.toString()}</TableCell>
         <TableCell align="center">
           <Button
             size="small"
             onClick={() => {
-              setChangeElement(element);
+              setChangeElement(nft);
               setFormValue((prevState) => {
                 return {
                   ...prevState,
-                  inputRentFee: element.rentFee / Math.pow(10, 18),
-                  inputFeeTokenAddress: element.feeTokenAddress,
-                  inputRentFeeByToken:
-                    element.rentFeeByToken / Math.pow(10, 18),
-                  inputRentDuration: element.rentDuration,
+                  inputRentFee: nft.rentFee / Math.pow(10, 18),
+                  inputFeeTokenAddress: nft.feeTokenAddress,
+                  inputRentFeeByToken: nft.rentFeeByToken / Math.pow(10, 18),
+                  inputRentDuration: nft.rentDuration,
                 };
               });
               setOpenInput(true);
@@ -604,25 +742,9 @@ export default function Content({
           <Button
             size="small"
             onClick={async () => {
-              //* Create WalletConnect Provider.
-              let provider;
-              if (isMobile === true) {
-                provider = new WalletConnectProvider({
-                  rpc: {
-                    137: "https://rpc-mainnet.maticvigil.com",
-                    80001: "https://rpc-mumbai.maticvigil.com/",
-                  },
-                  infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
-                });
-
-                //* Enable session (triggers QR Code modal).
-                await provider.enable();
-                // console.log("provider: ", provider);
-              }
-
               try {
                 writeUnregisterNFT?.({
-                  args: [element.nftAddress, element.tokenId],
+                  args: [nft.nftAddress, nft.tokenId],
                 });
               } catch (error) {
                 console.error(error);
@@ -696,13 +818,13 @@ export default function Content({
         <TableBody>
           {myRegisteredNFTArray &&
             myRegisteredNFTArray
-              .filter((element) => element.nftAddress === nftContractAddress)
+              .filter((nft) => nft.nftAddress === nftContractAddress)
               .slice(
                 tablePage * tableRowsPerPage,
                 tablePage * tableRowsPerPage + tableRowsPerPage
               )
-              .map((element) => {
-                return buildRegisterRowList({ element });
+              .map((nft) => {
+                return buildRegisterNFTRow({ nft });
               })}
         </TableBody>
         <TableFooter>
@@ -788,7 +910,6 @@ export default function Content({
   //* TODO: Handle isLoadingUnregisterNFTTx status.
   function buildUnregisterRowList({ element }) {
     return (
-      // <TableRow key={`TableRow-NFT-${element.nftAddress}-${element.tokenId}`}>
       <TableRow key={getUniqueKey()}>
         <TableCell component="th" scope="row">
           <Avatar
@@ -887,8 +1008,8 @@ export default function Content({
     );
   }
 
-  function showMyUnregisteredNFTElementTable() {
-    // console.log("call showMyUnregisteredNFTElementTable()");
+  function buildMyUnregisteredNFTElementTable() {
+    // console.log("call buildMyUnregisteredNFTElementTable()");
     // https://mui.com/material-ui/react-table/
     // https://medium.com/@freshmilkdev/reactjs-render-optimization-for-collapsible-material-ui-long-list-with-checkboxes-231b36892e20
 
@@ -911,9 +1032,9 @@ export default function Content({
 
     return (
       <List>
-        {myUnregisteredUniqueNFTAddressArray.map((nftContractAddress) => {
+        {myUnregisteredUniqueNFTAddressArray.map((nftContractAddress, idx) => {
           return (
-            <ListItem key={getUniqueKey()}>
+            <ListItem key={idx}>
               <TableContainer component={Paper}>
                 <Table aria-label="collapsible table">
                   <UnregisterNftDataRow
@@ -952,7 +1073,7 @@ export default function Content({
       <Divider sx={{ margin: "5px", marginTop: "20px" }}>
         <Chip label="My Unregistered NFT" />
       </Divider>
-      {showMyUnregisteredNFTElementTable()}
+      {buildMyUnregisteredNFTElementTable()}
 
       {/*//*-----------------------------------------------------------------*/}
       {/*//* Show input dialog.                                              */}
@@ -1043,40 +1164,6 @@ export default function Content({
           <Button
             onClick={async () => {
               try {
-                // console.log("typeof inputRentFee: ", typeof inputRentFee);
-                // console.log(
-                //   "typeof inputFeeTokenAddress: ",
-                //   typeof inputFeeTokenAddress
-                // );
-                // console.log(
-                //   "typeof inputRentFeeByToken: ",
-                //   typeof inputRentFeeByToken
-                // );
-                // console.log(
-                //   "typeof inputRentDuration: ",
-                //   typeof inputRentDuration
-                // );
-                // console.log("inputRentFee: ", inputRentFee);
-                // console.log("inputFeeTokenAddress: ", inputFeeTokenAddress);
-                // console.log("inputRentFeeByToken: ", inputRentFeeByToken);
-                // console.log("inputRentDuration: ", inputRentDuration);
-
-                //* Create WalletConnect Provider.
-                let provider;
-                if (isMobile === true) {
-                  provider = new WalletConnectProvider({
-                    rpc: {
-                      137: "https://rpc-mainnet.maticvigil.com",
-                      80001: "https://rpc-mumbai.maticvigil.com/",
-                    },
-                    infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
-                  });
-
-                  //* Enable session (triggers QR Code modal).
-                  await provider.enable();
-                  // console.log("provider: ", provider);
-                }
-
                 writeChangeNFT?.({
                   args: [
                     changeElement.nftAddress,

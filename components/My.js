@@ -33,18 +33,12 @@ import {
   RBSize,
   shortenAddress,
   getUniqueKey,
-  getChainName,
 } from "@/components/RentContentUtil";
 
 const My = ({
-  selectAvatarFunc,
-  inputRentMarket,
   inputCollectionArray,
-  inputServiceAddress,
   inputMyRegisteredNFTArray,
   inputMyRentNFTArray,
-  inputBlockchainNetwork,
-  setWriteToastMessage,
 }) => {
   //*---------------------------------------------------------------------------
   //* Wagmi.
@@ -60,12 +54,9 @@ const My = ({
   //*---------------------------------------------------------------------------
   //* Define copied local varialbe from input data.
   //*---------------------------------------------------------------------------
-  const rentMarketRef = React.useRef();
   const [collectionArray, setCollectionArray] = React.useState([]);
-  const [serviceAddress, setServiceAddress] = React.useState("");
   const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState([]);
   const [myRentNFTArray, setMyRentNFTArray] = React.useState([]);
-  const [blockchainNetwork, setBlockchainNetwork] = React.useState("");
   const [currentTimestamp, setCurrentTimestamp] = React.useState();
 
   //*---------------------------------------------------------------------------
@@ -111,43 +102,19 @@ const My = ({
 
   React.useEffect(() => {
     // console.log("call React.useEffect()");
-    // console.log("inputRentMarket: ", inputRentMarket);
     // console.log("inputCollectionArray: ", inputCollectionArray);
-    // console.log("inputServiceAddress: ", inputServiceAddress);
     // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
     // console.log("inputMyRentNFTArray: ", inputMyRentNFTArray);
-    // console.log("inputBlockchainNetwork: ", inputBlockchainNetwork);
 
-    if (inputRentMarket) {
-      setMyRentNFTArray(inputMyRentNFTArray);
-      rentMarketRef.current = inputRentMarket;
-    }
+    setMyRentNFTArray(inputMyRentNFTArray);
 
     if (Array.isArray(inputCollectionArray) === true) {
       // TODO: Handle the collection.metadata undefined case.
       setCollectionArray(inputCollectionArray);
     }
 
-    if (
-      typeof inputServiceAddress === "string" ||
-      inputServiceAddress instanceof String
-    ) {
-      setServiceAddress(inputServiceAddress);
-    }
-
     if (Array.isArray(inputMyRegisteredNFTArray) === true) {
       setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
-    }
-
-    if (Array.isArray(inputMyRentNFTArray) === true) {
-      setMyRentNFTArray(inputMyRentNFTArray);
-    }
-
-    if (
-      typeof inputBlockchainNetwork === "string" ||
-      inputBlockchainNetwork instanceof String
-    ) {
-      setBlockchainNetwork(inputBlockchainNetwork);
     }
 
     // * Initialize page and rowsPerPage array.
@@ -170,16 +137,7 @@ const My = ({
       mode: MyMenu.rent,
       rowsPerPage: 5,
     });
-  }, [
-    selectAvatarFunc,
-    inputRentMarket,
-    inputRentMarket.rentMarketContract,
-    inputCollectionArray,
-    inputServiceAddress,
-    inputMyRegisteredNFTArray,
-    inputMyRentNFTArray,
-    inputBlockchainNetwork,
-  ]);
+  }, [inputCollectionArray, inputMyRegisteredNFTArray, inputMyRentNFTArray]);
 
   function buildNftTableRowBody({ elementArray, type }) {
     // console.log("call buildNftTableRowBody()");
@@ -275,28 +233,6 @@ const My = ({
                       ? durationTimestampDisplay
                       : endRentTimestampDisplay}
                   </TableCell>
-                  {/* <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      onClick={function (event) {
-                        if (selectAvatarFunc) {
-                          selectAvatarFunc(element);
-                        }
-
-                        setWriteToastMessage({
-                          snackbarSeverity: AlertSeverity.info,
-                          snackbarMessage: `You select ${
-                            element.metadata ? element.metadata.name : "..."
-                          } avatar.`,
-                          snackbarTime: new Date(),
-                          snackbarOpen: true,
-                        });
-                      }}
-                    >
-                      SELECT
-                    </Button>
-                  </TableCell> */}
                 </TableRow>
               );
             })}
@@ -477,17 +413,6 @@ const My = ({
     // console.log("call buildCollectionTableRow()");
     // console.log("collection: ", collection);
 
-    let openseaMode;
-    if (getChainName({ chainId: inputBlockchainNetwork }) === "matic") {
-      openseaMode = "opensea_matic";
-    } else if (
-      getChainName({ chainId: inputBlockchainNetwork }) === "maticmum"
-    ) {
-      openseaMode = "opensea_maticmum";
-    } else {
-      openseaMode = "";
-    }
-
     return (
       <TableRow
         sx={{
@@ -531,7 +456,7 @@ const My = ({
                   {shortenAddress({
                     address: collection.collectionAddress,
                     number: 5,
-                    withLink: openseaMode,
+                    withLink: "opensea",
                   })}
                 </Typography>
                 <Typography
@@ -572,51 +497,43 @@ const My = ({
     // console.log("collectionArray: ", collectionArray);
     // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
     // console.log("myRentNFTArray: ", myRentNFTArray);
-    // console.log(
-    //   "getChainName({ chainId: inputBlockchainNetwork }): ",
-    //   getChainName({ chainId: inputBlockchainNetwork })
-    // );
 
     if (
-      isConnected === true &&
-      chain &&
-      getChainName({ chainId: chain.id }) ===
-        getChainName({ chainId: inputBlockchainNetwork })
+      selectedItem === MyMenu.own &&
+      inputMyRegisteredNFTArray === undefined
     ) {
-      if (
-        selectedItem === MyMenu.own &&
-        inputMyRegisteredNFTArray === undefined
-      ) {
-        // console.log("own loading...");
-        return (
-          <Box
-            sx={{
-              marginTop: "20px",
-              display: "flex",
-              height: "100vh",
-              flexDirection: "row",
-              justifyContent: "center",
-            }}
-          >
-            <CircularProgress />
-          </Box>
-        );
-      } else if (selectedItem === MyMenu.rent && myRentNFTArray === undefined) {
-        // console.log("rent loading...");
-        return (
-          <Box
-            sx={{
-              marginTop: "20px",
-              display: "flex",
-              height: "100vh",
-              flexDirection: "row",
-              justifyContent: "center",
-            }}
-          >
-            <CircularProgress />
-          </Box>
-        );
+      // console.log("own loading...");
+      return (
+        <Box
+          sx={{
+            marginTop: "20px",
+            display: "flex",
+            height: "100vh",
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      );
+      if (Array.isArray(inputMyRentNFTArray) === true) {
+        setMyRentNFTArray(inputMyRentNFTArray);
       }
+    } else if (selectedItem === MyMenu.rent && myRentNFTArray === undefined) {
+      // console.log("rent loading...");
+      return (
+        <Box
+          sx={{
+            marginTop: "20px",
+            display: "flex",
+            height: "100vh",
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      );
     }
 
     return (
