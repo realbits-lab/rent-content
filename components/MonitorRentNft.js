@@ -315,9 +315,7 @@ export default function MonitorRentNft() {
               if (remainTimestamp < 0) {
                 showSettleButton = true;
                 remainTimestampDisplay = moment
-                  .unix(
-                    data.rentStartTimestamp.add(data.rentDuration).toNumber()
-                  )
+                  .unix(Number(data.rentStartTimestamp + data.rentDuration))
                   .fromNow();
               } else {
                 showSettleButton = false;
