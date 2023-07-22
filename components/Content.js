@@ -178,15 +178,6 @@ export default function Content() {
   //*---------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
-  const writeToastMessage =
-    writeToastMessageLoadable?.state === "hasValue"
-      ? writeToastMessageLoadable.contents
-      : {
-          snackbarSeverity: AlertSeverity.info,
-          snackbarMessage: "",
-          snackbarTime: new Date(),
-          snackbarOpen: true,
-        };
 
   //*---------------------------------------------------------------------------
   //* Handle text input change.

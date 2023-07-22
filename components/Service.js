@@ -68,9 +68,9 @@ export default function Service() {
         };
 
   //*---------------------------------------------------------------------------
-  //* Wagmi hook functions.
+  //* Wagmi
   //*---------------------------------------------------------------------------
-  const RENT_MARKET_CONTRACT_ADDRES =
+  const RENT_MARKET_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
 
   const {
@@ -78,7 +78,7 @@ export default function Service() {
     write: writeRegisterService,
     isLoading: isLoadingRegisterService,
   } = useContractWrite({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI.abi,
     functionName: "registerService",
     onSuccess(data) {
@@ -149,7 +149,7 @@ export default function Service() {
     write: writeUnregisterService,
     isLoading: isLoadingUnregisterService,
   } = useContractWrite({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI.abi,
     functionName: "unregisterService",
     onSuccess(data) {
@@ -211,7 +211,7 @@ export default function Service() {
     isLoading: isLoadingAllService,
     status: statusAllService,
   } = useContractRead({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI.abi,
     functionName: "getAllService",
     watch: true,

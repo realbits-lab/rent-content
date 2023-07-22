@@ -30,7 +30,7 @@ import {
 } from "@/components/RentContentUtil";
 
 export default function Token() {
-  const RENT_MARKET_CONTRACT_ADDRES =
+  const RENT_MARKET_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
   const BLOCKCHAIN_NETWORK = process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK;
 
@@ -45,7 +45,7 @@ export default function Token() {
     isLoading: isLoadingAllToken,
     status: statusAllToken,
   } = useContractRead({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI.abi,
     functionName: "getAllToken",
     watch: true,
@@ -127,7 +127,7 @@ export default function Token() {
     write: writeRegisterToken,
     isLoading: isLoadingRegisterToken,
   } = useContractWrite({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI.abi,
     functionName: "registerToken",
 
@@ -208,7 +208,7 @@ export default function Token() {
     write: writeUnregisterToken,
     isLoading: isLoadingUnregisterToken,
   } = useContractWrite({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI.abi,
     functionName: "unregisterToken",
     onSuccess(data) {

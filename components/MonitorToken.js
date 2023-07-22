@@ -64,7 +64,7 @@ export default function MonitorToken() {
   //*---------------------------------------------------------------------------
   //* Wagmi hook functions.
   //*---------------------------------------------------------------------------
-  const RENT_MARKET_CONTRACT_ADDRES =
+  const RENT_MARKET_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
 
   const {
@@ -73,7 +73,7 @@ export default function MonitorToken() {
     isLoading: isLoadingAllToken,
     status: statusAllToken,
   } = useContractRead({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI.abi,
     functionName: "getAllToken",
     watch: true,
@@ -102,7 +102,7 @@ export default function MonitorToken() {
       .getLogs({
         fromBlock: 27956165,
         toBlock: "latest",
-        address: RENT_MARKET_CONTRACT_ADDRES,
+        address: RENT_MARKET_CONTRACT_ADDRESS,
         topics: [topicHash],
       })
       .then((response) => {

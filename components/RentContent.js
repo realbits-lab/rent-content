@@ -138,7 +138,7 @@ const RentContent = ({
   const MONITOR_REWARD_MENU_INDEX = 10;
   const MONITOR_SETTING_MENU_INDEX = 11;
 
-  const DEFAULT_MENU_INDEX = MONITOR_ACCOUNT_BALANCE_MENU_INDEX;
+  const DEFAULT_MENU_INDEX = MARKET_MENU_INDEX;
 
   //*---------------------------------------------------------------------------
   //* Set MUI theme.
@@ -650,16 +650,7 @@ const RentContent = ({
 
         <LoginWrapper>
           {selectedIndex === MARKET_MENU_INDEX ? (
-            inputRentMarket && (
-              <Market
-                inputRentMarketClass={inputRentMarket}
-                inputCollectionArray={collectionArray}
-                inputServiceAddress={serviceAddress}
-                inputRegisterNFTArray={registerNFTArray}
-                inputBlockchainNetwork={blockchainNetwork}
-                setWriteToastMessage={setWriteToastMessage}
-              />
-            )
+            inputRentMarket && <Market inputRentMarketClass={inputRentMarket} />
           ) : selectedIndex === MY_MENU_INDEX ? (
             inputRentMarket && <My />
           ) : selectedIndex === CONTENT_MENU_INDEX ? (

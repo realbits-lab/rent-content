@@ -1,16 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
+import axios from "axios";
 import {
   useAccount,
   useNetwork,
   useContractRead,
   useContractWrite,
   useWaitForTransaction,
-  useWalletClient,
 } from "wagmi";
 import { getContract } from "@wagmi/core";
 import { utils } from "ethers";
-import WalletConnectProvider from "@walletconnect/web3-provider";
-import { isMobile } from "react-device-detect";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -37,37 +35,90 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import { useRecoilStateLoadable } from "recoil";
 import {
   changeIPFSToGateway,
   AlertSeverity,
   RBSize,
   shortenAddress,
   getUniqueKey,
-  getErrorDescription,
-  getChainName,
+  writeToastMessageState,
 } from "@/components/RentContentUtil";
 import rentmarketABI from "@/contracts/rentMarket.json";
 //* TODO: Test token
 import faucetTokenABI from "@/contracts/faucetToken.json";
 
-const Market = ({
-  inputRentMarketClass,
-  inputCollectionArray,
-  inputServiceAddress,
-  inputRegisterNFTArray,
-  inputBlockchainNetwork,
-  setWriteToastMessage,
-}) => {
-  const theme = useTheme();
-  const RENT_MARKET_CONTRACT_ADDRES =
+const Market = ({ inputRentMarketClass }) => {
+  const RENT_MARKET_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
   const SERVICE_OWNER_ADDRESS = process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS;
 
   //*---------------------------------------------------------------------------
-  //* Wagmi hook functions.
+  //* Wagmi
   //*---------------------------------------------------------------------------
   const { chain, chains } = useNetwork();
   const { address, isConnecting, isDisconnected } = useAccount();
+
+  //* getAllRegisterData function.
+  const {
+    data: dataAllRegisterData,
+    isError: isErrorAllRegisterData,
+    isLoading: isLoadingAllRegisterData,
+    status: statusAllRegisterData,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRESS,
+    abi: rentmarketABI.abi,
+    functionName: "getAllRegisterData",
+    watch: true,
+  });
+
+  //* getAllCollection function.
+  const {
+    data: dataAllCollection,
+    isError: isErrorAllCollection,
+    isLoading: isLoadingAllCollection,
+    status: statusAllCollection,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRESS,
+    abi: rentmarketABI.abi,
+    functionName: "getAllCollection",
+    watch: true,
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+
+      Promise.all(
+        data.map(async (collection) => {
+          // console.log("collection: ", collection);
+          let response;
+          try {
+            response = await axios.get(collection.uri, {
+              headers: {
+                "Cache-Control": "no-cache",
+                Pragma: "no-cache",
+                Expires: "0",
+              },
+            });
+          } catch (error) {
+            console.error(error);
+          }
+          // console.log("response: ", response);
+
+          return {
+            collectionAddress: collection.collectionAddress,
+            uri: collection.uri,
+            name: response.data.name,
+            description: response.data.description,
+            image: response.data.image,
+          };
+        })
+      ).then((collectionArray) => {
+        // console.log("collectionArray: ", collectionArray);
+        setCollectionArray(collectionArray);
+      });
+    },
+  });
+
   const { data: dataApprove, write: writeApprove } = useContractWrite({
     abi: faucetTokenABI.abi,
     functionName: "approve",
@@ -85,9 +136,47 @@ const Market = ({
       },
     });
 
+  //* rentNFT function
+  const {
+    data: dataRentNFT,
+    isError: isErrorRentNFT,
+    isLoading: isLoadingRentNFT,
+    write: writeRentNFT,
+  } = useContractWrite({
+    address: RENT_MARKET_CONTRACT_ADDRESS,
+    abi: rentmarketABI?.abi,
+    functionName: "rentNFT",
+  });
+  const {
+    data: dataRentNFTTx,
+    isError: isErrorRentNFTTx,
+    isLoading: isLoadingRentNFTTx,
+  } = useWaitForTransaction({
+    hash: dataRentNFT?.hash,
+  });
+
+  //* changeNFT function
+  const {
+    data: dataChangeNFT,
+    isError: isErrorChangeNFT,
+    isLoading: isLoadingChangeNFT,
+    write: writeChangeNFT,
+  } = useContractWrite({
+    address: RENT_MARKET_CONTRACT_ADDRESS,
+    abi: rentmarketABI?.abi,
+    functionName: "changeNFT",
+  });
+  const {
+    data: dataChangeNFTTx,
+    isError: isErrorChangeNFTTx,
+    isLoading: isLoadingChangeNFTTx,
+  } = useWaitForTransaction({
+    hash: dataChangeNFT?.hash,
+  });
+
   const { data: dataRentNftByToken, write: writeRentNftByToken } =
     useContractWrite({
-      address: RENT_MARKET_CONTRACT_ADDRES,
+      address: RENT_MARKET_CONTRACT_ADDRESS,
       abi: rentmarketABI.abi,
       functionName: "rentNFTByToken",
     });
@@ -112,9 +201,6 @@ const Market = ({
   //*---------------------------------------------------------------------------
   const rentMarketClassRef = React.useRef();
   const [collectionArray, setCollectionArray] = React.useState([]);
-  const [serviceAddress, setServiceAddress] = React.useState("");
-  const [registerNFTArray, setRegisterNFTArray] = React.useState([]);
-  const [blockchainNetwork, setBlockchainNetwork] = React.useState("");
 
   //*---------------------------------------------------------------------------
   //* Define collection array data.
@@ -131,14 +217,12 @@ const Market = ({
     collectionDescription,
     collectionImage,
   } = collectionMetadata;
-  const handleListCollectionClick = (element) => {
+  const handleListCollectionClick = (collection) => {
     setCollectionMetadata({
-      collectionAddress: element.collectionAddress,
-      collectionName: element.metadata ? element.metadata.name : "n/a",
-      collectionDescription: element.metadata
-        ? element.metadata.description
-        : "n/a",
-      collectionImage: element.metadata ? element.metadata.image : "",
+      collectionAddress: collection.collectionAddress,
+      collectionName: collection.name,
+      collectionDescription: collection.description,
+      collectionImage: collection.image,
     });
   };
 
@@ -149,47 +233,23 @@ const Market = ({
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   //*---------------------------------------------------------------------------
-  //* Initialize data.
+  //* Handle toast message.
   //*---------------------------------------------------------------------------
-  React.useEffect(() => {
-    // console.log("call React.useEffect()");
+  const [writeToastMessageLoadable, setWriteToastMessage] =
+    useRecoilStateLoadable(writeToastMessageState);
+
+  useEffect(() => {
+    console.log("call useEffect()");
     // console.log("inputRentMarketClass: ", inputRentMarketClass);
-    // console.log("inputCollectionArray: ", inputCollectionArray);
-    // console.log("inputServiceAddress: ", inputServiceAddress);
-    // console.log("inputRegisterNFTArray: ", inputRegisterNFTArray);
-    // console.log("inputBlockchainNetwork: ", inputBlockchainNetwork);
+
+    if (collectionArray.length > 0) {
+      handleListCollectionClick(collectionArray[0]);
+    }
 
     if (inputRentMarketClass) {
       rentMarketClassRef.current = inputRentMarketClass;
     }
-    if (Array.isArray(inputCollectionArray) === true) {
-      setCollectionArray(inputCollectionArray);
-      if (inputCollectionArray.length > 0) {
-        handleListCollectionClick(inputCollectionArray[0]);
-      }
-    }
-    if (
-      typeof inputServiceAddress === "string" ||
-      inputServiceAddress instanceof String
-    ) {
-      setServiceAddress(inputServiceAddress);
-    }
-    if (Array.isArray(inputRegisterNFTArray) === true) {
-      setRegisterNFTArray(inputRegisterNFTArray);
-    }
-    if (
-      typeof inputBlockchainNetwork === "string" ||
-      inputBlockchainNetwork instanceof String
-    ) {
-      setBlockchainNetwork(inputBlockchainNetwork);
-    }
-  }, [
-    inputRentMarketClass,
-    inputCollectionArray,
-    inputServiceAddress,
-    inputRegisterNFTArray,
-    inputBlockchainNetwork,
-  ]);
+  }, []);
 
   async function erc20PermitSignature({ owner, spender, amount, contract }) {
     // console.log("call erc20PermitSignature()");
@@ -270,17 +330,7 @@ const Market = ({
     // console.log("element: ", element);
 
     return (
-      <TableRow
-        key={getUniqueKey()}
-        // sx={{
-        //   "&:hover": {
-        //     backgroundColor: theme.palette.success.light,
-        //   },
-        //   "&:hover .MuiTableCell-root": {
-        //     color: "white",
-        //   },
-        // }}
-      >
+      <TableRow key={getUniqueKey()}>
         <TableCell align="center">
           <Box
             sx={{
@@ -292,18 +342,14 @@ const Market = ({
           >
             <Avatar
               alt="image"
-              src={
-                element.metadata
-                  ? changeIPFSToGateway(element.metadata.image)
-                  : ""
-              }
+              src={changeIPFSToGateway(element.image)}
               sx={{ width: RBSize.big, height: RBSize.big }}
             />
           </Box>
         </TableCell>
-        <TableCell align="center">
-          {element.metadata ? element.metadata.name : "n/a"}
-        </TableCell>
+
+        <TableCell align="center">{element.name}</TableCell>
+
         <TableCell align="center">
           <Button
             color="primary"
@@ -313,11 +359,11 @@ const Market = ({
               await rentMarketClassRef.current.rentNFT({
                 provider,
                 element,
-                serviceAddress,
+                SERVICE_OWNER_ADDRESS,
               });
             }}
           >
-            {element.rentFee / Math.pow(10, 18)}
+            {Number(element.rentFee / BigInt(10 ** 18))}
           </Button>
         </TableCell>
         <TableCell align="center">
@@ -329,7 +375,7 @@ const Market = ({
               // await rentMarketClassRef.current.rentNFTByToken({
               //   provider,
               //   element,
-              //   serviceAddress,
+              //   SERVICE_OWNER_ADDRESS,
               // });
               // console.log("element: ", element);
               const contract = getContract({
@@ -339,7 +385,7 @@ const Market = ({
               // console.log("contract: ", contract);
               await erc20PermitSignature({
                 owner: address,
-                spender: RENT_MARKET_CONTRACT_ADDRES,
+                spender: RENT_MARKET_CONTRACT_ADDRESS,
                 amount: element.rentFeeByToken,
                 contract: contract,
               });
@@ -370,10 +416,10 @@ const Market = ({
               // });
             }}
           >
-            {element.rentFeeByToken / Math.pow(10, 18)}
+            {Number(element.rentFeeByToken / BigInt(10 ** 18))}
           </Button>
         </TableCell>
-        <TableCell align="center">{element.rentDuration.toNumber()}</TableCell>
+        <TableCell align="center">{Number(element.rentDuration)}</TableCell>
         {/* <TableCell align="center">
           <Button
             color="primary"
@@ -395,7 +441,7 @@ const Market = ({
                 await rentMarketClassRef.current.rentNFT({
                   provider,
                   element,
-                  serviceAddress,
+                  SERVICE_OWNER_ADDRESS,
                 });
               } catch (error) {
                 let message = error.data
@@ -480,18 +526,6 @@ const Market = ({
     }
 
     const url = changeIPFSToGateway(collectionImage);
-    // console.log("url: ", url);
-    // console.log("inputBlockchainNetwork: ", inputBlockchainNetwork);
-    let openseaMode;
-    if (getChainName({ chainId: inputBlockchainNetwork }) === "matic") {
-      openseaMode = "opensea_matic";
-    } else if (
-      getChainName({ chainId: inputBlockchainNetwork }) === "maticmum"
-    ) {
-      openseaMode = "opensea_maticmum";
-    } else {
-      openseaMode = "";
-    }
 
     return (
       <TableRow
@@ -536,7 +570,7 @@ const Market = ({
                   {shortenAddress({
                     address: collectionAddress,
                     number: 5,
-                    withLink: openseaMode,
+                    withLink: "opensea",
                   })}
                 </Typography>
                 <Typography
@@ -611,10 +645,10 @@ const Market = ({
       return buildNFTDataTableSkeleton();
     }
 
-    const selectedRegisterNFTArray = registerNFTArray.filter(
-      (element) =>
-        element.nftAddress === collectionAddress &&
-        element.renterAddress === "0"
+    const selectedRegisterNFTArray = dataAllRegisterData.filter(
+      (registerData) =>
+        registerData.nftAddress.toLowerCase() ===
+        collectionAddress.toLowerCase()
     );
 
     return (
@@ -668,36 +702,20 @@ const Market = ({
     // console.log("call buildCollectionList()");
     // console.log("collectionArray: ", collectionArray);
 
-    //* TODO: Consider if collectionArray has zero element, it's now loading status.
-    //* TODO: Later, we will change this method.
-    if (collectionArray.length === 0) {
-      return (
-        <List>
-          <Skeleton
-            variant="rounded"
-            width={RBSize.middle}
-            height={RBSize.middle}
-          />
-        </List>
-      );
-    }
-
     return (
       <List style={{ display: "flex", flexDirection: "row", padding: 10 }}>
-        {collectionArray.map((element) => {
-          // console.log("list collectionArray element: ", element);
-          // console.log("ListItem key element.key: ", element.key);
+        {collectionArray.map((collection, idx) => {
+          // console.log("collection: ", collection);
+
           return (
-            <ListItem key={element.key} disablePadding>
+            <ListItem key={idx} disablePadding>
               <ListItemButton
-                selected={collectionAddress === element.collectionAddress}
-                onClick={(event) => handleListCollectionClick(element)}
+                selected={collectionAddress === collection.collectionAddress}
+                onClick={(event) => handleListCollectionClick(collection)}
               >
-                <Tooltip
-                  title={element.metadata ? element.metadata.name : "n/a"}
-                >
+                <Tooltip title={collection.name}>
                   <Avatar
-                    src={element.metadata ? element.metadata.image : "n/a"}
+                    src={collection.image}
                     variant="rounded"
                     sx={{ width: RBSize.middle, height: RBSize.middle }}
                   />
@@ -811,9 +829,9 @@ const Market = ({
 
   return (
     <>
-      {/*//* ----------------------------------------------------------------*/}
-      {/*//* Show collection array data.                                     */}
-      {/*//* ----------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Collection list.                                                */}
+      {/*//*-----------------------------------------------------------------*/}
       <Grid
         container
         padding={0}
