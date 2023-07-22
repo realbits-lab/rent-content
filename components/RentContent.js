@@ -138,7 +138,7 @@ const RentContent = ({
   const MONITOR_REWARD_MENU_INDEX = 10;
   const MONITOR_SETTING_MENU_INDEX = 11;
 
-  const DEFAULT_MENU_INDEX = MONITOR_PENDING_RENT_FEE_MENU_INDEX;
+  const DEFAULT_MENU_INDEX = MONITOR_ACCOUNT_BALANCE_MENU_INDEX;
 
   //*---------------------------------------------------------------------------
   //* Set MUI theme.
@@ -673,13 +673,7 @@ const RentContent = ({
           ) : selectedIndex === MONITOR_TOKEN_MENU_INDEX ? (
             inputRentMarket && <MonitorToken />
           ) : selectedIndex === MONITOR_ACCOUNT_BALANCE_MENU_INDEX ? (
-            inputRentMarket && (
-              <MonitorAccountBalance
-                inputRentMarket={inputRentMarket}
-                rentMarketAddress={rentMarketAddress}
-                inputBlockchainNetwork={blockchainNetwork}
-              />
-            )
+            inputRentMarket && <MonitorAccountBalance />
           ) : selectedIndex === MONITOR_PENDING_RENT_FEE_MENU_INDEX ? (
             inputRentMarket && <MonitorPendingRentFee />
           ) : selectedIndex === MONITOR_RENT_NFT_MENU_INDEX ? (
