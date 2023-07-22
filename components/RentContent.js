@@ -27,7 +27,7 @@ import CircleIcon from "@mui/icons-material/Circle";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CollectionsIcon from "@mui/icons-material/Collections";
-import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
+import { useRecoilValueLoadable } from "recoil";
 import My from "@/components/My";
 import Market from "@/components/Market";
 import Content from "@/components/Content";
@@ -107,12 +107,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-const RentContent = ({
-  rentMarketAddress,
-  testNftAddress,
-  blockchainNetwork,
-  serviceAddress,
-}) => {
+export default function RentContent() {
   //*---------------------------------------------------------------------------
   //* Wagmi
   //*---------------------------------------------------------------------------
@@ -199,7 +194,7 @@ const RentContent = ({
     if (isMobileRef.current === true) {
       setOpenDrawer(false);
     }
-  }, [rentMarketAddress, testNftAddress, blockchainNetwork, serviceAddress]);
+  }, []);
 
   //* Render.
   return (
@@ -559,6 +554,4 @@ const RentContent = ({
       />
     </Box>
   );
-};
-
-export default RentContent;
+}

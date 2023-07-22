@@ -11,12 +11,7 @@ const RentContent = dynamic(() => import("../components/RentContent"), {
 
 function App() {
   const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY || "";
-  const RENT_MARKET_CONTRACT_ADDRESS =
-    process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
-  const LOCAL_NFT_CONTRACT_ADDRESS =
-    process.env.NEXT_PUBLIC_LOCAL_NFT_CONTRACT_ADDRESS;
   const BLOCKCHAIN_NETWORK = process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK;
-  const SERVICE_OWNER_ADDRESS = process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS;
 
   let chains = [];
   switch (BLOCKCHAIN_NETWORK) {
@@ -59,12 +54,7 @@ function App() {
   return (
     <>
       <WagmiConfig config={wagmiConfig}>
-        <RentContent
-          rentMarketAddress={RENT_MARKET_CONTRACT_ADDRESS}
-          testNftAddress={LOCAL_NFT_CONTRACT_ADDRESS}
-          blockchainNetwork={BLOCKCHAIN_NETWORK}
-          serviceAddress={SERVICE_OWNER_ADDRESS}
-        />
+        <RentContent />
       </WagmiConfig>
     </>
   );
