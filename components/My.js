@@ -1,5 +1,14 @@
-import React from "react";
-import { useWeb3Modal } from "@web3modal/react";
+import React, { useEffect } from "react";
+import axios from "axios";
+import { Alchemy, Network } from "alchemy-sdk";
+import {
+  useAccount,
+  useNetwork,
+  useContractRead,
+  useContractWrite,
+  useWaitForTransaction,
+  useWalletClient,
+} from "wagmi";
 import moment from "moment";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
@@ -33,35 +42,134 @@ import {
   RBSize,
   shortenAddress,
   getUniqueKey,
-  getChainName,
 } from "@/components/RentContentUtil";
+import rentmarketABI from "@/contracts/rentMarket.json";
 
-const My = ({
-  selectAvatarFunc,
-  inputRentMarket,
-  inputCollectionArray,
-  inputServiceAddress,
-  inputMyRegisteredNFTArray,
-  inputMyRentNFTArray,
-  inputBlockchainNetwork,
-  setWriteToastMessage,
-  web3modalSelectedChain,
-  wagmiIsConnected,
-}) => {
+export default function My() {
   //*---------------------------------------------------------------------------
-  //* Hook variables.
+  //* Wagmi
+  //*---------------------------------------------------------------------------
+  const RENT_MARKET_CONTRACT_ADDRESS =
+    process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
+  const { address, connector: activeConnector, isConnected } = useAccount();
+  const { chain, chains } = useNetwork();
+
+  //* getAllRentData function
+  const {
+    data: dataAllRentData,
+    isError: isErrorAllRentData,
+    isLoading: isLoadingAllRentData,
+    status: statusAllRentData,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRESS,
+    abi: rentmarketABI?.abi,
+    functionName: "getAllRentData",
+    watch: true,
+    async onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+
+  //* getAllRegisterData function
+  const {
+    data: dataAllRegisterData,
+    isError: isErrorAllRegisterData,
+    isLoading: isLoadingAllRegisterData,
+    status: statusAllRegisterData,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRESS,
+    abi: rentmarketABI?.abi,
+    functionName: "getAllRegisterData",
+    watch: true,
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+
+  //* getAllCollection function
+  const {
+    data: dataAllCollection,
+    isError: isErrorAllCollection,
+    isLoading: isLoadingAllCollection,
+    status: statusAllCollection,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRESS,
+    abi: rentmarketABI?.abi,
+    functionName: "getAllCollection",
+    watch: true,
+    async onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+
+      //* Get register data from smart contract.
+      let tempCollectionArray = [];
+      const promises = data.map(async (element) => {
+        // console.log("element: ", element);
+        let response;
+        try {
+          response = await axios.get(element.uri);
+        } catch (error) {
+          console.error(error);
+          throw error;
+        }
+        const metadata = response.data;
+        // console.log("collection metadata: ", metadata);
+
+        //* Add collection array with metadata.
+        tempCollectionArray.push({
+          key: element.collectionAddress,
+          collectionAddress: element.collectionAddress,
+          uri: element.uri,
+          metadata: metadata,
+        });
+      });
+      await Promise.all(promises);
+
+      setCollectionArray(tempCollectionArray);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+
+  //*---------------------------------------------------------------------------
+  //* Variable.
   //*---------------------------------------------------------------------------
   const theme = useTheme();
+  const ALCHEMY_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
 
   //*---------------------------------------------------------------------------
   //* Define copied local varialbe from input data.
   //*---------------------------------------------------------------------------
-  const rentMarketRef = React.useRef();
   const [collectionArray, setCollectionArray] = React.useState([]);
-  const [serviceAddress, setServiceAddress] = React.useState("");
   const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState([]);
   const [myRentNFTArray, setMyRentNFTArray] = React.useState([]);
-  const [blockchainNetwork, setBlockchainNetwork] = React.useState("");
   const [currentTimestamp, setCurrentTimestamp] = React.useState();
 
   //*---------------------------------------------------------------------------
@@ -90,22 +198,12 @@ const My = ({
   };
 
   //*---------------------------------------------------------------------------
-  //* Wagmi hook functions.
-  //*---------------------------------------------------------------------------
-  const {
-    isOpen: isOpenWeb3Modal,
-    open: openWeb3Modal,
-    close: closeWeb3Modal,
-    setDefaultChain: setDefaultChainWeb3Modal,
-  } = useWeb3Modal();
-
-  //*---------------------------------------------------------------------------
   //* Table pagination data.
   //*---------------------------------------------------------------------------
   const [page, setPage] = React.useState([]);
   const [rowsPerPage, setRowsPerPage] = React.useState([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // console.log("call useEffect()");
     const countdown = setInterval(() => {
       const timestamp = Math.floor(Date.now() / 1000);
@@ -115,48 +213,78 @@ const My = ({
     return () => clearInterval(countdown);
   }, [currentTimestamp]);
 
-  React.useEffect(() => {
-    // console.log("call React.useEffect()");
-    // console.log("inputRentMarket: ", inputRentMarket);
-    // console.log("inputCollectionArray: ", inputCollectionArray);
-    // console.log("inputServiceAddress: ", inputServiceAddress);
+  async function initialize() {
+    let network;
+    // console.log("chain: ", chain);
+    switch (chain.network) {
+      case "matic":
+        network = Network.MATIC_MAINNET;
+        break;
+
+      case "maticmum":
+        network = Network.MATIC_MUMBAI;
+        break;
+    }
+    const config = {
+      apiKey: ALCHEMY_KEY,
+      network,
+    };
+    // console.log("config: ", config);
+    const alchemy = new Alchemy(config);
+
+    //* Get all NFTs.
+    // console.log("address: ", address);
+    const nfts = await alchemy.nft.getNftsForOwner(address);
+    // console.log("nfts: ", nfts);
+
+    let inputMyRegisteredNFTArray = [];
+    let inputMyRentNFTArray = [];
+
+    nfts["ownedNfts"].map((nft) => {
+      const foundRegisterData = dataAllRegisterData?.find(
+        (registerData) =>
+          registerData.nftAddress.toLowerCase() ===
+            nft?.contract?.address.toLowerCase() &&
+          Number(registerData.tokenId) === Number(nft?.tokenId)
+      );
+      if (foundRegisterData) {
+        //* Find my NFT in register data.
+        inputMyRegisteredNFTArray.push({
+          nftAddress: foundRegisterData.nftAddress,
+          tokenId: foundRegisterData.tokenId,
+          rentFee: foundRegisterData.rentFee,
+          feeTokenAddress: foundRegisterData.feeTokenAddress,
+          rentFeeByToken: foundRegisterData.rentFeeByToken,
+          rentDuration: foundRegisterData.rentDuration,
+          metadata: nft.rawMetadata,
+        });
+      }
+
+      const foundRentData = dataAllRentData?.find(
+        (rentData) =>
+          rentData.nftAddress.toLowerCase() ===
+            nft?.contract?.address.toLowerCase() &&
+          Number(rentData.tokenId) === Number(nft?.tokenId)
+      );
+      if (foundRentData) {
+        //* Find my NFT in register data.
+        inputMyRentNFTArray.push({
+          ...foundRentData,
+          metadata: nft.rawMetadata,
+        });
+      }
+    });
     // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
-    // console.log("inputMyRentNFTArray: ", inputMyRentNFTArray);
-    // console.log("inputBlockchainNetwork: ", inputBlockchainNetwork);
-    // console.log("web3modalSelectedChain: ", web3modalSelectedChain);
-    // console.log("wagmiIsConnected: ", wagmiIsConnected);
 
-    if (inputRentMarket) {
-      setMyRentNFTArray(inputMyRentNFTArray);
-      rentMarketRef.current = inputRentMarket;
-    }
+    setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
+    setMyRentNFTArray(inputMyRentNFTArray);
+  }
 
-    if (Array.isArray(inputCollectionArray) === true) {
-      // TODO: Handle the collection.metadata undefined case.
-      setCollectionArray(inputCollectionArray);
-    }
+  useEffect(() => {
+    initialize();
 
-    if (
-      typeof inputServiceAddress === "string" ||
-      inputServiceAddress instanceof String
-    ) {
-      setServiceAddress(inputServiceAddress);
-    }
-
-    if (Array.isArray(inputMyRegisteredNFTArray) === true) {
-      setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
-    }
-
-    if (Array.isArray(inputMyRentNFTArray) === true) {
-      setMyRentNFTArray(inputMyRentNFTArray);
-    }
-
-    if (
-      typeof inputBlockchainNetwork === "string" ||
-      inputBlockchainNetwork instanceof String
-    ) {
-      setBlockchainNetwork(inputBlockchainNetwork);
-    }
+    // console.log("call useEffect()");
+    // setMyRentNFTArray(inputMyRentNFTArray);
 
     // * Initialize page and rowsPerPage array.
     page.splice(0, page.length);
@@ -178,16 +306,7 @@ const My = ({
       mode: MyMenu.rent,
       rowsPerPage: 5,
     });
-  }, [
-    selectAvatarFunc,
-    inputRentMarket,
-    inputRentMarket.rentMarketContract,
-    inputCollectionArray,
-    inputServiceAddress,
-    inputMyRegisteredNFTArray,
-    inputMyRentNFTArray,
-    inputBlockchainNetwork,
-  ]);
+  }, []);
 
   function buildNftTableRowBody({ elementArray, type }) {
     // console.log("call buildNftTableRowBody()");
@@ -208,9 +327,9 @@ const My = ({
               tablePage * tableRowsPerPage + tableRowsPerPage
             )
             .map((element) => {
-              // console.log("element: ", element);
+              console.log("element: ", element);
               const rentStartTimestamp = element.rentStartTimestamp
-                ? element.rentStartTimestamp.toNumber()
+                ? Number(element.rentStartTimestamp)
                 : 0;
               // console.log("rentStartTimestamp: ", rentStartTimestamp);
 
@@ -222,7 +341,7 @@ const My = ({
 
               //* Get end rent time display string for rent case.
               const endRentTimestamp =
-                rentStartTimestamp + element.rentDuration.toNumber();
+                rentStartTimestamp + Number(element.rentDuration);
               // console.log("endRentTimestamp: ", endRentTimestamp);
               // console.log("currentTimestamp: ", currentTimestamp);
               let endRentTimestampDisplay;
@@ -273,38 +392,16 @@ const My = ({
                     {element.metadata ? element.metadata.name : "N/A"}
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                    {element.rentFee / Math.pow(10, 18)}
+                    {(element.rentFee / BigInt(10 ** 18)).toString()}
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                    {element.rentFeeByToken / Math.pow(10, 18)}
+                    {(element.rentFeeByToken / BigInt(10 ** 18)).toString()}
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
                     {type === MyMenu.own
                       ? durationTimestampDisplay
                       : endRentTimestampDisplay}
                   </TableCell>
-                  {/* <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      onClick={function (event) {
-                        if (selectAvatarFunc) {
-                          selectAvatarFunc(element);
-                        }
-
-                        setWriteToastMessage({
-                          snackbarSeverity: AlertSeverity.info,
-                          snackbarMessage: `You select ${
-                            element.metadata ? element.metadata.name : "..."
-                          } avatar.`,
-                          snackbarTime: new Date(),
-                          snackbarOpen: true,
-                        });
-                      }}
-                    >
-                      SELECT
-                    </Button>
-                  </TableCell> */}
                 </TableRow>
               );
             })}
@@ -482,19 +579,8 @@ const My = ({
   }
 
   function buildCollectionTableRow({ collection }) {
-    // console.log("call buildCollectionTableRow()");
-    // console.log("collection: ", collection);
-
-    let openseaMode;
-    if (getChainName({ chainId: inputBlockchainNetwork }) === "matic") {
-      openseaMode = "opensea_matic";
-    } else if (
-      getChainName({ chainId: inputBlockchainNetwork }) === "maticmum"
-    ) {
-      openseaMode = "opensea_maticmum";
-    } else {
-      openseaMode = "";
-    }
+    console.log("call buildCollectionTableRow()");
+    console.log("collection: ", collection);
 
     return (
       <TableRow
@@ -539,7 +625,7 @@ const My = ({
                   {shortenAddress({
                     address: collection.collectionAddress,
                     number: 5,
-                    withLink: openseaMode,
+                    withLink: "opensea",
                   })}
                 </Typography>
                 <Typography
@@ -578,78 +664,7 @@ const My = ({
   function buildNftTable() {
     // console.log("call buildNftTable()");
     // console.log("collectionArray: ", collectionArray);
-    // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
     // console.log("myRentNFTArray: ", myRentNFTArray);
-    // console.log("web3modalSelectedChain: ", web3modalSelectedChain);
-    // console.log(
-    //   "getChainName({ chainId: inputBlockchainNetwork }): ",
-    //   getChainName({ chainId: inputBlockchainNetwork })
-    // );
-    // console.log("wagmiIsConnected: ", wagmiIsConnected);
-
-    if (
-      wagmiIsConnected === false ||
-      web3modalSelectedChain === undefined ||
-      getChainName({ chainId: web3modalSelectedChain.id }) !==
-        getChainName({ chainId: inputBlockchainNetwork })
-    ) {
-      return (
-        <Box
-          sx={{
-            marginTop: "20px",
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-          }}
-        >
-          <Button variant="text" onClick={openWeb3Modal}>
-            Click the connect wallet button
-          </Button>
-        </Box>
-      );
-    }
-
-    if (
-      wagmiIsConnected === true &&
-      web3modalSelectedChain &&
-      getChainName({ chainId: web3modalSelectedChain.id }) ===
-        getChainName({ chainId: inputBlockchainNetwork })
-    ) {
-      if (
-        selectedItem === MyMenu.own &&
-        inputMyRegisteredNFTArray === undefined
-      ) {
-        // console.log("own loading...");
-        return (
-          <Box
-            sx={{
-              marginTop: "20px",
-              display: "flex",
-              height: "100vh",
-              flexDirection: "row",
-              justifyContent: "center",
-            }}
-          >
-            <CircularProgress />
-          </Box>
-        );
-      } else if (selectedItem === MyMenu.rent && myRentNFTArray === undefined) {
-        // console.log("rent loading...");
-        return (
-          <Box
-            sx={{
-              marginTop: "20px",
-              display: "flex",
-              height: "100vh",
-              flexDirection: "row",
-              justifyContent: "center",
-            }}
-          >
-            <CircularProgress />
-          </Box>
-        );
-      }
-    }
 
     return (
       <Box
@@ -658,32 +673,26 @@ const My = ({
         }}
       >
         <Table>
-          {collectionArray.map((element) => {
+          {collectionArray.map((collection) => {
             let elementArray = [];
             let type = MyMenu.own;
 
             if (selectedItem === MyMenu.own) {
-              elementArray = inputMyRegisteredNFTArray?.filter(
+              elementArray = myRegisteredNFTArray?.filter(
                 (nftElement) =>
-                  nftElement.nftAddress === element.collectionAddress
+                  nftElement.nftAddress === collection.collectionAddress
               );
               type = MyMenu.own;
             } else {
               elementArray = myRentNFTArray?.filter(
                 (nftElement) =>
-                  nftElement.nftAddress === element.collectionAddress
+                  nftElement.nftAddress === collection.collectionAddress
               );
               type = MyMenu.rent;
             }
-            // console.log(
-            //   "inputMyRegisteredNFTArray: ",
-            //   inputMyRegisteredNFTArray
-            // );
-            // console.log("myRentNFTArray: ", myRentNFTArray);
-            // console.log("elementArray: ", elementArray);
 
             return buildMyTable({
-              collection: element,
+              collection: collection,
               elementArray: elementArray,
               type: type,
             });
@@ -768,6 +777,4 @@ const My = ({
       </Grid>
     </div>
   );
-};
-
-export default My;
+}

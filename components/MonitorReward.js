@@ -74,7 +74,7 @@ export default function MonitorReward() {
   //*---------------------------------------------------------------------------
   //* Wagmi hook functions.
   //*---------------------------------------------------------------------------
-  const RENT_MARKET_CONTRACT_ADDRES =
+  const RENT_MARKET_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
 
   const rewardTokenContract = {
@@ -186,7 +186,7 @@ export default function MonitorReward() {
       .getLogs({
         fromBlock: 27956165,
         toBlock: "latest",
-        address: RENT_MARKET_CONTRACT_ADDRES,
+        address: RENT_MARKET_CONTRACT_ADDRESS,
         topics: [topicHash],
       })
       .then((response) => {

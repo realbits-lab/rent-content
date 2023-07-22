@@ -1,5 +1,11 @@
-import { Network, Alchemy } from "alchemy-sdk";
 import { ethers } from "ethers";
+import {
+  readContract,
+  writeContract,
+  waitForTransaction,
+  prepareWriteContract,
+} from "@wagmi/core";
+import { parseUnits } from "viem";
 import rentmarketABI from "@/contracts/rentMarket.json";
 
 export default async function handler(req, res) {
@@ -11,7 +17,7 @@ export default async function handler(req, res) {
     process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK;
   const NEXT_PUBLIC_SETTLE_PRIVATE_KEY =
     process.env.NEXT_PUBLIC_SETTLE_PRIVATE_KEY;
-  const NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS =
+  const RENT_MARKET_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
   const PAYMENT_NFT_ADDRESS = process.env.NEXT_PUBLIC_PAYMENT_NFT_ADDRESS;
   const PAYMENT_NFT_TOKEN = process.env.NEXT_PUBLIC_PAYMENT_NFT_TOKEN;
@@ -37,7 +43,7 @@ export default async function handler(req, res) {
 
   //* Get rent market contract instance.
   const rentMarketContract = new ethers.Contract(
-    NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS,
+    RENT_MARKET_CONTRACT_ADDRESS,
     rentmarketABI.abi,
     signer
   );
@@ -96,11 +102,19 @@ export default async function handler(req, res) {
 
   if (maticPricePerUSD) {
     //* Change NFT price.
-    const registerData = await rentMarketContract.getRegisterData(
-      PAYMENT_NFT_ADDRESS,
-      PAYMENT_NFT_TOKEN
-    );
+    // const registerData = await rentMarketContract.getRegisterData(
+    //   PAYMENT_NFT_ADDRESS,
+    //   PAYMENT_NFT_TOKEN
+    // );
+    const registerData = await readContract({
+      address: RENT_MARKET_CONTRACT_ADDRESS,
+      abi: rentmarketABI?.abi,
+      functionName: "getRegisterData",
+      args: [PAYMENT_NFT_ADDRESS, PAYMENT_NFT_TOKEN],
+    });
     console.log("registerData: ", registerData);
+
+    //* TODO: Handle error case (ex: no register data)
 
     //* Change NFT price.
     // address nftAddress
@@ -112,14 +126,15 @@ export default async function handler(req, res) {
     const tx = await rentMarketContract.changeNFT(
       PAYMENT_NFT_ADDRESS,
       PAYMENT_NFT_TOKEN,
-      ethers.utils.parseUnits(maticPricePerUSD.toFixed(2), 18),
+      parseUnits(maticPricePerUSD.toFixed(2), 18),
       registerData.feeTokenAddress,
       registerData.rentFeeByToken,
       registerData.rentDuration
     );
-    // console.log("tx: ", tx);
+    console.log("tx: ", tx);
+
     const receipt = await tx.wait();
-    // console.log("receipt: ", receipt);
+    console.log("receipt: ", receipt);
   } else {
     return res
       .status(500)

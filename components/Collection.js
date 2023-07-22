@@ -75,7 +75,7 @@ export default function Collection() {
   //*---------------------------------------------------------------------------
   const [unregisterCollectionAddress, setUnregisterCollectionAddress] =
     React.useState();
-  const RENT_MARKET_CONTRACT_ADDRES =
+  const RENT_MARKET_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
 
   const { data: walletClient } = useWalletClient();
@@ -87,7 +87,7 @@ export default function Collection() {
     write: writeRegisterCollection,
     isLoading: isLoadingRegisterCollection,
   } = useContractWrite({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI.abi,
     functionName: "registerCollection",
     onSuccess(data) {
@@ -158,7 +158,7 @@ export default function Collection() {
     write: writeUnregisterCollection,
     isLoading: isLoadingUnregisterCollection,
   } = useContractWrite({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI.abi,
     functionName: "unregisterCollection",
     onSuccess(data) {
@@ -220,7 +220,7 @@ export default function Collection() {
     isLoading: isLoadingAllCollection,
     status: statusAllCollection,
   } = useContractRead({
-    address: RENT_MARKET_CONTRACT_ADDRES,
+    address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI.abi,
     functionName: "getAllCollection",
     watch: true,
