@@ -30,7 +30,6 @@ import CollectionsIcon from "@mui/icons-material/Collections";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
 import My from "@/components/My";
 import Market from "@/components/Market";
-import RentMarket from "@/components/RentMarket";
 import Content from "@/components/Content";
 import Collection from "@/components/Collection";
 import Service from "@/components/Service";
@@ -44,7 +43,6 @@ import MonitorSetting from "@/components/MonitorSetting";
 import {
   AlertSeverity,
   RBSnackbar,
-  writeToastMessageState,
   readToastMessageState,
   checkMobile,
 } from "@/components/RentContentUtil";
@@ -55,7 +53,7 @@ const LoginWrapper = dynamic(() => import("./LoginWrapper"), {
 const RENT_CONTENT_COMPONENT_DRAWER_WIDTH = 180;
 
 //*-----------------------------------------------------------------------------
-//* Define Main component style.
+//* Main
 //*-----------------------------------------------------------------------------
 const Main = styled("main", {
   shouldForwardProp: (prop) => prop !== "open",
@@ -78,7 +76,7 @@ const Main = styled("main", {
 }));
 
 //*-----------------------------------------------------------------------------
-//* Define AppBar component style.
+//* AppBar
 //*-----------------------------------------------------------------------------
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -98,7 +96,7 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 //*-----------------------------------------------------------------------------
-//* Define DrawerHeader component style.
+//* DrawerHeader
 //*-----------------------------------------------------------------------------
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -146,27 +144,10 @@ const RentContent = ({
   const theme = useTheme();
 
   //*---------------------------------------------------------------------------
-  //* Define rent market class.
-  //*---------------------------------------------------------------------------
-  const rentMarketClassRef = React.useRef();
-
-  //*---------------------------------------------------------------------------
   //* Data list.
   //* Undefined varialbe means loading status.
   //*---------------------------------------------------------------------------
-  const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState();
-  const [myUnregisteredNFTArray, setMyUnregisteredNFTArray] = React.useState();
-  const [collectionArray, setCollectionArray] = React.useState();
-  const [serviceArray, setServiceArray] = React.useState();
-  const [tokenArray, setTokenArray] = React.useState();
-  const [inputRentMarket, setInputRentMarket] = React.useState();
   const isMobileRef = React.useRef(false);
-
-  //*---------------------------------------------------------------------------
-  //* If undefined, it'd loading status.
-  //*---------------------------------------------------------------------------
-  const [registerNFTArray, setRegisterNFTArray] = React.useState();
-  const [myRentNFTArray, setMyRentNFTArray] = React.useState();
 
   //*---------------------------------------------------------------------------
   //* Handle drawer open.
@@ -196,18 +177,6 @@ const RentContent = ({
   //*---------------------------------------------------------------------------
   //* Handle toast message.
   //*---------------------------------------------------------------------------
-  const [writeToastMessageLoadable, setWriteToastMessage] =
-    useRecoilStateLoadable(writeToastMessageState);
-  const writeToastMessage =
-    writeToastMessageLoadable?.state === "hasValue"
-      ? writeToastMessageLoadable.contents
-      : {
-          snackbarSeverity: AlertSeverity.info,
-          snackbarMessage: "",
-          snackbarTime: new Date(),
-          snackbarOpen: true,
-        };
-
   const readToastMessageLoadable = useRecoilValueLoadable(
     readToastMessageState
   );
@@ -223,125 +192,25 @@ const RentContent = ({
 
   useEffect(() => {
     // console.log("call useEffect()");
-    // console.log("rentMarketAddress: ", rentMarketAddress);
-    // console.log("testNftAddress: ", testNftAddress);
-    // console.log("blockchainNetwork: ", blockchainNetwork);
-    // console.log("serviceAddress: ", serviceAddress);
 
-    async function initRentMarket() {
-      // console.log("call initRentMarket()");
-
-      rentMarketClassRef.current = new RentMarket({
-        accountAddress: address,
-        rentMarketAddress,
-        testNftAddress,
-        blockchainNetwork,
-        onEventFunc,
-        onErrorFunc,
-      });
-      // console.log("rentMarketClassRef.current: ", rentMarketClassRef.current);
-
-      //* Set inputRentMarket for updating component which uses rentMarket.
-      //* For calling function of rentMarket contract.
-      // console.log("call setInputRentMarket()");
-      setInputRentMarket(rentMarketClassRef.current);
-
-      // console.log("call rentMarketClassRef.current.initializeAll()");
-      try {
-        // await rentMarketClassRef.current.initializeAll();
-        rentMarketClassRef.current.initializeAll();
-      } catch (error) {
-        console.error(error);
-        setWriteToastMessage({
-          snackbarSeverity: AlertSeverity.error,
-          snackbarMessage: error.reason ? error.reason : error,
-          snackbarTime: new Date(),
-          snackbarOpen: true,
-        });
-      }
-
-      //* Close drawer in mobile browser.
-      isMobileRef.current = checkMobile();
-      // console.log("isMobileRef.current: ", isMobileRef.current);
-      if (isMobileRef.current === true) {
-        setOpenDrawer(false);
-      }
+    //* Close drawer in mobile browser.
+    isMobileRef.current = checkMobile();
+    // console.log("isMobileRef.current: ", isMobileRef.current);
+    if (isMobileRef.current === true) {
+      setOpenDrawer(false);
     }
-
-    //*-------------------------------------------------------------------------
-    //* Fetch token, collection, service, request/register data,
-    //* and rent data to interconnect them.
-    //*-------------------------------------------------------------------------
-    initRentMarket().catch(console.error);
   }, [rentMarketAddress, testNftAddress, blockchainNetwork, serviceAddress]);
 
-  function onErrorFunc({ severity = AlertSeverity.error, message = "" }) {
-    setWriteToastMessage({
-      snackbarSeverity: severity,
-      snackbarMessage: message,
-      snackbarTime: new Date(),
-      snackbarOpen: true,
-    });
-  }
-
-  function onEventFunc(
-    { event, message } = { event: undefined, message: undefined }
-  ) {
-    // console.log("call onEventFunc()");
-
-    // console.log(
-    //   "rentMarketClassRef.current.registerNFTArray: ",
-    //   rentMarketClassRef.current.registerNFTArray
-    // );
-    // console.log(
-    //   "rentMarketClassRef.current.myRentNFTArray: ",
-    //   rentMarketClassRef.current.myRentNFTArray
-    // );
-    // console.log(
-    //   "rentMarketClassRef.current.collectionArray: ",
-    //   rentMarketClassRef.current.collectionArray
-    // );
-    // console.log(
-    //   "rentMarketClassRef.current.myRegisteredNFTArray: ",
-    //   rentMarketClassRef.current.myRegisteredNFTArray
-    // );
-    // console.log(
-    //   "rentMarketClassRef.current.myUnregisteredNFTArray: ",
-    //   rentMarketClassRef.current.myUnregisteredNFTArray
-    // );
-
-    setMyRegisteredNFTArray(rentMarketClassRef.current.myRegisteredNFTArray);
-    setMyUnregisteredNFTArray(
-      rentMarketClassRef.current.myUnregisteredNFTArray
-    );
-    setRegisterNFTArray(rentMarketClassRef.current.registerNFTArray);
-    setMyRentNFTArray(rentMarketClassRef.current.myRentNFTArray);
-    setCollectionArray(rentMarketClassRef.current.collectionArray);
-    setServiceArray(rentMarketClassRef.current.serviceArray);
-    setTokenArray(rentMarketClassRef.current.tokenArray);
-
-    if (message) {
-      setWriteToastMessage({
-        snackbarSeverity: AlertSeverity.info,
-        snackbarMessage: message,
-        snackbarTime: new Date(),
-        snackbarOpen: true,
-      });
-    }
-  }
-
-  //*---------------------------------------------------------------------------
-  //* Rendering function.
-  //*---------------------------------------------------------------------------
+  //* Render.
   return (
     <Box
       sx={{
         display: "flex",
       }}
     >
-      {/* //*----------------------------------------------------------------*/}
-      {/* //* App bar title part.                                            */}
-      {/* //*----------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* App bar title part.                                             */}
+      {/*//*-----------------------------------------------------------------*/}
       <AppBar position="fixed" open={openDrawer}>
         <Toolbar>
           <IconButton
@@ -650,25 +519,25 @@ const RentContent = ({
 
         <LoginWrapper>
           {selectedIndex === MARKET_MENU_INDEX ? (
-            inputRentMarket && <Market inputRentMarketClass={inputRentMarket} />
+            <Market />
           ) : selectedIndex === MY_MENU_INDEX ? (
-            inputRentMarket && <My />
+            <My />
           ) : selectedIndex === CONTENT_MENU_INDEX ? (
-            inputRentMarket && <Content />
+            <Content />
           ) : selectedIndex === COLLECTION_MENU_INDEX ? (
-            inputRentMarket && <Collection />
+            <Collection />
           ) : selectedIndex === SERVICE_MENU_INDEX ? (
-            inputRentMarket && <Service />
+            <Service />
           ) : selectedIndex === TOKEN_MENU_INDEX ? (
-            inputRentMarket && <Token />
+            <Token />
           ) : selectedIndex === MONITOR_TOKEN_MENU_INDEX ? (
-            inputRentMarket && <MonitorToken />
+            <MonitorToken />
           ) : selectedIndex === MONITOR_ACCOUNT_BALANCE_MENU_INDEX ? (
-            inputRentMarket && <MonitorAccountBalance />
+            <MonitorAccountBalance />
           ) : selectedIndex === MONITOR_PENDING_RENT_FEE_MENU_INDEX ? (
-            inputRentMarket && <MonitorPendingRentFee />
+            <MonitorPendingRentFee />
           ) : selectedIndex === MONITOR_RENT_NFT_MENU_INDEX ? (
-            inputRentMarket && <MonitorRentNft />
+            <MonitorRentNft />
           ) : selectedIndex === MONITOR_REWARD_MENU_INDEX ? (
             <MonitorReward />
           ) : selectedIndex === MONITOR_SETTING_MENU_INDEX ? (
@@ -680,7 +549,7 @@ const RentContent = ({
       </Main>
 
       {/*//*-----------------------------------------------------------------*/}
-      {/*//* Toast message.                                                  */}
+      {/*//* Snackbar message.                                               */}
       {/*//*-----------------------------------------------------------------*/}
       <RBSnackbar
         open={readToastMessage.snackbarOpen}

@@ -48,7 +48,7 @@ import rentmarketABI from "@/contracts/rentMarket.json";
 //* TODO: Test token
 import faucetTokenABI from "@/contracts/faucetToken.json";
 
-const Market = ({ inputRentMarketClass }) => {
+export default function Market() {
   const RENT_MARKET_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
   const SERVICE_OWNER_ADDRESS = process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS;
@@ -199,7 +199,6 @@ const Market = ({ inputRentMarketClass }) => {
   //*---------------------------------------------------------------------------
   //* Define copied local varialbe from input data.
   //*---------------------------------------------------------------------------
-  const rentMarketClassRef = React.useRef();
   const [collectionArray, setCollectionArray] = React.useState([]);
 
   //*---------------------------------------------------------------------------
@@ -240,14 +239,9 @@ const Market = ({ inputRentMarketClass }) => {
 
   useEffect(() => {
     console.log("call useEffect()");
-    // console.log("inputRentMarketClass: ", inputRentMarketClass);
 
     if (collectionArray.length > 0) {
       handleListCollectionClick(collectionArray[0]);
-    }
-
-    if (inputRentMarketClass) {
-      rentMarketClassRef.current = inputRentMarketClass;
     }
   }, []);
 
@@ -355,11 +349,12 @@ const Market = ({ inputRentMarketClass }) => {
             color="primary"
             variant="outlined"
             onClick={async () => {
-              let provider;
-              await rentMarketClassRef.current.rentNFT({
-                provider,
-                element,
-                SERVICE_OWNER_ADDRESS,
+              writeRentNFT?.({
+                args: [
+                  element.nftAddress,
+                  element.tokenId,
+                  SERVICE_OWNER_ADDRESS,
+                ],
               });
             }}
           >
@@ -371,18 +366,12 @@ const Market = ({ inputRentMarketClass }) => {
             color="primary"
             variant="outlined"
             onClick={async () => {
-              // let provider;
-              // await rentMarketClassRef.current.rentNFTByToken({
-              //   provider,
-              //   element,
-              //   SERVICE_OWNER_ADDRESS,
-              // });
-              // console.log("element: ", element);
               const contract = getContract({
                 address: element.feeTokenAddress,
                 abi: faucetTokenABI.abi,
               });
               // console.log("contract: ", contract);
+
               await erc20PermitSignature({
                 owner: address,
                 spender: RENT_MARKET_CONTRACT_ADDRESS,
@@ -407,77 +396,12 @@ const Market = ({ inputRentMarketClass }) => {
                   snackbarOpen: true,
                 });
               }
-
-              // setWriteToastMessage({
-              //   snackbarSeverity: AlertSeverity.info,
-              //   snackbarMessage: "Make transaction for renting nft.",
-              //   snackbarTime: new Date(),
-              //   snackbarOpen: true,
-              // });
             }}
           >
             {Number(element.rentFeeByToken / BigInt(10 ** 18))}
           </Button>
         </TableCell>
         <TableCell align="center">{Number(element.rentDuration)}</TableCell>
-        {/* <TableCell align="center">
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={async () => {
-              let provider;
-              if (isMobile === true) {
-                provider = new WalletConnectProvider({
-                  rpc: {
-                    137: "https://rpc-mainnet.maticvigil.com",
-                    80001: "https://rpc-mumbai.maticvigil.com/",
-                  },
-                  infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
-                });
-                await provider.enable();
-              }
-
-              try {
-                await rentMarketClassRef.current.rentNFT({
-                  provider,
-                  element,
-                  SERVICE_OWNER_ADDRESS,
-                });
-              } catch (error) {
-                let message = error.data
-                  ? error.data.message
-                  : error.reason || error.message || error || "";
-
-                if (error.message) {
-                  let regex = new RegExp(
-                    "while formatting outputs from RPC '(.*)'"
-                  );
-                  let match = regex.exec(error.message);
-
-                  if (match !== null && match.length == 2) {
-                    let messageJson = JSON.parse(match[1]);
-                    regex = new RegExp(
-                      "Error: VM Exception while processing transaction: reverted with reason string '(.*)'"
-                    );
-                    match = regex.exec(messageJson.value.data.message);
-                    if (match !== null && match.length == 2) {
-                      message = getErrorDescription({ errorString: match[1] });
-                    }
-                  }
-                }
-
-                setWriteToastMessage({
-                  snackbarSeverity: AlertSeverity.error,
-                  snackbarMessage: message,
-                  snackbarTime: new Date(),
-                  snackbarOpen: true,
-                });
-              }
-            }}
-          >
-            RENT
-          </Button>
-        </TableCell> */}
       </TableRow>
     );
   }
@@ -845,6 +769,4 @@ const Market = ({ inputRentMarketClass }) => {
       </Grid>
     </>
   );
-};
-
-export default Market;
+}

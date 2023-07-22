@@ -85,7 +85,7 @@ export default function MonitorPendingRentFee() {
           {/*//* Current pending data table body.                            */}
           {/*//*-------------------------------------------------------------*/}
           <TableBody>
-            {dataAllPendingRentFee.map((data) => {
+            {dataAllPendingRentFee?.map((data) => {
               // console.log("data: ", data);
 
               return (
