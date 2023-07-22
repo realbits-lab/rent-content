@@ -122,7 +122,7 @@ export default function MonitorAccountBalance() {
         </TableHead>
 
         <TableBody>
-          {dataAllAccountBalance.map((row) => {
+          {dataAllAccountBalance?.map((row) => {
             // console.log("row: ", row);
             return (
               <TableRow
