@@ -7,7 +7,6 @@ import {
   useContractRead,
   useContractWrite,
   useWaitForTransaction,
-  useWalletClient,
 } from "wagmi";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
