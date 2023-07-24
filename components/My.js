@@ -66,19 +66,6 @@ export default function My() {
     abi: rentmarketABI?.abi,
     functionName: "getAllRentData",
     watch: true,
-    async onSuccess(data) {
-      // console.log("call onSuccess()");
-      // console.log("data: ", data);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
-    },
   });
 
   //* getAllRegisterData function
@@ -92,19 +79,6 @@ export default function My() {
     abi: rentmarketABI?.abi,
     functionName: "getAllRegisterData",
     watch: true,
-    onSuccess(data) {
-      // console.log("call onSuccess()");
-      // console.log("data: ", data);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
-    },
   });
 
   //* getAllCollection function
@@ -147,15 +121,6 @@ export default function My() {
       await Promise.all(promises);
 
       setCollectionArray(tempCollectionArray);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
     },
   });
 
