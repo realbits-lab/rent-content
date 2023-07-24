@@ -1,4 +1,5 @@
 import React from "react";
+import { formatEther } from "viem";
 import {
   useContractRead,
   useContractWrite,
@@ -145,9 +146,7 @@ export default function MonitorAccountBalance() {
                     withLink: "scan",
                   })}
                 </TableCell>
-                <TableCell align="center">
-                  {Number(row.amount / BigInt(10 ** 18))}
-                </TableCell>
+                <TableCell align="center">{formatEther(row.amount)}</TableCell>
                 <TableCell align="center">
                   {buildWithdrawButton({
                     recipient: row.accountAddress,

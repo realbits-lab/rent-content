@@ -1,4 +1,5 @@
 import React from "react";
+import { formatEther } from "viem";
 import { useContractRead } from "wagmi";
 import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
@@ -117,7 +118,7 @@ export default function MonitorPendingRentFee() {
                     })}
                   </TableCell>
                   <TableCell align="center">
-                    {Number(data.amount / BigInt(10 ** 18))}
+                    {formatEther(data.amount)}
                   </TableCell>
                 </TableRow>
               );

@@ -1,14 +1,6 @@
 import React from "react";
-import {
-  useAccount,
-  useNetwork,
-  useContractRead,
-  useContractReads,
-  useContractWrite,
-  useWaitForTransaction,
-  useWalletClient,
-} from "wagmi";
-import { ethers } from "ethers";
+import { formatEther } from "viem";
+import { useContractReads } from "wagmi";
 import { Network, Alchemy } from "alchemy-sdk";
 import keccak256 from "keccak256";
 import { Buffer } from "buffer";
@@ -17,7 +9,6 @@ import momentDurationFormatSetup from "moment-duration-format";
 import {
   Divider,
   Chip,
-  Link,
   Table,
   TableBody,
   TableCell,
@@ -28,12 +19,9 @@ import {
 } from "@mui/material";
 import { useRecoilStateLoadable } from "recoil";
 import {
-  shortenAddress,
   AlertSeverity,
   writeToastMessageState,
-  getChainName,
 } from "@/components/RentContentUtil";
-import rentmarketABI from "@/contracts/rentMarket.json";
 import rewardTokenABI from "@/contracts/rewardToken.json";
 import rewardTokenShareABI from "@/contracts/rewardTokenShare.json";
 import faucetTokenABI from "@/contracts/faucetToken.json";
@@ -241,16 +229,13 @@ export default function MonitorReward() {
                 // console.log("func: ", func);
                 if (dataRewardToken[idx].status === "success") {
                   let value;
-                  // if (typeof dataRewardToken[idx].result === "bigint") {
                   if (
                     functionName === "totalSupply" ||
                     functionName === "currentReleasable" ||
                     functionName === "totalAllocation" ||
                     functionName === "minimumReleasable"
                   ) {
-                    value = (
-                      dataRewardToken[idx].result / BigInt(Math.pow(10, 18))
-                    ).toLocaleString();
+                    value = formatEther(dataRewardToken[idx].result);
                   } else if (functionName === "start") {
                     value = moment
                       .unix(Number(dataRewardToken[idx].result), "seconds")
@@ -306,10 +291,7 @@ export default function MonitorReward() {
                   if (dataRewardTokenShare[idx].status === "success") {
                     let value;
                     if (functionName === "getRewardTokenBalance") {
-                      value = (
-                        dataRewardTokenShare[idx].result /
-                        BigInt(Math.pow(10, 18))
-                      ).toLocaleString();
+                      value = formatEther(dataRewardTokenShare[idx].result);
                     } else {
                       value = dataRewardTokenShare[idx].result.toString();
                     }
