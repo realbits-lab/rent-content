@@ -34,7 +34,8 @@ import Content from "@/components/Content";
 import Collection from "@/components/Collection";
 import Service from "@/components/Service";
 import Token from "@/components/Token";
-import MonitorToken from "@/components/MonitorToken";
+import MonitorPaymentToken from "@/components/MonitorPaymentToken";
+import MonitorPaymentNFT from "@/components/MonitorPaymentNFT";
 import MonitorRentNft from "@/components/MonitorRentNft";
 import MonitorPendingRentFee from "@/components/MonitorPendingRentFee";
 import MonitorAccountBalance from "@/components/MonitorAccountBalance";
@@ -124,14 +125,15 @@ export default function RentContent() {
   const COLLECTION_MENU_INDEX = 3;
   const SERVICE_MENU_INDEX = 4;
   const TOKEN_MENU_INDEX = 5;
-  const MONITOR_TOKEN_MENU_INDEX = 6;
-  const MONITOR_ACCOUNT_BALANCE_MENU_INDEX = 7;
-  const MONITOR_PENDING_RENT_FEE_MENU_INDEX = 8;
-  const MONITOR_RENT_NFT_MENU_INDEX = 9;
-  const MONITOR_REWARD_MENU_INDEX = 10;
-  const MONITOR_SETTING_MENU_INDEX = 11;
+  const MONITOR_PAYMENT_TOKEN_MENU_INDEX = 6;
+  const MONITOR_PAYMENT_NFT_MENU_INDEX = 7;
+  const MONITOR_ACCOUNT_BALANCE_MENU_INDEX = 8;
+  const MONITOR_PENDING_RENT_FEE_MENU_INDEX = 9;
+  const MONITOR_RENT_NFT_MENU_INDEX = 10;
+  const MONITOR_REWARD_MENU_INDEX = 11;
+  const MONITOR_SETTING_MENU_INDEX = 12;
 
-  const DEFAULT_MENU_INDEX = MARKET_MENU_INDEX;
+  const DEFAULT_MENU_INDEX = MONITOR_PAYMENT_NFT_MENU_INDEX;
 
   //*---------------------------------------------------------------------------
   //* Set MUI theme.
@@ -230,8 +232,10 @@ export default function RentContent() {
               ? "Service"
               : selectedIndex === TOKEN_MENU_INDEX
               ? "Token"
-              : selectedIndex === MONITOR_TOKEN_MENU_INDEX
-              ? "Monitor - Token"
+              : selectedIndex === MONITOR_PAYMENT_TOKEN_MENU_INDEX
+              ? "Monitor - Payment Token"
+              : selectedIndex === MONITOR_PAYMENT_NFT_MENU_INDEX
+              ? "Monitor - Payment NFT"
               : selectedIndex === MONITOR_ACCOUNT_BALANCE_MENU_INDEX
               ? "Monitor - Account Balance"
               : selectedIndex === MONITOR_PENDING_RENT_FEE_MENU_INDEX
@@ -409,17 +413,32 @@ export default function RentContent() {
           </Divider>
 
           {
-            <ListItem key="Monitor-Token" disablePadding>
+            <ListItem key="Monitor-Payment Token" disablePadding>
               <ListItemButton
-                selected={selectedIndex === MONITOR_TOKEN_MENU_INDEX}
+                selected={selectedIndex === MONITOR_PAYMENT_TOKEN_MENU_INDEX}
                 onClick={(event) =>
-                  handleListItemClick(event, MONITOR_TOKEN_MENU_INDEX)
+                  handleListItemClick(event, MONITOR_PAYMENT_TOKEN_MENU_INDEX)
                 }
               >
                 <ListItemIcon>
                   <CircleIcon />
                 </ListItemIcon>
-                <ListItemText primary="Token" />
+                <ListItemText primary="Payment Token" />
+              </ListItemButton>
+            </ListItem>
+          }
+          {
+            <ListItem key="Monitor-Payment NFT" disablePadding>
+              <ListItemButton
+                selected={selectedIndex === MONITOR_PAYMENT_NFT_MENU_INDEX}
+                onClick={(event) =>
+                  handleListItemClick(event, MONITOR_PAYMENT_NFT_MENU_INDEX)
+                }
+              >
+                <ListItemIcon>
+                  <CircleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Payment NFT" />
               </ListItemButton>
             </ListItem>
           }
@@ -525,8 +544,10 @@ export default function RentContent() {
             <Service />
           ) : selectedIndex === TOKEN_MENU_INDEX ? (
             <Token />
-          ) : selectedIndex === MONITOR_TOKEN_MENU_INDEX ? (
-            <MonitorToken />
+          ) : selectedIndex === MONITOR_PAYMENT_TOKEN_MENU_INDEX ? (
+            <MonitorPaymentToken />
+          ) : selectedIndex === MONITOR_PAYMENT_NFT_MENU_INDEX ? (
+            <MonitorPaymentNFT />
           ) : selectedIndex === MONITOR_ACCOUNT_BALANCE_MENU_INDEX ? (
             <MonitorAccountBalance />
           ) : selectedIndex === MONITOR_PENDING_RENT_FEE_MENU_INDEX ? (

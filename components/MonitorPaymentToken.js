@@ -33,7 +33,7 @@ import {
 } from "@/components/RentContentUtil";
 import rentmarketABI from "@/contracts/rentMarket.json";
 
-export default function MonitorToken() {
+export default function MonitorPaymentToken() {
   const [tokenEventArray, setTokenEventArray] = React.useState([]);
 
   //*---------------------------------------------------------------------------
@@ -50,16 +50,6 @@ export default function MonitorToken() {
   //*---------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
-  const writeToastMessage = React.useMemo(() => {
-    return writeToastMessageLoadable?.state === "hasValue"
-      ? writeToastMessageLoadable.contents
-      : {
-          snackbarSeverity: AlertSeverity.info,
-          snackbarMessage: "",
-          snackbarTime: new Date(),
-          snackbarOpen: true,
-        };
-  });
 
   //*---------------------------------------------------------------------------
   //* Wagmi hook functions.
@@ -77,19 +67,6 @@ export default function MonitorToken() {
     abi: rentmarketABI.abi,
     functionName: "getAllToken",
     watch: true,
-    onSuccess(data) {
-      // console.log("call onSuccess()");
-      // console.log("data: ", data);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
-    },
   });
   // console.log("dataAllToken: ", dataAllToken);
 
@@ -152,7 +129,7 @@ export default function MonitorToken() {
           </TableHead>
           <TableBody>
             {dataAllToken?.map((token, idx) => {
-              console.log("token: ", token);
+              // console.log("token: ", token);
               return (
                 <TableRow
                   key={idx}

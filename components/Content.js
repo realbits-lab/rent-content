@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Alchemy, Network } from "alchemy-sdk";
-import { parseEther } from "viem";
+import { parseEther, formatEther } from "viem";
 import {
   useAccount,
   useNetwork,
@@ -597,12 +597,8 @@ export default function Content() {
           {nft.metadata ? nft.metadata.name : "N/A"}
         </TableCell>
         <TableCell align="center">{nft.tokenId.toString()}</TableCell>
-        <TableCell align="center">
-          {(nft.rentFee / BigInt(10 ** 18)).toString()}
-        </TableCell>
-        <TableCell align="center">
-          {(nft.rentFeeByToken / BigInt(10 ** 18)).toString()}
-        </TableCell>
+        <TableCell align="center">{formatEther(nft.rentFee)}</TableCell>
+        <TableCell align="center">{formatEther(nft.rentFeeByToken)}</TableCell>
         <TableCell align="center">{nft.rentDuration.toString()}</TableCell>
         <TableCell align="center">
           <Button
@@ -610,11 +606,12 @@ export default function Content() {
             onClick={() => {
               setChangeElement(nft);
               setFormValue((prevState) => {
+                console.log("nft: ", nft);
                 return {
                   ...prevState,
-                  inputRentFee: nft.rentFee / Math.pow(10, 18),
+                  inputRentFee: formatEther(nft.rentFee),
                   inputFeeTokenAddress: nft.feeTokenAddress,
-                  inputRentFeeByToken: nft.rentFeeByToken / Math.pow(10, 18),
+                  inputRentFeeByToken: formatEther(nft.rentFeeByToken),
                   inputRentDuration: nft.rentDuration,
                 };
               });

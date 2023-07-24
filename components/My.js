@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import axios from "axios";
 import { Alchemy, Network } from "alchemy-sdk";
+import { parseEther, formatEther } from "viem";
 import {
   useAccount,
   useNetwork,
@@ -65,19 +66,6 @@ export default function My() {
     abi: rentmarketABI?.abi,
     functionName: "getAllRentData",
     watch: true,
-    async onSuccess(data) {
-      // console.log("call onSuccess()");
-      // console.log("data: ", data);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
-    },
   });
 
   //* getAllRegisterData function
@@ -91,19 +79,6 @@ export default function My() {
     abi: rentmarketABI?.abi,
     functionName: "getAllRegisterData",
     watch: true,
-    onSuccess(data) {
-      // console.log("call onSuccess()");
-      // console.log("data: ", data);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
-    },
   });
 
   //* getAllCollection function
@@ -146,15 +121,6 @@ export default function My() {
       await Promise.all(promises);
 
       setCollectionArray(tempCollectionArray);
-    },
-    onError(error) {
-      // console.log("call onError()");
-      // console.log("error: ", error);
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
     },
   });
 
@@ -392,10 +358,10 @@ export default function My() {
                     {element.metadata ? element.metadata.name : "N/A"}
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                    {(element.rentFee / BigInt(10 ** 18)).toString()}
+                    {formatEther(element.rentFee)}
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                    {(element.rentFeeByToken / BigInt(10 ** 18)).toString()}
+                    {formatEther(element.rentFeeByToken)}
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
                     {type === MyMenu.own

@@ -1,4 +1,5 @@
 import React from "react";
+import { formatEther } from "viem";
 import moment from "moment";
 import {
   useAccount,
@@ -385,7 +386,7 @@ export default function MonitorRentNft() {
                   </TableCell>
                   <TableCell align="center">{Number(data.tokenId)}</TableCell>
                   <TableCell align="center">
-                    {Number(data.rentFee / BigInt(10 ** 18))}
+                    {formatEther(data.rentFee)}
                   </TableCell>
                   <TableCell align="center">
                     {shortenAddress({
@@ -395,7 +396,7 @@ export default function MonitorRentNft() {
                     })}
                   </TableCell>
                   <TableCell align="center">
-                    {Number(data.rentFeeByToken / BigInt(10 ** 18))}
+                    {formatEther(data.rentFeeByToken)}
                   </TableCell>
                   <TableCell align="center">
                     {data.isRentByToken.toString()}

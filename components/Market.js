@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { formatEther } from "viem";
 import axios from "axios";
 import {
   useAccount,
@@ -358,7 +359,7 @@ export default function Market() {
               });
             }}
           >
-            {Number(element.rentFee / BigInt(10 ** 18))}
+            {formatEther(element.rentFee)}
           </Button>
         </TableCell>
         <TableCell align="center">
@@ -398,7 +399,7 @@ export default function Market() {
               }
             }}
           >
-            {Number(element.rentFeeByToken / BigInt(10 ** 18))}
+            {formatEther(element.rentFeeByToken)}
           </Button>
         </TableCell>
         <TableCell align="center">{Number(element.rentDuration)}</TableCell>
