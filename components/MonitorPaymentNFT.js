@@ -172,6 +172,7 @@ export default function MonitorPaymentNFT() {
               <TableCell align="center">Address</TableCell>
               <TableCell align="center">Id</TableCell>
               <TableCell align="center">Rent duration</TableCell>
+              <TableCell align="center">Rent Fee by Token</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -191,6 +192,9 @@ export default function MonitorPaymentNFT() {
                 {moment
                   .duration(Number(dataRegisterData?.rentDuration), "seconds")
                   .format()}
+              </TableCell>
+              <TableCell align="center">
+                {formatEther(dataRegisterData?.rentFeeByToken)}
               </TableCell>
             </TableRow>
           </TableBody>
