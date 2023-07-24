@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { formatEther } from "viem";
 import { useContractReads } from "wagmi";
 import { Network, Alchemy } from "alchemy-sdk";
@@ -163,7 +163,7 @@ export default function MonitorReward() {
   });
   // console.log("dataRewardTokenShare: ", dataRewardTokenShare);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // console.log("call useEffect()");
 
     momentDurationFormatSetup(moment);

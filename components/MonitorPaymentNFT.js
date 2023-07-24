@@ -3,6 +3,7 @@ import { useContractRead } from "wagmi";
 import { parseAbiItem, decodeEventLog, formatEther } from "viem";
 import { getPublicClient } from "@wagmi/core";
 import moment from "moment";
+import momentDurationFormatSetup from "moment-duration-format";
 import {
   Divider,
   Chip,
@@ -40,6 +41,21 @@ export default function MonitorPaymentNFT() {
     abi: paymentNFTABI?.abi,
     functionName: "symbol",
   });
+
+  //* getRegisterData function
+  const {
+    data: dataRegisterData,
+    isError: isErrorRegisterData,
+    isLoading: isLoadingRegisterData,
+    status: statusRegisterData,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRESS,
+    abi: rentMarketABI?.abi,
+    functionName: "getRegisterData",
+    args: [PAYMENT_NFT_ADDRESS, PAYMENT_NFT_TOKEN],
+    watch: true,
+  });
+  console.log("dataRegisterData: ", dataRegisterData);
 
   //* getAllRentData function
   const {
@@ -112,7 +128,7 @@ export default function MonitorPaymentNFT() {
           data: log.data,
           topics: log.topics,
         });
-        console.log("topic: ", topic);
+        // console.log("topic: ", topic);
         topics.push(topic.args);
       });
       // feeTokenAddress : "0x0000000000000000000000000000000000000000"
@@ -128,11 +144,13 @@ export default function MonitorPaymentNFT() {
       // tokenId : 1n
       setRentNFTEventLogs(topics);
     },
-    [RENT_MARKET_CONTRACT_ADDRESS]
+    [PAYMENT_NFT_ADDRESS, PAYMENT_NFT_TOKEN, RENT_MARKET_CONTRACT_ADDRESS]
   );
 
   useEffect(() => {
     // console.log("call useEffect()");
+    momentDurationFormatSetup(moment);
+
     getEventLogsOfRentNFT();
   }, [getEventLogsOfRentNFT]);
 
@@ -153,6 +171,7 @@ export default function MonitorPaymentNFT() {
               <TableCell align="center">Symbol</TableCell>
               <TableCell align="center">Address</TableCell>
               <TableCell align="center">Id</TableCell>
+              <TableCell align="center">Rent duration</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -168,6 +187,11 @@ export default function MonitorPaymentNFT() {
                 })}
               </TableCell>
               <TableCell align="center">{PAYMENT_NFT_TOKEN}</TableCell>
+              <TableCell align="center">
+                {moment
+                  .duration(Number(dataRegisterData?.rentDuration), "seconds")
+                  .format()}
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -196,7 +220,7 @@ export default function MonitorPaymentNFT() {
           </TableHead>
           <TableBody>
             {rentingNFTData?.map((rentData, idx) => {
-              console.log("rentData: ", rentData);
+              // console.log("rentData: ", rentData);
               return (
                 <>
                   <TableRow
@@ -272,7 +296,7 @@ export default function MonitorPaymentNFT() {
           </TableHead>
           <TableBody>
             {rentNFTEventLogs?.map((eventLog, idx) => {
-              console.log("eventLog: ", eventLog);
+              // console.log("eventLog: ", eventLog);
               return (
                 <>
                   <TableRow
