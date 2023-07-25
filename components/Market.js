@@ -48,11 +48,14 @@ import {
 import rentmarketABI from "@/contracts/rentMarket.json";
 //* TODO: Test token
 import faucetTokenABI from "@/contracts/faucetToken.json";
+import rewardTokenABI from "@/contracts/rewardToken.json";
 
 export default function Market() {
   const RENT_MARKET_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
   const SERVICE_OWNER_ADDRESS = process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS;
+  const REWARD_TOKEN_CONTRACT_ADDRESS =
+    process.env.NEXT_PUBLIC_REWARD_TOKEN_CONTRACT_ADDRESS;
 
   //*---------------------------------------------------------------------------
   //* Wagmi
@@ -120,23 +123,6 @@ export default function Market() {
     },
   });
 
-  const { data: dataApprove, write: writeApprove } = useContractWrite({
-    abi: faucetTokenABI.abi,
-    functionName: "approve",
-  });
-  const { isLoading: isLoadingApprove, isSuccess: isSuccessApprove } =
-    useWaitForTransaction({
-      hash: dataApprove?.hash,
-      onSuccess(data) {
-        setWriteToastMessage({
-          snackbarSeverity: AlertSeverity.info,
-          snackbarMessage: "Approve transaction is made successfully.",
-          snackbarTime: new Date(),
-          snackbarOpen: true,
-        });
-      },
-    });
-
   //* permit function
   const {
     data: dataPermit,
@@ -144,8 +130,9 @@ export default function Market() {
     isLoading: isLoadingPermit,
     write: writePermit,
   } = useContractWrite({
-    address: RENT_MARKET_CONTRACT_ADDRESS,
-    abi: rentmarketABI?.abi,
+    address: REWARD_TOKEN_CONTRACT_ADDRESS,
+    //* TODO: Handle localhost case.
+    abi: chain.network === "matic" ? rewardTokenABI?.abi : faucetTokenABI?.abi,
     functionName: "permit",
   });
   const {
@@ -258,7 +245,7 @@ export default function Market() {
     useRecoilStateLoadable(writeToastMessageState);
 
   useEffect(() => {
-    console.log("call useEffect()");
+    // console.log("call useEffect()");
 
     if (collectionArray.length > 0) {
       handleListCollectionClick(collectionArray[0]);
@@ -397,6 +384,18 @@ export default function Market() {
                 spender: RENT_MARKET_CONTRACT_ADDRESS,
                 amount: element.rentFeeByToken,
                 contract: contract,
+              });
+
+              writePermit?.({
+                args: [
+                  address,
+                  RENT_MARKET_CONTRACT_ADDRESS,
+                  element.rentFeeByToken,
+                  deadline,
+                  v,
+                  r,
+                  s,
+                ],
               });
 
               try {
@@ -589,7 +588,7 @@ export default function Market() {
       return buildNFTDataTableSkeleton();
     }
 
-    const selectedRegisterNFTArray = dataAllRegisterData.filter(
+    const selectedRegisterNFTArray = dataAllRegisterData?.filter(
       (registerData) =>
         registerData.nftAddress.toLowerCase() ===
         collectionAddress.toLowerCase()

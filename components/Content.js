@@ -47,7 +47,6 @@ import {
   changeIPFSToGateway,
   RBSize,
   getUniqueKey,
-  getChainName,
   AlertSeverity,
   shortenAddress,
   writeToastMessageState,
@@ -606,7 +605,7 @@ export default function Content() {
             onClick={() => {
               setChangeElement(nft);
               setFormValue((prevState) => {
-                console.log("nft: ", nft);
+                // console.log("nft: ", nft);
                 return {
                   ...prevState,
                   inputRentFee: formatEther(nft.rentFee),
