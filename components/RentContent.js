@@ -41,6 +41,7 @@ import MonitorPendingRentFee from "@/components/MonitorPendingRentFee";
 import MonitorAccountBalance from "@/components/MonitorAccountBalance";
 import MonitorReward from "@/components/MonitorReward";
 import MonitorSetting from "@/components/MonitorSetting";
+import WalletProfile from "@/components/WalletProfile";
 import {
   AlertSeverity,
   RBSnackbar,
@@ -532,6 +533,8 @@ export default function RentContent() {
         <DrawerHeader />
 
         <LoginWrapper>
+          <WalletProfile />
+
           {selectedIndex === MARKET_MENU_INDEX ? (
             <Market />
           ) : selectedIndex === MY_MENU_INDEX ? (
