@@ -545,8 +545,8 @@ export default function My() {
   }
 
   function buildCollectionTableRow({ collection }) {
-    console.log("call buildCollectionTableRow()");
-    console.log("collection: ", collection);
+    // console.log("call buildCollectionTableRow()");
+    // console.log("collection: ", collection);
 
     return (
       <TableRow
