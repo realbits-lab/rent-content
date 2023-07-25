@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { formatEther } from "viem";
+import { formatEther, encodeAbiParameters, parseAbiParameters } from "viem";
 import axios from "axios";
 import {
   useAccount,
@@ -7,6 +7,7 @@ import {
   useContractRead,
   useContractWrite,
   useWaitForTransaction,
+  useWalletClient,
 } from "wagmi";
 import { getContract } from "@wagmi/core";
 import { utils } from "ethers";
@@ -62,6 +63,8 @@ export default function Market() {
   //*---------------------------------------------------------------------------
   const { chain, chains } = useNetwork();
   const { address, isConnecting, isDisconnected } = useAccount();
+
+  const { data: dataWalletClient, isError, isLoading } = useWalletClient();
 
   //* getAllRegisterData function.
   const {
@@ -121,26 +124,6 @@ export default function Market() {
         setCollectionArray(collectionArray);
       });
     },
-  });
-
-  //* permit function
-  const {
-    data: dataPermit,
-    isError: isErrorPermit,
-    isLoading: isLoadingPermit,
-    write: writePermit,
-  } = useContractWrite({
-    address: REWARD_TOKEN_CONTRACT_ADDRESS,
-    //* TODO: Handle localhost case.
-    abi: chain.network === "matic" ? rewardTokenABI?.abi : faucetTokenABI?.abi,
-    functionName: "permit",
-  });
-  const {
-    data: dataPermitTx,
-    isError: isErrorPermitTx,
-    isLoading: isLoadingPermitTx,
-  } = useWaitForTransaction({
-    hash: dataPermit?.hash,
   });
 
   //* rentNFT function
@@ -386,26 +369,28 @@ export default function Market() {
                 contract: contract,
               });
 
-              writePermit?.({
-                args: [
-                  address,
-                  RENT_MARKET_CONTRACT_ADDRESS,
-                  element.rentFeeByToken,
-                  deadline,
-                  v,
-                  r,
-                  s,
-                ],
+              const encodedData = encodeAbiParameters(
+                parseAbiParameters("uint8 v, bytes32 r, bytes32 s"),
+                [v, r, s]
+              );
+              console.log("encodedData: ", encodedData);
+              console.log("element: ", element);
+
+              await dataWalletClient.sendTransaction({
+                to: RENT_MARKET_CONTRACT_ADDRESS,
+                account: address,
               });
 
               try {
-                writeRentNftByToken?.({
-                  args: [
-                    element.nftAddress,
-                    element.tokenId,
-                    SERVICE_OWNER_ADDRESS,
-                  ],
-                });
+                // writeRentNftByToken?.({
+                //   args: [
+                //     element.nftAddress,
+                //     element.tokenId,
+                //     SERVICE_OWNER_ADDRESS,
+                //     deadline,
+                //     encodedData,
+                //   ],
+                // });
               } catch (error) {
                 console.error(error);
                 setWriteToastMessage({
@@ -618,7 +603,10 @@ export default function Market() {
 
                 <TableBody>
                   {selectedRegisterNFTArray
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    ?.slice(
+                      page * rowsPerPage,
+                      page * rowsPerPage + rowsPerPage
+                    )
                     .map((element, idx) => {
                       // console.log("element: ", element);
                       return buildRowList({
