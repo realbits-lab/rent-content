@@ -369,28 +369,18 @@ export default function Market() {
                 contract: contract,
               });
 
-              const encodedData = encodeAbiParameters(
-                parseAbiParameters("uint8 v, bytes32 r, bytes32 s"),
-                [v, r, s]
-              );
-              console.log("encodedData: ", encodedData);
-              console.log("element: ", element);
-
-              await dataWalletClient.sendTransaction({
-                to: RENT_MARKET_CONTRACT_ADDRESS,
-                account: address,
-              });
-
               try {
-                // writeRentNftByToken?.({
-                //   args: [
-                //     element.nftAddress,
-                //     element.tokenId,
-                //     SERVICE_OWNER_ADDRESS,
-                //     deadline,
-                //     encodedData,
-                //   ],
-                // });
+                writeRentNftByToken?.({
+                  args: [
+                    element.nftAddress,
+                    element.tokenId,
+                    SERVICE_OWNER_ADDRESS,
+                    deadline,
+                    v,
+                    r,
+                    s,
+                  ],
+                });
               } catch (error) {
                 console.error(error);
                 setWriteToastMessage({
