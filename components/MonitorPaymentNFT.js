@@ -55,7 +55,7 @@ export default function MonitorPaymentNFT() {
     args: [PAYMENT_NFT_ADDRESS, PAYMENT_NFT_TOKEN],
     watch: true,
   });
-  console.log("dataRegisterData: ", dataRegisterData);
+  // console.log("dataRegisterData: ", dataRegisterData);
 
   //* getAllRentData function
   const {
