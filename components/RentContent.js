@@ -134,7 +134,7 @@ export default function RentContent() {
   const MONITOR_REWARD_MENU_INDEX = 11;
   const MONITOR_SETTING_MENU_INDEX = 12;
 
-  const DEFAULT_MENU_INDEX = MONITOR_PAYMENT_NFT_MENU_INDEX;
+  const DEFAULT_MENU_INDEX = MARKET_MENU_INDEX;
 
   //*---------------------------------------------------------------------------
   //* Set MUI theme.

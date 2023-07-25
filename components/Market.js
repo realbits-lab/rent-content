@@ -137,6 +137,25 @@ export default function Market() {
       },
     });
 
+  //* permit function
+  const {
+    data: dataPermit,
+    isError: isErrorPermit,
+    isLoading: isLoadingPermit,
+    write: writePermit,
+  } = useContractWrite({
+    address: RENT_MARKET_CONTRACT_ADDRESS,
+    abi: rentmarketABI?.abi,
+    functionName: "permit",
+  });
+  const {
+    data: dataPermitTx,
+    isError: isErrorPermitTx,
+    isLoading: isLoadingPermitTx,
+  } = useWaitForTransaction({
+    hash: dataPermit?.hash,
+  });
+
   //* rentNFT function
   const {
     data: dataRentNFT,
@@ -373,7 +392,7 @@ export default function Market() {
               });
               // console.log("contract: ", contract);
 
-              await erc20PermitSignature({
+              const { r, s, v, deadline } = await erc20PermitSignature({
                 owner: address,
                 spender: RENT_MARKET_CONTRACT_ADDRESS,
                 amount: element.rentFeeByToken,
