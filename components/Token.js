@@ -132,8 +132,8 @@ export default function Token() {
     functionName: "registerToken",
 
     onSuccess(data) {
-      console.log("call onSettled()");
-      console.log("data: ", data);
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
 
       setWriteToastMessage({
         snackbarSeverity: AlertSeverity.info,
@@ -143,8 +143,8 @@ export default function Token() {
       });
     },
     onError(error) {
-      console.log("call onError()");
-      console.log("error: ", error);
+      // console.log("call onError()");
+      // console.log("error: ", error);
 
       setWriteToastMessage({
         snackbarSeverity: AlertSeverity.error,
@@ -161,9 +161,9 @@ export default function Token() {
       });
     },
     onSettled(data, error) {
-      console.log("call onSettled()");
-      console.log("data: ", data);
-      console.log("error: ", error);
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
     },
   });
 

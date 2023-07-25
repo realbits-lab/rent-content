@@ -53,19 +53,10 @@ export default function Service() {
     React.useState();
 
   //*---------------------------------------------------------------------------
-  //* Handle toast mesage.
+  //* Toast message.
   //*---------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
-  const writeToastMessage =
-    writeToastMessageLoadable?.state === "hasValue"
-      ? writeToastMessageLoadable.contents
-      : {
-          snackbarSeverity: AlertSeverity.info,
-          snackbarMessage: "",
-          snackbarTime: new Date(),
-          snackbarOpen: true,
-        };
 
   //*---------------------------------------------------------------------------
   //* Wagmi
@@ -102,11 +93,6 @@ export default function Service() {
           serviceUri: "",
         };
       });
-    },
-    onSettled(data, error) {
-      // console.log("call onSettled()");
-      // console.log("data: ", data);
-      // console.log("error: ", error);
     },
   });
   const {

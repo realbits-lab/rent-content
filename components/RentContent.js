@@ -41,6 +41,7 @@ import MonitorPendingRentFee from "@/components/MonitorPendingRentFee";
 import MonitorAccountBalance from "@/components/MonitorAccountBalance";
 import MonitorReward from "@/components/MonitorReward";
 import MonitorSetting from "@/components/MonitorSetting";
+import WalletProfile from "@/components/WalletProfile";
 import {
   AlertSeverity,
   RBSnackbar,
@@ -133,7 +134,7 @@ export default function RentContent() {
   const MONITOR_REWARD_MENU_INDEX = 11;
   const MONITOR_SETTING_MENU_INDEX = 12;
 
-  const DEFAULT_MENU_INDEX = MONITOR_PAYMENT_NFT_MENU_INDEX;
+  const DEFAULT_MENU_INDEX = MARKET_MENU_INDEX;
 
   //*---------------------------------------------------------------------------
   //* Set MUI theme.
@@ -532,6 +533,8 @@ export default function RentContent() {
         <DrawerHeader />
 
         <LoginWrapper>
+          <WalletProfile />
+
           {selectedIndex === MARKET_MENU_INDEX ? (
             <Market />
           ) : selectedIndex === MY_MENU_INDEX ? (

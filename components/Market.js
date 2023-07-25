@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { formatEther } from "viem";
+import { formatEther, encodeAbiParameters, parseAbiParameters } from "viem";
 import axios from "axios";
 import {
   useAccount,
@@ -7,6 +7,7 @@ import {
   useContractRead,
   useContractWrite,
   useWaitForTransaction,
+  useWalletClient,
 } from "wagmi";
 import { getContract } from "@wagmi/core";
 import { utils } from "ethers";
@@ -48,17 +49,22 @@ import {
 import rentmarketABI from "@/contracts/rentMarket.json";
 //* TODO: Test token
 import faucetTokenABI from "@/contracts/faucetToken.json";
+import rewardTokenABI from "@/contracts/rewardToken.json";
 
 export default function Market() {
   const RENT_MARKET_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
   const SERVICE_OWNER_ADDRESS = process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS;
+  const REWARD_TOKEN_CONTRACT_ADDRESS =
+    process.env.NEXT_PUBLIC_REWARD_TOKEN_CONTRACT_ADDRESS;
 
   //*---------------------------------------------------------------------------
   //* Wagmi
   //*---------------------------------------------------------------------------
   const { chain, chains } = useNetwork();
   const { address, isConnecting, isDisconnected } = useAccount();
+
+  const { data: dataWalletClient, isError, isLoading } = useWalletClient();
 
   //* getAllRegisterData function.
   const {
@@ -119,23 +125,6 @@ export default function Market() {
       });
     },
   });
-
-  const { data: dataApprove, write: writeApprove } = useContractWrite({
-    abi: faucetTokenABI.abi,
-    functionName: "approve",
-  });
-  const { isLoading: isLoadingApprove, isSuccess: isSuccessApprove } =
-    useWaitForTransaction({
-      hash: dataApprove?.hash,
-      onSuccess(data) {
-        setWriteToastMessage({
-          snackbarSeverity: AlertSeverity.info,
-          snackbarMessage: "Approve transaction is made successfully.",
-          snackbarTime: new Date(),
-          snackbarOpen: true,
-        });
-      },
-    });
 
   //* rentNFT function
   const {
@@ -239,7 +228,7 @@ export default function Market() {
     useRecoilStateLoadable(writeToastMessageState);
 
   useEffect(() => {
-    console.log("call useEffect()");
+    // console.log("call useEffect()");
 
     if (collectionArray.length > 0) {
       handleListCollectionClick(collectionArray[0]);
@@ -320,12 +309,12 @@ export default function Market() {
     }
   }
 
-  function buildRowList({ element }) {
+  function buildRowList({ element, key }) {
     // console.log("call buildRowList()");
     // console.log("element: ", element);
 
     return (
-      <TableRow key={getUniqueKey()}>
+      <TableRow key={key}>
         <TableCell align="center">
           <Box
             sx={{
@@ -373,7 +362,7 @@ export default function Market() {
               });
               // console.log("contract: ", contract);
 
-              await erc20PermitSignature({
+              const { r, s, v, deadline } = await erc20PermitSignature({
                 owner: address,
                 spender: RENT_MARKET_CONTRACT_ADDRESS,
                 amount: element.rentFeeByToken,
@@ -386,6 +375,10 @@ export default function Market() {
                     element.nftAddress,
                     element.tokenId,
                     SERVICE_OWNER_ADDRESS,
+                    deadline,
+                    v,
+                    r,
+                    s,
                   ],
                 });
               } catch (error) {
@@ -570,7 +563,7 @@ export default function Market() {
       return buildNFTDataTableSkeleton();
     }
 
-    const selectedRegisterNFTArray = dataAllRegisterData.filter(
+    const selectedRegisterNFTArray = dataAllRegisterData?.filter(
       (registerData) =>
         registerData.nftAddress.toLowerCase() ===
         collectionAddress.toLowerCase()
@@ -600,11 +593,15 @@ export default function Market() {
 
                 <TableBody>
                   {selectedRegisterNFTArray
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((element) => {
+                    ?.slice(
+                      page * rowsPerPage,
+                      page * rowsPerPage + rowsPerPage
+                    )
+                    .map((element, idx) => {
                       // console.log("element: ", element);
                       return buildRowList({
                         element,
+                        key: idx,
                       });
                     })}
                 </TableBody>
