@@ -320,12 +320,12 @@ export default function Market() {
     }
   }
 
-  function buildRowList({ element }) {
+  function buildRowList({ element, key }) {
     // console.log("call buildRowList()");
     // console.log("element: ", element);
 
     return (
-      <TableRow key={getUniqueKey()}>
+      <TableRow key={key}>
         <TableCell align="center">
           <Box
             sx={{
@@ -601,10 +601,11 @@ export default function Market() {
                 <TableBody>
                   {selectedRegisterNFTArray
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((element) => {
+                    .map((element, idx) => {
                       // console.log("element: ", element);
                       return buildRowList({
                         element,
+                        key: idx,
                       });
                     })}
                 </TableBody>

@@ -194,7 +194,7 @@ export default function MonitorPaymentNFT() {
                   .format()}
               </TableCell>
               <TableCell align="center">
-                {formatEther(dataRegisterData?.rentFeeByToken)}
+                {formatEther(dataRegisterData?.rentFeeByToken || BigInt(0))}
               </TableCell>
             </TableRow>
           </TableBody>
