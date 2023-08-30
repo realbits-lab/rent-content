@@ -105,16 +105,16 @@ export default async function handler(req, res) {
 
   if (maticPricePerUSDAmount) {
     //* Change NFT price.
-    // const registerData = await rentMarketContract.getRegisterData(
-    //   PAYMENT_NFT_ADDRESS,
-    //   PAYMENT_NFT_TOKEN
-    // );
-    const registerData = await readContract({
-      address: RENT_MARKET_CONTRACT_ADDRESS,
-      abi: rentmarketABI?.abi,
-      functionName: "getRegisterData",
-      args: [PAYMENT_NFT_ADDRESS, PAYMENT_NFT_TOKEN],
-    });
+    const registerData = await rentMarketContract.getRegisterData(
+      PAYMENT_NFT_ADDRESS,
+      PAYMENT_NFT_TOKEN
+    );
+    // const registerData = await readContract({
+    //   address: RENT_MARKET_CONTRACT_ADDRESS,
+    //   abi: rentmarketABI?.abi,
+    //   functionName: "getRegisterData",
+    //   args: [PAYMENT_NFT_ADDRESS, PAYMENT_NFT_TOKEN],
+    // });
     console.log("registerData: ", registerData);
 
     //* TODO: Handle error case (ex: no register data)
