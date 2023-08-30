@@ -1,15 +1,9 @@
 import { ethers } from "ethers";
-import {
-  readContract,
-  writeContract,
-  waitForTransaction,
-  prepareWriteContract,
-} from "@wagmi/core";
 import { parseUnits } from "viem";
 import rentmarketABI from "@/contracts/rentMarket.json";
 
 export default async function handler(req, res) {
-  // console.log("call /api/change-payment-nft-rent-price");
+  console.log("call /api/change-payment-nft-rent-price");
 
   const NEXT_PUBLIC_SETTLE_AUTH_KEY = process.env.NEXT_PUBLIC_SETTLE_AUTH_KEY;
   const NEXT_PUBLIC_ALCHEMY_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
@@ -52,8 +46,9 @@ export default async function handler(req, res) {
   //* Check method.
   if (req.method !== "POST") {
     // console.log("req.method: ", req.method);
-    res.status(500).json({ error: "Invalid method. Support only POST." });
-    return;
+    return res
+      .status(500)
+      .json({ error: "Invalid method. Support only POST." });
   }
 
   //* Check auth key.
@@ -70,8 +65,7 @@ export default async function handler(req, res) {
   console.log("usd_amount: ", usd_amount);
 
   if (auth_key !== NEXT_PUBLIC_SETTLE_AUTH_KEY) {
-    res.status(500).json({ error: "Invalid auth key." });
-    return;
+    return res.status(500).json({ error: "Invalid auth key." });
   }
 
   //* Get MATIC converted price of 1 USD from coin market cap.
@@ -96,50 +90,48 @@ export default async function handler(req, res) {
   const responseJson = await response.json();
   console.log("responseJson: ", responseJson);
 
-  const maticPricePerUSD = responseJson.data.quote.MATIC.price;
-  console.log("maticPricePerUSD: ", maticPricePerUSD);
-  console.log("maticPricePerUSD.toFixed(2): ", maticPricePerUSD.toFixed(2));
+  const maticPricePerUSDAmount = responseJson.data.quote.MATIC.price;
+  console.log("maticPricePerUSDAmount: ", maticPricePerUSDAmount);
+  console.log(
+    "maticPricePerUSDAmount.toFixed(2): ",
+    maticPricePerUSDAmount.toFixed(2)
+  );
 
-  if (maticPricePerUSD) {
-    //* Change NFT price.
-    // const registerData = await rentMarketContract.getRegisterData(
-    //   PAYMENT_NFT_ADDRESS,
-    //   PAYMENT_NFT_TOKEN
-    // );
-    const registerData = await readContract({
-      address: RENT_MARKET_CONTRACT_ADDRESS,
-      abi: rentmarketABI?.abi,
-      functionName: "getRegisterData",
-      args: [PAYMENT_NFT_ADDRESS, PAYMENT_NFT_TOKEN],
-    });
-    console.log("registerData: ", registerData);
-
-    //* TODO: Handle error case (ex: no register data)
-
-    //* Change NFT price.
-    // address nftAddress
-    // uint256 tokenId
-    // uint256 rentFee
-    // address feeTokenAddress
-    // uint256 rentFeeByToken
-    // uint256 rentDuration
-    const tx = await rentMarketContract.changeNFT(
-      PAYMENT_NFT_ADDRESS,
-      PAYMENT_NFT_TOKEN,
-      parseUnits(maticPricePerUSD.toFixed(2), 18),
-      registerData.feeTokenAddress,
-      registerData.rentFeeByToken,
-      registerData.rentDuration
-    );
-    console.log("tx: ", tx);
-
-    const receipt = await tx.wait();
-    console.log("receipt: ", receipt);
-  } else {
+	//* Check price value error.
+  if (!maticPricePerUSDAmount) {
     return res
       .status(500)
       .json({ error: "Can't get matic price from coin market cap." });
   }
+
+  //* Change NFT price.
+  const registerData = await rentMarketContract.getRegisterData(
+    PAYMENT_NFT_ADDRESS,
+    PAYMENT_NFT_TOKEN
+  );
+  console.log("registerData: ", registerData);
+
+  //* TODO: Handle error case (ex: no register data)
+
+  //* Change NFT price.
+  // address nftAddress
+  // uint256 tokenId
+  // uint256 rentFee
+  // address feeTokenAddress
+  // uint256 rentFeeByToken
+  // uint256 rentDuration
+  const tx = await rentMarketContract.changeNFT(
+    PAYMENT_NFT_ADDRESS,
+    PAYMENT_NFT_TOKEN,
+    parseUnits(maticPricePerUSDAmount.toFixed(2), 18),
+    registerData.feeTokenAddress,
+    registerData.rentFeeByToken,
+    registerData.rentDuration
+  );
+  console.log("tx: ", tx);
+
+  const receipt = await tx.wait();
+  console.log("receipt: ", receipt);
 
   //* Send 200 status.
   return res.status(200).json({ data: responseJson.data });

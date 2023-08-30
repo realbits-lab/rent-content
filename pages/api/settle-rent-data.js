@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     rentmarketABI.abi,
     signer
   );
-  console.log("rentMarketContract: ", rentMarketContract);
+  // console.log("rentMarketContract: ", rentMarketContract);
 
   //* Get alchemy instance.
   const settings = {
