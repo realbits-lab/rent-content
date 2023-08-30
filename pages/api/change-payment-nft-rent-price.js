@@ -96,11 +96,14 @@ export default async function handler(req, res) {
   const responseJson = await response.json();
   console.log("responseJson: ", responseJson);
 
-  const maticPricePerUSD = responseJson.data.quote.MATIC.price;
-  console.log("maticPricePerUSD: ", maticPricePerUSD);
-  console.log("maticPricePerUSD.toFixed(2): ", maticPricePerUSD.toFixed(2));
+  const maticPricePerUSDAmount = responseJson.data.quote.MATIC.price;
+  console.log("maticPricePerUSDAmount: ", maticPricePerUSDAmount);
+  console.log(
+    "maticPricePerUSDAmount.toFixed(2): ",
+    maticPricePerUSDAmount.toFixed(2)
+  );
 
-  if (maticPricePerUSD) {
+  if (maticPricePerUSDAmount) {
     //* Change NFT price.
     // const registerData = await rentMarketContract.getRegisterData(
     //   PAYMENT_NFT_ADDRESS,
@@ -126,7 +129,7 @@ export default async function handler(req, res) {
     const tx = await rentMarketContract.changeNFT(
       PAYMENT_NFT_ADDRESS,
       PAYMENT_NFT_TOKEN,
-      parseUnits(maticPricePerUSD.toFixed(2), 18),
+      parseUnits(maticPricePerUSDAmount.toFixed(2), 18),
       registerData.feeTokenAddress,
       registerData.rentFeeByToken,
       registerData.rentDuration

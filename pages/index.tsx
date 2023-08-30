@@ -53,9 +53,9 @@ function App() {
 
   return (
     <>
-      <WagmiConfig config={wagmiConfig}>
-        <RentContent />
-      </WagmiConfig>
+      {/* <WagmiConfig config={wagmiConfig}> */}
+      <RentContent />
+      {/* </WagmiConfig> */}
     </>
   );
 }
