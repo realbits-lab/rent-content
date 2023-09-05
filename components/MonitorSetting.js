@@ -174,7 +174,7 @@ export default function MonitorSetting() {
 
           <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
             <TableCell align="left">RENTER_FEE_QUOTA</TableCell>
-            <TableCell align="left">{dataGetFeeQuota[0].toString()}%</TableCell>
+            <TableCell align="left">{dataGetFeeQuota && dataGetFeeQuota[0].toString()}%</TableCell>
             <TableCell align="left" sx={{ color: "grey" }}>
               The proportion of NFT owner from rent fee
             </TableCell>
@@ -182,7 +182,7 @@ export default function MonitorSetting() {
 
           <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
             <TableCell align="left">SERVICE_FEE_QUOTA</TableCell>
-            <TableCell align="left">{dataGetFeeQuota[1].toString()}%</TableCell>
+            <TableCell align="left">{dataGetFeeQuota && dataGetFeeQuota[1].toString()}%</TableCell>
             <TableCell align="left" sx={{ color: "grey" }}>
               The proportion of service owner from rent fee
             </TableCell>
@@ -190,7 +190,7 @@ export default function MonitorSetting() {
 
           <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
             <TableCell align="left">MARKET_FEE_QUOTA</TableCell>
-            <TableCell align="left">{dataGetFeeQuota[2].toString()}%</TableCell>
+            <TableCell align="left">{dataGetFeeQuota && dataGetFeeQuota[2].toString()}%</TableCell>
             <TableCell align="left" sx={{ color: "grey" }}>
               The proportion of market owner from rent fee
             </TableCell>
@@ -200,7 +200,7 @@ export default function MonitorSetting() {
             <TableCell align="left">MARKET_SHARE_ADDRESS</TableCell>
             <TableCell align="left">
               {shortenAddress({
-                address: dataGetMarketShareAddress.toString(),
+                address: dataGetMarketShareAddress?.toString(),
                 withLink: "scan",
                 number: 20,
               })}
