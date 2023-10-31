@@ -562,7 +562,7 @@ export default function Content() {
   //* Draw each register data row list in table.
   //*---------------------------------------------------------------------------
   function buildRegisterNFTRow({ nft }) {
-    // console.log("call buildRegisterRowList()");
+    // console.log("call buildRegisterNFTRow()");
     // console.log("nft: ", nft);
 
     const found = dataAllToken?.find((token) => {
@@ -603,15 +603,15 @@ export default function Content() {
           <Button
             size="small"
             onClick={() => {
+              console.log("nft: ", nft);
               setChangeElement(nft);
               setFormValue((prevState) => {
-                // console.log("nft: ", nft);
                 return {
                   ...prevState,
                   inputRentFee: formatEther(nft.rentFee),
                   inputFeeTokenAddress: nft.feeTokenAddress,
                   inputRentFeeByToken: formatEther(nft.rentFeeByToken),
-                  inputRentDuration: nft.rentDuration,
+                  inputRentDuration: Number(nft.rentDuration),
                 };
               });
               setOpenInput(true);
