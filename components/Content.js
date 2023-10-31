@@ -74,6 +74,23 @@ export default function Content() {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "unregisterNFT",
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Unregistering NFT data contract call is started successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Unregistering NFT data contract call is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
   });
   const {
     data: dataUnregisterNFTTx,
@@ -81,6 +98,23 @@ export default function Content() {
     isLoading: isLoadingUnregisterNFTTx,
   } = useWaitForTransaction({
     hash: dataUnregisterNFT?.hash,
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Unregistering NFT data contract transaction is finished successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Unregistering NFT data transaction is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
   });
 
   //* registerNFT function
@@ -93,6 +127,23 @@ export default function Content() {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "registerNFT",
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Registering NFT data contract call is started successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Registering NFT data contract call is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
   });
   const {
     data: dataRegisterNFTTx,
@@ -100,6 +151,23 @@ export default function Content() {
     isLoading: isLoadingRegisterNFTTx,
   } = useWaitForTransaction({
     hash: dataRegisterNFT?.hash,
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Registering NFT data contract transaction is finished successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Registering NFT data transaction is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
   });
 
   //* changeNFT function
@@ -112,6 +180,24 @@ export default function Content() {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "changeNFT",
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Changing the registered NFT data contract call is started successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage:
+          "Changing the registered NFT data contract call is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
   });
   const {
     data: dataChangeNFTTx,
@@ -119,6 +205,24 @@ export default function Content() {
     isLoading: isLoadingChangeNFTTx,
   } = useWaitForTransaction({
     hash: dataChangeNFT?.hash,
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Changing the registered NFT data transaction is finished successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage:
+          "Changing the registered NFT data transaction is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
   });
 
   //* getAllRegister function
@@ -1045,6 +1149,7 @@ export default function Content() {
           </Button>
           <Button
             onClick={async () => {
+              // Change register NFT data.
               try {
                 writeChangeNFT?.({
                   args: [
@@ -1065,6 +1170,8 @@ export default function Content() {
                   snackbarOpen: true,
                 });
               }
+
+              // Initialize form value.
               setFormValue((prevState) => {
                 return {
                   ...prevState,
@@ -1074,6 +1181,8 @@ export default function Content() {
                   inputRentDuration: 0,
                 };
               });
+
+              // Close form dialog.
               setOpenInput(false);
             }}
           >

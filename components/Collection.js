@@ -93,7 +93,8 @@ export default function Collection() {
     onSuccess(data) {
       setWriteToastMessage({
         snackbarSeverity: AlertSeverity.info,
-        snackbarMessage: "Registering collection is made successfully.",
+        snackbarMessage:
+          "Registering collection contract call is started successfully.",
         snackbarTime: new Date(),
         snackbarOpen: true,
       });
@@ -101,7 +102,7 @@ export default function Collection() {
     onError(error) {
       setWriteToastMessage({
         snackbarSeverity: AlertSeverity.error,
-        snackbarMessage: "Registering collection is failed.",
+        snackbarMessage: "Registering collection contract call is failed.",
         snackbarTime: new Date(),
         snackbarOpen: true,
       });
@@ -127,7 +128,7 @@ export default function Collection() {
       setWriteToastMessage({
         snackbarSeverity: AlertSeverity.info,
         snackbarMessage:
-          "Registering collection transaction is made successfully.",
+          "Registering collection transaction is finished successfully.",
         snackbarTime: new Date(),
         snackbarOpen: true,
       });
