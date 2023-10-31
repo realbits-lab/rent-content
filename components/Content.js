@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Alchemy, Network } from "alchemy-sdk";
 import { parseEther, formatEther } from "viem";
 import {
@@ -74,6 +74,23 @@ export default function Content() {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "unregisterNFT",
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Unregistering NFT data contract call is started successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Unregistering NFT data contract call is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
   });
   const {
     data: dataUnregisterNFTTx,
@@ -81,6 +98,23 @@ export default function Content() {
     isLoading: isLoadingUnregisterNFTTx,
   } = useWaitForTransaction({
     hash: dataUnregisterNFT?.hash,
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Unregistering NFT data contract transaction is finished successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Unregistering NFT data transaction is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
   });
 
   //* registerNFT function
@@ -93,6 +127,23 @@ export default function Content() {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "registerNFT",
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Registering NFT data contract call is started successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Registering NFT data contract call is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
   });
   const {
     data: dataRegisterNFTTx,
@@ -100,6 +151,23 @@ export default function Content() {
     isLoading: isLoadingRegisterNFTTx,
   } = useWaitForTransaction({
     hash: dataRegisterNFT?.hash,
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Registering NFT data contract transaction is finished successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Registering NFT data transaction is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
   });
 
   //* changeNFT function
@@ -112,6 +180,24 @@ export default function Content() {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "changeNFT",
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Changing the registered NFT data contract call is started successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage:
+          "Changing the registered NFT data contract call is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
   });
   const {
     data: dataChangeNFTTx,
@@ -119,6 +205,24 @@ export default function Content() {
     isLoading: isLoadingChangeNFTTx,
   } = useWaitForTransaction({
     hash: dataChangeNFT?.hash,
+    onSuccess(data) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage:
+          "Changing the registered NFT data transaction is finished successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage:
+          "Changing the registered NFT data transaction is failed.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
   });
 
   //* getAllRegister function
@@ -211,186 +315,133 @@ export default function Content() {
   const [page, setPage] = React.useState([]);
   const [rowsPerPage, setRowsPerPage] = React.useState([]);
 
-  async function initialize() {
-    let network;
-    // console.log("chain: ", chain);
-    switch (chain.network) {
-      case "matic":
-        network = Network.MATIC_MAINNET;
-        break;
-
-      case "maticmum":
-        network = Network.MATIC_MUMBAI;
-        break;
-    }
-    const config = {
-      apiKey: ALCHEMY_KEY,
-      network,
-    };
-    // console.log("config: ", config);
-    const alchemy = new Alchemy(config);
-
-    //* Get all NFTs.
-    // console.log("address: ", address);
-    const nfts = await alchemy.nft.getNftsForOwner(address);
-    // console.log("nfts: ", nfts);
-
-    let inputMyRegisteredNFTArray = [];
-    let inputMyUnregisteredNFTArray = [];
-
-    nfts["ownedNfts"].map((nft) => {
-      const foundRegisterData = dataAllRegisterData?.find(
-        (registerData) =>
-          registerData.nftAddress.toLowerCase() ===
-            nft?.contract?.address.toLowerCase() &&
-          Number(nft?.tokenId) === Number(registerData.tokenId)
-      );
-      if (foundRegisterData) {
-        //* Find my NFT in register data.
-        inputMyRegisteredNFTArray.push({
-          nftAddress: foundRegisterData.nftAddress,
-          tokenId: foundRegisterData.tokenId,
-          rentFee: foundRegisterData.rentFee,
-          feeTokenAddress: foundRegisterData.feeTokenAddress,
-          rentFeeByToken: foundRegisterData.rentFeeByToken,
-          rentDuration: foundRegisterData.rentDuration,
-          metadata: nft.rawMetadata,
-        });
-      } else {
-        // console.log("nft: ", nft);
-        //* Not find my NFT in register data.
-        inputMyUnregisteredNFTArray.push({
-          nftAddress: nft.contract.address,
-          tokenId: nft.tokenId,
-          metadata: nft.rawMetadata,
-        });
-      }
-    });
-    // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
-    // console.log("inputMyUnregisteredNFTArray: ", inputMyUnregisteredNFTArray);
-
-    setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
-    setMyUnregisteredNFTArray(inputMyUnregisteredNFTArray);
-
-    // Set unique data.
-    let uniqueRegisterNFTAddressSet;
-    if (inputMyRegisteredNFTArray) {
-      uniqueRegisterNFTAddressSet = new Set(
-        inputMyRegisteredNFTArray.map((element) => element.nftAddress)
-      );
-      setMyRegisteredUniqueNFTAddressArray([...uniqueRegisterNFTAddressSet]);
-    }
-
-    let uniqueUnregisterNFTAddressSet;
-    if (inputMyUnregisteredNFTArray) {
-      uniqueUnregisterNFTAddressSet = new Set(
-        inputMyUnregisteredNFTArray.map((element) => element.nftAddress)
-      );
-      setMyUnregisteredUniqueNFTAddressArray([
-        ...uniqueUnregisterNFTAddressSet,
-      ]);
-    }
-
-    // * Initialize page and rowsPerPage array.
-    page.splice(0, page.length);
-    rowsPerPage.splice(0, rowsPerPage.length);
-
-    // * Add each register and unregister page and rowsPerPage per nft contract address.
-    if (uniqueRegisterNFTAddressSet) {
-      for (const nftAddress of uniqueRegisterNFTAddressSet) {
-        page.push({
-          address: nftAddress,
-          mode: "register",
-          page: 0,
-        });
-        rowsPerPage.push({
-          address: nftAddress,
-          mode: "register",
-          rowsPerPage: 5,
-        });
-      }
-    }
-
-    if (uniqueUnregisterNFTAddressSet) {
-      for (const nftAddress of uniqueUnregisterNFTAddressSet) {
-        page.push({
-          address: nftAddress,
-          mode: "unregister",
-          page: 0,
-        });
-        rowsPerPage.push({
-          address: nftAddress,
-          mode: "unregister",
-          rowsPerPage: 5,
-        });
-      }
-    }
-  }
-
   useEffect(() => {
     // console.log("call React.useEffect()");
-    // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
-    // console.log("inputMyUnregisteredNFTArray: ", inputMyUnregisteredNFTArray);
+    async function initialize() {
+      let network;
+      // console.log("chain: ", chain);
+      switch (chain.network) {
+        case "matic":
+          network = Network.MATIC_MAINNET;
+          break;
+
+        case "maticmum":
+          network = Network.MATIC_MUMBAI;
+          break;
+      }
+      const config = {
+        apiKey: ALCHEMY_KEY,
+        network,
+      };
+      // console.log("config: ", config);
+      const alchemy = new Alchemy(config);
+
+      //* Get all NFTs.
+      // console.log("address: ", address);
+      const nfts = await alchemy.nft.getNftsForOwner(address);
+      // console.log("nfts: ", nfts);
+
+      let inputMyRegisteredNFTArray = [];
+      let inputMyUnregisteredNFTArray = [];
+
+      nfts["ownedNfts"].map((nft) => {
+        const foundRegisterData = dataAllRegisterData?.find(
+          (registerData) =>
+            registerData.nftAddress.toLowerCase() ===
+              nft?.contract?.address.toLowerCase() &&
+            Number(nft?.tokenId) === Number(registerData.tokenId)
+        );
+        if (foundRegisterData) {
+          //* Find my NFT in register data.
+          inputMyRegisteredNFTArray.push({
+            nftAddress: foundRegisterData.nftAddress,
+            tokenId: foundRegisterData.tokenId,
+            rentFee: foundRegisterData.rentFee,
+            feeTokenAddress: foundRegisterData.feeTokenAddress,
+            rentFeeByToken: foundRegisterData.rentFeeByToken,
+            rentDuration: foundRegisterData.rentDuration,
+            metadata: nft.rawMetadata,
+          });
+        } else {
+          // console.log("nft: ", nft);
+          //* Not find my NFT in register data.
+          inputMyUnregisteredNFTArray.push({
+            nftAddress: nft.contract.address,
+            tokenId: nft.tokenId,
+            metadata: nft.rawMetadata,
+          });
+        }
+      });
+      // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
+      // console.log("inputMyUnregisteredNFTArray: ", inputMyUnregisteredNFTArray);
+
+      setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
+      setMyUnregisteredNFTArray(inputMyUnregisteredNFTArray);
+
+      // Set unique data.
+      let uniqueRegisterNFTAddressSet;
+      if (inputMyRegisteredNFTArray) {
+        uniqueRegisterNFTAddressSet = new Set(
+          inputMyRegisteredNFTArray.map((element) => element.nftAddress)
+        );
+        setMyRegisteredUniqueNFTAddressArray([...uniqueRegisterNFTAddressSet]);
+      }
+
+      let uniqueUnregisterNFTAddressSet;
+      if (inputMyUnregisteredNFTArray) {
+        uniqueUnregisterNFTAddressSet = new Set(
+          inputMyUnregisteredNFTArray.map((element) => element.nftAddress)
+        );
+        setMyUnregisteredUniqueNFTAddressArray([
+          ...uniqueUnregisterNFTAddressSet,
+        ]);
+      }
+
+      // * Initialize page and rowsPerPage array.
+      page.splice(0, page.length);
+      rowsPerPage.splice(0, rowsPerPage.length);
+
+      // * Add each register and unregister page and rowsPerPage per nft contract address.
+      if (uniqueRegisterNFTAddressSet) {
+        for (const nftAddress of uniqueRegisterNFTAddressSet) {
+          page.push({
+            address: nftAddress,
+            mode: "register",
+            page: 0,
+          });
+          rowsPerPage.push({
+            address: nftAddress,
+            mode: "register",
+            rowsPerPage: 5,
+          });
+        }
+      }
+
+      if (uniqueUnregisterNFTAddressSet) {
+        for (const nftAddress of uniqueUnregisterNFTAddressSet) {
+          page.push({
+            address: nftAddress,
+            mode: "unregister",
+            page: 0,
+          });
+          rowsPerPage.push({
+            address: nftAddress,
+            mode: "unregister",
+            rowsPerPage: 5,
+          });
+        }
+      }
+    }
 
     initialize();
-
-    // setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
-    // setMyUnregisteredNFTArray(inputMyUnregisteredNFTArray);
-
-    // // Set unique data.
-    // let uniqueRegisterNFTAddressSet;
-    // if (inputMyRegisteredNFTArray) {
-    //   uniqueRegisterNFTAddressSet = new Set(
-    //     inputMyRegisteredNFTArray.map((element) => element.nftAddress)
-    //   );
-    //   setMyRegisteredUniqueNFTAddressArray([...uniqueRegisterNFTAddressSet]);
-    // }
-
-    // let uniqueUnregisterNFTAddressSet;
-    // if (inputMyUnregisteredNFTArray) {
-    //   uniqueUnregisterNFTAddressSet = new Set(
-    //     inputMyUnregisteredNFTArray.map((element) => element.nftAddress)
-    //   );
-    //   setMyUnregisteredUniqueNFTAddressArray([
-    //     ...uniqueUnregisterNFTAddressSet,
-    //   ]);
-    // }
-
-    // // * Initialize page and rowsPerPage array.
-    // page.splice(0, page.length);
-    // rowsPerPage.splice(0, rowsPerPage.length);
-
-    // // * Add each register and unregister page and rowsPerPage per nft contract address.
-    // if (uniqueRegisterNFTAddressSet) {
-    //   for (const nftAddress of uniqueRegisterNFTAddressSet) {
-    //     page.push({
-    //       address: nftAddress,
-    //       mode: "register",
-    //       page: 0,
-    //     });
-    //     rowsPerPage.push({
-    //       address: nftAddress,
-    //       mode: "register",
-    //       rowsPerPage: 5,
-    //     });
-    //   }
-    // }
-
-    // if (uniqueUnregisterNFTAddressSet) {
-    //   for (const nftAddress of uniqueUnregisterNFTAddressSet) {
-    //     page.push({
-    //       address: nftAddress,
-    //       mode: "unregister",
-    //       page: 0,
-    //     });
-    //     rowsPerPage.push({
-    //       address: nftAddress,
-    //       mode: "unregister",
-    //       rowsPerPage: 5,
-    //     });
-    //   }
-    // }
-  }, []);
+  }, [
+    dataAllRegisterData,
+    ALCHEMY_KEY,
+    address,
+    chain.network,
+    page,
+    rowsPerPage,
+  ]);
 
   function TablePaginationActions(props) {
     const theme = useTheme();
@@ -562,7 +613,7 @@ export default function Content() {
   //* Draw each register data row list in table.
   //*---------------------------------------------------------------------------
   function buildRegisterNFTRow({ nft }) {
-    // console.log("call buildRegisterRowList()");
+    // console.log("call buildRegisterNFTRow()");
     // console.log("nft: ", nft);
 
     const found = dataAllToken?.find((token) => {
@@ -603,15 +654,15 @@ export default function Content() {
           <Button
             size="small"
             onClick={() => {
+              console.log("nft: ", nft);
               setChangeElement(nft);
               setFormValue((prevState) => {
-                // console.log("nft: ", nft);
                 return {
                   ...prevState,
                   inputRentFee: formatEther(nft.rentFee),
                   inputFeeTokenAddress: nft.feeTokenAddress,
                   inputRentFeeByToken: formatEther(nft.rentFeeByToken),
-                  inputRentDuration: nft.rentDuration,
+                  inputRentDuration: Number(nft.rentDuration),
                 };
               });
               setOpenInput(true);
@@ -1045,6 +1096,7 @@ export default function Content() {
           </Button>
           <Button
             onClick={async () => {
+              // Change register NFT data.
               try {
                 writeChangeNFT?.({
                   args: [
@@ -1065,6 +1117,8 @@ export default function Content() {
                   snackbarOpen: true,
                 });
               }
+
+              // Initialize form value.
               setFormValue((prevState) => {
                 return {
                   ...prevState,
@@ -1074,6 +1128,8 @@ export default function Content() {
                   inputRentDuration: 0,
                 };
               });
+
+              // Close form dialog.
               setOpenInput(false);
             }}
           >

@@ -4,7 +4,7 @@ import keccak256 from "keccak256";
 import rentmarketABI from "@/contracts/rentMarket.json";
 
 export default async function handler(req, res) {
-  // console.log("call /api/settle-rent-data");
+  console.log("call /api/settle-rent-data");
 
   const NEXT_PUBLIC_SETTLE_AUTH_KEY = process.env.NEXT_PUBLIC_SETTLE_AUTH_KEY;
   const NEXT_PUBLIC_ALCHEMY_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
@@ -43,21 +43,20 @@ export default async function handler(req, res) {
         ? Network.MATIC_MUMBAI
         : Network.MATIC_MAINNET,
   };
-  const alchemy = new Alchemy(settings);
 
   //* Check method.
   if (req.method !== "POST") {
-    // console.log("req.method: ", req.method);
-    res.status(500).json({ error: "Invalid method. Support only POST." });
-    return;
+    console.log("req.method: ", req.method);
+    return res
+      .status(500)
+      .json({ error: "Invalid method. Support only POST." });
   }
 
   //* Check auth key.
   const { auth_key } = req.body;
   console.log("auth_key: ", auth_key);
   if (auth_key !== NEXT_PUBLIC_SETTLE_AUTH_KEY) {
-    res.status(500).json({ error: "Invalid auth key." });
-    return;
+    return res.status(500).json({ error: "Invalid auth key." });
   }
 
   //* Get all rent data.
@@ -75,7 +74,7 @@ export default async function handler(req, res) {
   //     uint256 rentStartTimestamp;
   // }
   const rentDataArray = await rentMarketContract.getAllRentData();
-  console.log("rentDataArray: ", rentDataArray);
+  // console.log("rentDataArray: ", rentDataArray);
 
   //* TODO: Handle error: replacement fee too low.
   //* TODO: Handle gas prices.
@@ -83,15 +82,22 @@ export default async function handler(req, res) {
   const promises = rentDataArray.map(async function (rentData) {
     console.log("rentData: ", rentData);
 
-		//* Get current time.
+    //* Get current time.
     const currentSeconds = new Date().getTime() / 1000;
     console.log("currentSeconds: ", currentSeconds);
 
-		//* Get rent finish time.
+    //* Get rent finish time.
     const rentEndSeconds = rentData.rentStartTimestamp
       .add(rentData.rentDuration)
       .toNumber();
+    console.log("rentStartTimestamp: ", rentData.rentStartTimestamp.toNumber());
+    console.log(
+      "Date(rentStartTimestamp): ",
+      new Date(rentData.rentStartTimestamp.toNumber() * 1000)
+    );
+    console.log("rentDuration: ", rentData.rentDuration.toNumber());
     console.log("rentEndSeconds: ", rentEndSeconds);
+    console.log("Date(rentEndSeconds): ", new Date(rentEndSeconds * 1000));
 
     if (currentSeconds > rentEndSeconds) {
       console.log("try to call settleRentData()");
