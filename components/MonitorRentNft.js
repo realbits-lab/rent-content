@@ -269,6 +269,9 @@ export default function MonitorRentNft() {
               <TableCell align="center">Rent Fee by Token</TableCell>
               <TableCell align="center">Is rent by Token</TableCell>
               <TableCell align="center">Rent Duration</TableCell>
+              <TableCell align="center">Renter Address</TableCell>
+              <TableCell align="center">Rentee Address</TableCell>
+              <TableCell align="center">Service Address</TableCell>
               <TableCell align="center">Rent Start Timestamp</TableCell>
               <TableCell align="center">Rent Remain Timestamp</TableCell>
               <TableCell align="center">Settle</TableCell>
@@ -404,6 +407,29 @@ export default function MonitorRentNft() {
                   <TableCell align="center">
                     {durationTimestampDisplay}
                   </TableCell>
+
+                  <TableCell align="center">
+                    {shortenAddress({
+                      address: data.renterAddress,
+                      number: 2,
+                      withLink: "scan",
+                    })}
+                  </TableCell>
+                  <TableCell align="center">
+                    {shortenAddress({
+                      address: data.renteeAddress,
+                      number: 2,
+                      withLink: "scan",
+                    })}
+                  </TableCell>
+                  <TableCell align="center">
+                    {shortenAddress({
+                      address: data.serviceAddress,
+                      number: 2,
+                      withLink: "scan",
+                    })}
+                  </TableCell>
+
                   <TableCell align="center">
                     {rentStartTimestampDisplay}
                   </TableCell>
