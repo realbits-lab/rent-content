@@ -105,7 +105,8 @@ export default async function handler(req, res) {
       //* Call settleRentData function.
       const tx = await rentMarketContract.settleRentData(
         rentData.nftAddress,
-        rentData.tokenId
+        rentData.tokenId,
+        rentData.renteeAddress
       );
       console.log("tx: ", tx);
       const receipt = await tx.wait();
