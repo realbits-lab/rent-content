@@ -409,13 +409,25 @@ export default function MonitorRentNft() {
                   </TableCell>
 
                   <TableCell align="center">
-                    {data.renterAddress}
+                    {shortenAddress({
+                      address: data.renterAddress,
+                      number: 2,
+                      withLink: "scan",
+                    })}
                   </TableCell>
                   <TableCell align="center">
-                    {data.renteeAddress}
+                    {shortenAddress({
+                      address: data.renteeAddress,
+                      number: 2,
+                      withLink: "scan",
+                    })}
                   </TableCell>
                   <TableCell align="center">
-                    {data.serviceAddress}
+                    {shortenAddress({
+                      address: data.serviceAddress,
+                      number: 2,
+                      withLink: "scan",
+                    })}
                   </TableCell>
 
                   <TableCell align="center">
