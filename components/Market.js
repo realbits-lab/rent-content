@@ -721,7 +721,7 @@ export default function Market() {
       <TablePagination
         key={getUniqueKey()}
         rowsPerPageOptions={[5, 10, 20]}
-        count={selectedRegisterNFTArray.length}
+        count={selectedRegisterNFTArray?.length}
         page={page}
         rowsPerPage={rowsPerPage}
         labelRowsPerPage={""}
