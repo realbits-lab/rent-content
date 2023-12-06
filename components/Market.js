@@ -114,9 +114,9 @@ export default function Market() {
           return {
             collectionAddress: collection.collectionAddress,
             uri: collection.uri,
-            name: response.data.name,
-            description: response.data.description,
-            image: response.data.image,
+            name: response?.data?.name,
+            description: response?.data?.description,
+            image: response?.data?.image,
           };
         })
       ).then((collectionArray) => {
