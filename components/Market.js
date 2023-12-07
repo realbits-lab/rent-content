@@ -114,9 +114,9 @@ export default function Market() {
           return {
             collectionAddress: collection.collectionAddress,
             uri: collection.uri,
-            name: response.data.name,
-            description: response.data.description,
-            image: response.data.image,
+            name: response?.data?.name,
+            description: response?.data?.description,
+            image: response?.data?.image,
           };
         })
       ).then((collectionArray) => {
@@ -465,7 +465,12 @@ export default function Market() {
             <CardMedia
               component="img"
               sx={{ width: RBSize.double }}
-              image={url}
+              image={url || "/fallback.png"}
+              onError={(error) => {
+                e.target.onerror = null;
+                e.target.style.display = "none";
+                e.target.src = "/fallback.png";
+              }}
             />
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <CardContent sx={{ flex: "1 0 auto" }}>

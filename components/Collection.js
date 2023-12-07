@@ -250,9 +250,9 @@ export default function Collection() {
             key: collection.key,
             collectionAddress: collection.collectionAddress,
             uri: collection.uri,
-            name: response.data.name,
-            description: response.data.description,
-            image: response.data.image,
+            name: response?.data?.name,
+            description: response?.data?.description,
+            image: response?.data?.image,
           };
         })
       ).then((collectionArray) => {
@@ -371,11 +371,16 @@ export default function Collection() {
                     component="img"
                     alt="image"
                     height="140px"
-                    image={element.image}
+                    image={element.image || "/fallback.png"}
+                    onError={(error) => {
+                      e.target.onerror = null;
+                      e.target.style.display = "none";
+                      e.target.src = "/fallback.png";
+                    }}
                   />
                   <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
-                      {element.name}
+                      {element.name ?? "N/A (Can't fetch name data)"}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       PolygonScan:{" "}

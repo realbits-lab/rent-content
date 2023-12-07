@@ -568,7 +568,15 @@ export default function My() {
             <CardMedia
               component="img"
               sx={{ width: RBSize.double }}
-              image={changeIPFSToGateway(collection.metadata.image)}
+              image={
+                changeIPFSToGateway(collection.metadata.image) ||
+                "/fallback.png"
+              }
+              onError={(error) => {
+                e.target.onerror = null;
+                e.target.style.display = "none";
+                e.target.src = "/fallback.png";
+              }}
             />
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <CardContent sx={{ flex: "1 0 auto" }}>

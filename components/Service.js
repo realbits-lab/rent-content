@@ -316,7 +316,12 @@ export default function Service() {
                   component="img"
                   alt="image"
                   height="140"
-                  image={element.image}
+                  image={element.image || "/fallback.png"}
+                  onError={(error) => {
+                    e.target.onerror = null;
+                    e.target.style.display = "none";
+                    e.target.src = "/fallback.png";
+                  }}
                 />
                 <CardContent>
                   <Typography gutterBottom variant="h5" component="div">
