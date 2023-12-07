@@ -371,11 +371,16 @@ export default function Collection() {
                     component="img"
                     alt="image"
                     height="140px"
-                    image={element.image}
+                    image={element.image || "/fallback.png"}
+                    onError={(error) => {
+                      e.target.onerror = null;
+                      e.target.style.display = "none";
+                      e.target.src = "/fallback.png";
+                    }}
                   />
                   <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
-                      {element.name}
+                      {element.name ?? "N/A (Can't fetch name data)"}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       PolygonScan:{" "}
