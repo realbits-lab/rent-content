@@ -100,11 +100,11 @@ export default function Market() {
           let response;
           try {
             response = await axios.get(collection.uri, {
-              headers: {
-                "Cache-Control": "no-cache",
-                Pragma: "no-cache",
-                Expires: "0",
-              },
+              // headers: {
+              //   "Cache-Control": "no-cache",
+              //   Pragma: "no-cache",
+              //   Expires: "0",
+              // },
             });
           } catch (error) {
             console.error(error);
