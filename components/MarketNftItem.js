@@ -1,21 +1,26 @@
 import * as React from "react";
+import { formatEther } from "viem";
+import {
+  useContractRead,
+  useContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
-
 import {
   changeIPFSToGateway,
   AlertSeverity,
   RBSize,
 } from "@/components/RentContentUtil";
-import rentNFTABI from "@/contracts/rentNFTABI.json";
+import rentNFTABI from "@/contracts/rentNFT.json";
 import rentmarketABI from "@/contracts/rentMarket.json";
 
 export default function MarketNftItem({ element, key }) {
-  console.log("call MarketNftItem()");
-  console.log("element: ", element);
+  // console.log("call MarketNftItem()");
+  // console.log("element: ", element);
 
   const RENT_MARKET_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
@@ -35,15 +40,15 @@ export default function MarketNftItem({ element, key }) {
     args: [element?.tokenId],
     // watch: true,
     onSuccess(data) {
-      console.log("call onSuccess()");
-      console.log("data: ", data);
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
 
       fetch(data).then((fetchResult) =>
         fetchResult.blob().then((tokenMetadata) =>
           tokenMetadata.text().then((metadataJsonTextData) => {
             // console.log("metadataJsonTextData: ", metadataJsonTextData);
             const metadata = JSON.parse(metadataJsonTextData);
-            console.log("metadata: ", metadata);
+            // console.log("metadata: ", metadata);
             setMetadata(metadata);
           })
         )
@@ -122,13 +127,13 @@ export default function MarketNftItem({ element, key }) {
         >
           <Avatar
             alt="image"
-            src={changeIPFSToGateway(element.image)}
+            src={changeIPFSToGateway(metadata?.image)}
             sx={{ width: RBSize.big, height: RBSize.big }}
           />
         </Box>
       </TableCell>
 
-      <TableCell align="center">{element.name}</TableCell>
+      <TableCell align="center">{metadata?.name || "loading.."}</TableCell>
 
       <TableCell align="center">
         <Button

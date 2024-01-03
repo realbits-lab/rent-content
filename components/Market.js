@@ -38,6 +38,7 @@ import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import { useRecoilStateLoadable } from "recoil";
+import MarketNftItem from "@/components/MarketNftItem";
 import {
   changeIPFSToGateway,
   AlertSeverity,
@@ -309,97 +310,6 @@ export default function Market() {
     }
   }
 
-  function buildRowList({ element, key }) {
-    console.log("call buildRowList()");
-    console.log("element: ", element);
-
-    return (
-      <TableRow key={key}>
-        <TableCell align="center">
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Avatar
-              alt="image"
-              src={changeIPFSToGateway(element.image)}
-              sx={{ width: RBSize.big, height: RBSize.big }}
-            />
-          </Box>
-        </TableCell>
-
-        <TableCell align="center">{element.name}</TableCell>
-
-        <TableCell align="center">
-          <Button
-            color="primary"
-            variant="outlined"
-            onClick={async () => {
-              writeRentNFT?.({
-                args: [
-                  element.nftAddress,
-                  element.tokenId,
-                  SERVICE_OWNER_ADDRESS,
-                ],
-              });
-            }}
-          >
-            {formatEther(element.rentFee)}
-          </Button>
-        </TableCell>
-        <TableCell align="center">
-          <Button
-            color="primary"
-            variant="outlined"
-            onClick={async () => {
-              const contract = getContract({
-                address: element.feeTokenAddress,
-                abi: faucetTokenABI.abi,
-              });
-              // console.log("contract: ", contract);
-
-              const { r, s, v, deadline } = await erc20PermitSignature({
-                owner: address,
-                spender: RENT_MARKET_CONTRACT_ADDRESS,
-                amount: element.rentFeeByToken,
-                contract: contract,
-              });
-
-              try {
-                writeRentNftByToken?.({
-                  args: [
-                    element.nftAddress,
-                    element.tokenId,
-                    SERVICE_OWNER_ADDRESS,
-                    deadline,
-                    v,
-                    r,
-                    s,
-                  ],
-                });
-              } catch (error) {
-                console.error(error);
-                setWriteToastMessage({
-                  snackbarSeverity: AlertSeverity.error,
-                  snackbarMessage: error.reason,
-                  snackbarTime: new Date(),
-                  snackbarOpen: true,
-                });
-              }
-            }}
-          >
-            {formatEther(element.rentFeeByToken)}
-          </Button>
-        </TableCell>
-        <TableCell align="center">{Number(element.rentDuration)}</TableCell>
-      </TableRow>
-    );
-  }
-
   function buildCollectionMetadataCard() {
     if (collectionArray.length === 0) {
       return (
@@ -604,10 +514,7 @@ export default function Market() {
                     )
                     .map((element, idx) => {
                       // console.log("element: ", element);
-                      return buildRowList({
-                        element,
-                        key: idx,
-                      });
+                      return <MarketNftItem element={element} key={idx} />;
                     })}
                 </TableBody>
                 <TableFooter>
