@@ -1,4 +1,5 @@
 import * as React from "react";
+import { ethers } from "ethers";
 import { formatEther } from "viem";
 import { getContract } from "@wagmi/core";
 import {
@@ -171,6 +172,10 @@ export default function MarketNftItem({ element, key }) {
       </TableCell>
       <TableCell align="center">
         <Button
+          disabled={
+            element.feeTokenAddress?.toLowerCase() ===
+            ethers.constants.AddressZero.toLowerCase()
+          }
           color="primary"
           variant="outlined"
           onClick={async () => {
