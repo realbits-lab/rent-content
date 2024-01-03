@@ -1,13 +1,8 @@
 import React from "react";
+import { utils } from "ethers";
 import { Link, Portal, Snackbar, Alert as MuiAlert } from "@mui/material";
 import { v4 as uuidv4, v1 } from "uuid";
-import {
-  RecoilRoot,
-  atom,
-  selector,
-  useRecoilState,
-  useRecoilValue,
-} from "recoil";
+import { atom, selector } from "recoil";
 
 export const ConnectStatus = {
   connect: "connect",
