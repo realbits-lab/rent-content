@@ -3,6 +3,7 @@ import { formatEther } from "viem";
 import { getContract } from "@wagmi/core";
 import {
   useAccount,
+  useNetwork,
   useContractRead,
   useContractWrite,
   useWaitForTransaction,
@@ -40,6 +41,7 @@ export default function MarketNftItem({ element, key }) {
     useRecoilStateLoadable(writeToastMessageState);
 
   const { address, connector, isConnected } = useAccount();
+  const { chains, chain } = useNetwork();
 
   const {
     data: dataTokenURI,
@@ -183,6 +185,8 @@ export default function MarketNftItem({ element, key }) {
               spender: RENT_MARKET_CONTRACT_ADDRESS,
               amount: element.rentFeeByToken,
               contract: contract,
+              chain: chain,
+              address: address,
             });
 
             try {
