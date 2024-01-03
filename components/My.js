@@ -55,7 +55,7 @@ export default function My() {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "getAllRentData",
-    // watch: true,
+    watch: true,
   });
 
   //* getAllRegisterData function
@@ -68,7 +68,7 @@ export default function My() {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "getAllRegisterData",
-    // watch: true,
+    watch: true,
   });
 
   //* getAllCollection function
@@ -81,7 +81,7 @@ export default function My() {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "getAllCollection",
-    // watch: true,
+    watch: true,
     async onSuccess(data) {
       // console.log("call onSuccess()");
       // console.log("data: ", data);
@@ -117,7 +117,6 @@ export default function My() {
   //*---------------------------------------------------------------------------
   //* Variable.
   //*---------------------------------------------------------------------------
-  const theme = useTheme();
   const ALCHEMY_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
 
   //*---------------------------------------------------------------------------
@@ -216,7 +215,7 @@ export default function My() {
           rentData.tokenId,
           {}
         );
-        console.log("metadata: ", metadata);
+        // console.log("metadata: ", metadata);
 
         //* Find my rent nft in rent data.
         inputMyRentNFTArray.push({
