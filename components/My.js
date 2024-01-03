@@ -276,7 +276,7 @@ export default function My() {
               tablePage * tableRowsPerPage + tableRowsPerPage
             )
             .map((element) => {
-              console.log("element: ", element);
+              // console.log("element: ", element);
               const rentStartTimestamp = element.rentStartTimestamp
                 ? Number(element.rentStartTimestamp)
                 : 0;
@@ -328,17 +328,17 @@ export default function My() {
                     >
                       <Avatar
                         alt="image"
-                        src={
-                          element.metadata
-                            ? changeIPFSToGateway(element.metadata.image)
-                            : ""
-                        }
+                        src={changeIPFSToGateway(
+                          element.metadata.rawMetadata?.image
+                        )}
                         sx={{ width: RBSize.big, height: RBSize.big }}
                       />
                     </Box>
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                    {element.metadata ? element.metadata.name : "N/A"}
+                    {element.metadata
+                      ? element.metadata.rawMetadata?.name
+                      : "N/A"}
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
                     {formatEther(element.rentFee)}
