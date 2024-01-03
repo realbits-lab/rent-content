@@ -5,6 +5,7 @@ import {
   useContractWrite,
   useWaitForTransaction,
 } from "wagmi";
+import { useRecoilStateLoadable } from "recoil";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -14,6 +15,7 @@ import {
   changeIPFSToGateway,
   AlertSeverity,
   RBSize,
+  writeToastMessageState,
 } from "@/components/RentContentUtil";
 import rentNFTABI from "@/contracts/rentNFT.json";
 import rentmarketABI from "@/contracts/rentMarket.json";
@@ -26,6 +28,12 @@ export default function MarketNftItem({ element, key }) {
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
   const SERVICE_OWNER_ADDRESS = process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS;
   const [metadata, setMetadata] = React.useState();
+
+  //*---------------------------------------------------------------------------
+  //* Handle toast message.
+  //*---------------------------------------------------------------------------
+  const [writeToastMessageLoadable, setWriteToastMessage] =
+    useRecoilStateLoadable(writeToastMessageState);
 
   const {
     data: dataTokenURI,
@@ -146,6 +154,7 @@ export default function MarketNftItem({ element, key }) {
                 element.tokenId,
                 SERVICE_OWNER_ADDRESS,
               ],
+              value: element.rentFee,
             });
           }}
         >
