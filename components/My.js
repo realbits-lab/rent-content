@@ -185,6 +185,7 @@ export default function My() {
     //* Set metadata for register nft.
     let inputMyRegisteredNFTArray = [];
     nfts["ownedNfts"].map((nft) => {
+      console.log("nft: ", nft);
       const foundRegisterData = dataAllRegisterData?.find(
         (registerData) =>
           registerData.nftAddress.toLowerCase() ===
@@ -636,13 +637,15 @@ export default function My() {
             if (selectedItem === MyMenu.own) {
               elementArray = myRegisteredNFTArray?.filter(
                 (nftElement) =>
-                  nftElement.nftAddress === collection.collectionAddress
+                  nftElement.nftAddress.toLowerCase() ===
+                  collection.collectionAddress.toLowerCase()
               );
               type = MyMenu.own;
             } else {
               elementArray = myRentNFTArray?.filter(
                 (nftElement) =>
-                  nftElement.nftAddress === collection.collectionAddress
+                  nftElement.nftAddress.toLowerCase() ===
+                  collection.collectionAddress.toLowerCase()
               );
               type = MyMenu.rent;
             }
