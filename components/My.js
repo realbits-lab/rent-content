@@ -1,18 +1,10 @@
-import React, { useEffect } from "react";
+import * as React from "react";
 import axios from "axios";
 import { Alchemy, Network } from "alchemy-sdk";
-import { parseEther, formatEther } from "viem";
-import {
-  useAccount,
-  useNetwork,
-  useContractRead,
-  useContractWrite,
-  useWaitForTransaction,
-  useWalletClient,
-} from "wagmi";
+import { formatEther } from "viem";
+import { useAccount, useNetwork, useContractRead } from "wagmi";
 import moment from "moment";
 import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
@@ -22,7 +14,6 @@ import Typography from "@mui/material/Typography";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
-import CircularProgress from "@mui/material/CircularProgress";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -39,7 +30,6 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import {
   changeIPFSToGateway,
   MyMenu,
-  AlertSeverity,
   RBSize,
   shortenAddress,
   getUniqueKey,
@@ -127,7 +117,6 @@ export default function My() {
   //*---------------------------------------------------------------------------
   //* Variable.
   //*---------------------------------------------------------------------------
-  const theme = useTheme();
   const ALCHEMY_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
 
   //*---------------------------------------------------------------------------
@@ -169,16 +158,6 @@ export default function My() {
   const [page, setPage] = React.useState([]);
   const [rowsPerPage, setRowsPerPage] = React.useState([]);
 
-  useEffect(() => {
-    // console.log("call useEffect()");
-    const countdown = setInterval(() => {
-      const timestamp = Math.floor(Date.now() / 1000);
-      // console.log("timestamp: ", timestamp);
-      setCurrentTimestamp(timestamp);
-    }, 1000);
-    return () => clearInterval(countdown);
-  }, [currentTimestamp]);
-
   async function initialize() {
     let network;
     // console.log("chain: ", chain);
@@ -203,9 +182,8 @@ export default function My() {
     const nfts = await alchemy.nft.getNftsForOwner(address);
     // console.log("nfts: ", nfts);
 
+    //* Set metadata for register nft.
     let inputMyRegisteredNFTArray = [];
-    let inputMyRentNFTArray = [];
-
     nfts["ownedNfts"].map((nft) => {
       const foundRegisterData = dataAllRegisterData?.find(
         (registerData) =>
@@ -225,32 +203,36 @@ export default function My() {
           metadata: nft.rawMetadata,
         });
       }
+    });
+    // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
 
-      const foundRentData = dataAllRentData?.find(
-        (rentData) =>
-          rentData.nftAddress.toLowerCase() ===
-            nft?.contract?.address.toLowerCase() &&
-          Number(rentData.tokenId) === Number(nft?.tokenId)
-      );
-      if (foundRentData) {
-        //* Find my NFT in register data.
+    //* Set metadata for rent nft.
+    let inputMyRentNFTArray = [];
+    dataAllRentData?.map(async (rentData) => {
+      if (rentData.renteeAddress.toLowerCase() === address.toLowerCase()) {
+        const metadata = await alchemy.nft.getNftMetadata(
+          rentData.nftAddress,
+          rentData.tokenId,
+          {}
+        );
+        // console.log("metadata: ", metadata);
+
+        //* Find my rent nft in rent data.
         inputMyRentNFTArray.push({
-          ...foundRentData,
-          metadata: nft.rawMetadata,
+          ...rentData,
+          metadata: metadata,
         });
       }
     });
-    // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
 
     setMyRegisteredNFTArray(inputMyRegisteredNFTArray);
     setMyRentNFTArray(inputMyRentNFTArray);
   }
 
-  useEffect(() => {
-    initialize();
+  React.useEffect(() => {
+    // console.log("call React.useEffect()");
 
-    // console.log("call useEffect()");
-    // setMyRentNFTArray(inputMyRentNFTArray);
+    initialize();
 
     // * Initialize page and rowsPerPage array.
     page.splice(0, page.length);
@@ -293,7 +275,7 @@ export default function My() {
               tablePage * tableRowsPerPage + tableRowsPerPage
             )
             .map((element) => {
-              console.log("element: ", element);
+              // console.log("element: ", element);
               const rentStartTimestamp = element.rentStartTimestamp
                 ? Number(element.rentStartTimestamp)
                 : 0;
@@ -345,17 +327,17 @@ export default function My() {
                     >
                       <Avatar
                         alt="image"
-                        src={
-                          element.metadata
-                            ? changeIPFSToGateway(element.metadata.image)
-                            : ""
-                        }
+                        src={changeIPFSToGateway(
+                          element.metadata.rawMetadata?.image
+                        )}
                         sx={{ width: RBSize.big, height: RBSize.big }}
                       />
                     </Box>
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
-                    {element.metadata ? element.metadata.name : "N/A"}
+                    {element.metadata
+                      ? element.metadata.rawMetadata?.name
+                      : "N/A"}
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
                     {formatEther(element.rentFee)}

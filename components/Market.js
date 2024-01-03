@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { formatEther, encodeAbiParameters, parseAbiParameters } from "viem";
+import * as React from "react";
 import axios from "axios";
 import {
   useAccount,
@@ -7,14 +6,10 @@ import {
   useContractRead,
   useContractWrite,
   useWaitForTransaction,
-  useWalletClient,
 } from "wagmi";
-import { getContract } from "@wagmi/core";
-import { utils } from "ethers";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
@@ -38,6 +33,7 @@ import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import { useRecoilStateLoadable } from "recoil";
+import MarketNftItem from "@/components/MarketNftItem";
 import {
   changeIPFSToGateway,
   AlertSeverity,
@@ -47,24 +43,16 @@ import {
   writeToastMessageState,
 } from "@/components/RentContentUtil";
 import rentmarketABI from "@/contracts/rentMarket.json";
-//* TODO: Test token
-import faucetTokenABI from "@/contracts/faucetToken.json";
-import rewardTokenABI from "@/contracts/rewardToken.json";
 
 export default function Market() {
   const RENT_MARKET_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
-  const SERVICE_OWNER_ADDRESS = process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS;
-  const REWARD_TOKEN_CONTRACT_ADDRESS =
-    process.env.NEXT_PUBLIC_REWARD_TOKEN_CONTRACT_ADDRESS;
 
   //*---------------------------------------------------------------------------
   //* Wagmi
   //*---------------------------------------------------------------------------
   const { chain, chains } = useNetwork();
   const { address, isConnecting, isDisconnected } = useAccount();
-
-  const { data: dataWalletClient, isError, isLoading } = useWalletClient();
 
   //* getAllRegisterData function.
   const {
@@ -76,7 +64,7 @@ export default function Market() {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI.abi,
     functionName: "getAllRegisterData",
-    watch: true,
+    // watch: true,
   });
 
   //* getAllCollection function.
@@ -89,7 +77,7 @@ export default function Market() {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI.abi,
     functionName: "getAllCollection",
-    watch: true,
+    // watch: true,
     onSuccess(data) {
       // console.log("call onSuccess()");
       // console.log("data: ", data);
@@ -227,178 +215,13 @@ export default function Market() {
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // console.log("call useEffect()");
 
     if (collectionArray.length > 0) {
       handleListCollectionClick(collectionArray[0]);
     }
   }, []);
-
-  async function erc20PermitSignature({ owner, spender, amount, contract }) {
-    // console.log("call erc20PermitSignature()");
-    // console.log("owner: ", owner);
-    // console.log("spender: ", spender);
-    // console.log("amount: ", amount);
-
-    try {
-      //* Deadline is 20 minutes later from current timestamp.
-      const transactionDeadline = Date.now() + 20 * 60;
-      // console.log("transactionDeadline: ", transactionDeadline);
-      const nonce = await contract.read.nonces({ args: [owner] });
-      // console.log("nonce: ", nonce);
-      const contractName = await contract.read.name();
-      // console.log("contractName: ", contractName);
-      const EIP712Domain = [
-        { name: "name", type: "string" },
-        { name: "version", type: "string" },
-        { name: "chainId", type: "uint256" },
-        { name: "verifyingContract", type: "address" },
-      ];
-      // console.log("chain: ", chain);
-      const domain = {
-        name: contractName,
-        version: "1",
-        chainId: chain.id,
-        verifyingContract: contract.address,
-      };
-      const Permit = [
-        { name: "owner", type: "address" },
-        { name: "spender", type: "address" },
-        { name: "value", type: "uint256" },
-        { name: "nonce", type: "uint256" },
-        { name: "deadline", type: "uint256" },
-      ];
-      const message = {
-        owner,
-        spender,
-        value: amount.toString(),
-        nonce: nonce.toString(16),
-        deadline: transactionDeadline,
-      };
-      const msgParams = JSON.stringify({
-        types: {
-          EIP712Domain,
-          Permit,
-        },
-        domain,
-        primaryType: "Permit",
-        message,
-      });
-
-      const params = [address, msgParams];
-      const method = "eth_signTypedData_v4";
-      // console.log("params: ", params);
-      // console.log("method: ", method);
-      const signature = await ethereum.request({
-        method,
-        params,
-      });
-      // console.log("signature: ", signature);
-      const signData = utils.splitSignature(signature);
-      const { r, s, v } = signData;
-      return {
-        r,
-        s,
-        v,
-        deadline: transactionDeadline,
-      };
-    } catch (error) {
-      console.error("error: ", error);
-      return error;
-    }
-  }
-
-  function buildRowList({ element, key }) {
-    // console.log("call buildRowList()");
-    // console.log("element: ", element);
-
-    return (
-      <TableRow key={key}>
-        <TableCell align="center">
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Avatar
-              alt="image"
-              src={changeIPFSToGateway(element.image)}
-              sx={{ width: RBSize.big, height: RBSize.big }}
-            />
-          </Box>
-        </TableCell>
-
-        <TableCell align="center">{element.name}</TableCell>
-
-        <TableCell align="center">
-          <Button
-            color="primary"
-            variant="outlined"
-            onClick={async () => {
-              writeRentNFT?.({
-                args: [
-                  element.nftAddress,
-                  element.tokenId,
-                  SERVICE_OWNER_ADDRESS,
-                ],
-              });
-            }}
-          >
-            {formatEther(element.rentFee)}
-          </Button>
-        </TableCell>
-        <TableCell align="center">
-          <Button
-            color="primary"
-            variant="outlined"
-            onClick={async () => {
-              const contract = getContract({
-                address: element.feeTokenAddress,
-                abi: faucetTokenABI.abi,
-              });
-              // console.log("contract: ", contract);
-
-              const { r, s, v, deadline } = await erc20PermitSignature({
-                owner: address,
-                spender: RENT_MARKET_CONTRACT_ADDRESS,
-                amount: element.rentFeeByToken,
-                contract: contract,
-              });
-
-              try {
-                writeRentNftByToken?.({
-                  args: [
-                    element.nftAddress,
-                    element.tokenId,
-                    SERVICE_OWNER_ADDRESS,
-                    deadline,
-                    v,
-                    r,
-                    s,
-                  ],
-                });
-              } catch (error) {
-                console.error(error);
-                setWriteToastMessage({
-                  snackbarSeverity: AlertSeverity.error,
-                  snackbarMessage: error.reason,
-                  snackbarTime: new Date(),
-                  snackbarOpen: true,
-                });
-              }
-            }}
-          >
-            {formatEther(element.rentFeeByToken)}
-          </Button>
-        </TableCell>
-        <TableCell align="center">{Number(element.rentDuration)}</TableCell>
-      </TableRow>
-    );
-  }
 
   function buildCollectionMetadataCard() {
     if (collectionArray.length === 0) {
@@ -604,10 +427,7 @@ export default function Market() {
                     )
                     .map((element, idx) => {
                       // console.log("element: ", element);
-                      return buildRowList({
-                        element,
-                        key: idx,
-                      });
+                      return <MarketNftItem element={element} key={idx} />;
                     })}
                 </TableBody>
                 <TableFooter>
