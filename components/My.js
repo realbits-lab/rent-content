@@ -185,7 +185,7 @@ export default function My() {
     //* Set metadata for register nft.
     let inputMyRegisteredNFTArray = [];
     nfts["ownedNfts"].map((nft) => {
-      console.log("nft: ", nft);
+      // console.log("nft: ", nft);
       const foundRegisterData = dataAllRegisterData?.find(
         (registerData) =>
           registerData.nftAddress.toLowerCase() ===
