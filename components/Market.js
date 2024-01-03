@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import * as React from "react";
 import axios from "axios";
 import {
   useAccount,
@@ -6,9 +6,7 @@ import {
   useContractRead,
   useContractWrite,
   useWaitForTransaction,
-  useWalletClient,
 } from "wagmi";
-import { utils } from "ethers";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -66,7 +64,7 @@ export default function Market() {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI.abi,
     functionName: "getAllRegisterData",
-    watch: true,
+    // watch: true,
   });
 
   //* getAllCollection function.
@@ -79,7 +77,7 @@ export default function Market() {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI.abi,
     functionName: "getAllCollection",
-    watch: true,
+    // watch: true,
     onSuccess(data) {
       // console.log("call onSuccess()");
       // console.log("data: ", data);
@@ -217,7 +215,7 @@ export default function Market() {
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // console.log("call useEffect()");
 
     if (collectionArray.length > 0) {
