@@ -92,6 +92,27 @@ export default function MarketNftItem({ element, key }) {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "rentNFT",
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.success,
+        snackbarMessage:
+          "Rent transaction is just started and wait a moment...",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      // console.log("call onSuccess()");
+      // console.log("error: ", error);
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: `${error}`,
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
   });
   const {
     data: dataRentNFTTx,
@@ -102,7 +123,17 @@ export default function MarketNftItem({ element, key }) {
     onSuccess(data) {
       setWriteToastMessage({
         snackbarSeverity: AlertSeverity.info,
-        snackbarMessage: "Renting nft is made successfully.",
+        snackbarMessage: "Renting nft transaction is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Renting nft transaction is failed.",
         snackbarTime: new Date(),
         snackbarOpen: true,
       });
@@ -114,6 +145,27 @@ export default function MarketNftItem({ element, key }) {
       address: RENT_MARKET_CONTRACT_ADDRESS,
       abi: rentmarketABI.abi,
       functionName: "rentNFTByToken",
+      onSuccess(data) {
+        // console.log("call onSuccess()");
+        // console.log("data: ", data);
+        setWriteToastMessage({
+          snackbarSeverity: AlertSeverity.success,
+          snackbarMessage:
+            "Rent by token transaction is just started and wait a moment...",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        });
+      },
+      onError(error) {
+        // console.log("call onSuccess()");
+        // console.log("error: ", error);
+        setWriteToastMessage({
+          snackbarSeverity: AlertSeverity.error,
+          snackbarMessage: `${error}`,
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        });
+      },
     });
   const {
     isLoading: isLoadingRentNftByToken,
@@ -125,6 +177,16 @@ export default function MarketNftItem({ element, key }) {
         snackbarSeverity: AlertSeverity.info,
         snackbarMessage:
           "Renting nft by token transaction is made successfully.",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.error,
+        snackbarMessage: "Renting nft by token transaction is failed.",
         snackbarTime: new Date(),
         snackbarOpen: true,
       });
