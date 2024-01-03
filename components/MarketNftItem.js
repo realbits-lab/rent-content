@@ -1,6 +1,8 @@
 import * as React from "react";
 import { formatEther } from "viem";
+import { getContract } from "@wagmi/core";
 import {
+  useAccount,
   useContractRead,
   useContractWrite,
   useWaitForTransaction,
@@ -16,9 +18,11 @@ import {
   AlertSeverity,
   RBSize,
   writeToastMessageState,
+  erc20PermitSignature,
 } from "@/components/RentContentUtil";
 import rentNFTABI from "@/contracts/rentNFT.json";
 import rentmarketABI from "@/contracts/rentMarket.json";
+import faucetTokenABI from "@/contracts/faucetToken.json";
 
 export default function MarketNftItem({ element, key }) {
   // console.log("call MarketNftItem()");
@@ -34,6 +38,8 @@ export default function MarketNftItem({ element, key }) {
   //*---------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
+
+  const { address, connector, isConnected } = useAccount();
 
   const {
     data: dataTokenURI,
