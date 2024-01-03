@@ -65,7 +65,7 @@ export default function My() {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "getAllRentData",
-    watch: true,
+    // watch: true,
   });
 
   //* getAllRegisterData function
@@ -78,7 +78,7 @@ export default function My() {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "getAllRegisterData",
-    watch: true,
+    // watch: true,
   });
 
   //* getAllCollection function
@@ -91,7 +91,7 @@ export default function My() {
     address: RENT_MARKET_CONTRACT_ADDRESS,
     abi: rentmarketABI?.abi,
     functionName: "getAllCollection",
-    watch: true,
+    // watch: true,
     async onSuccess(data) {
       // console.log("call onSuccess()");
       // console.log("data: ", data);
