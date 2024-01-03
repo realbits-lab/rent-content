@@ -185,6 +185,7 @@ export default function My() {
     //* Set metadata for register nft.
     let inputMyRegisteredNFTArray = [];
     nfts["ownedNfts"].map((nft) => {
+      console.log("nft: ", nft);
       const foundRegisterData = dataAllRegisterData?.find(
         (registerData) =>
           registerData.nftAddress.toLowerCase() ===
@@ -220,7 +221,7 @@ export default function My() {
         //* Find my rent nft in rent data.
         inputMyRentNFTArray.push({
           ...rentData,
-          metadata: metadata,
+          metadata: metadata.rawMetadata,
         });
       }
     });
@@ -328,7 +329,7 @@ export default function My() {
                       <Avatar
                         alt="image"
                         src={changeIPFSToGateway(
-                          element.metadata.rawMetadata?.image
+                          element.metadata?.image
                         )}
                         sx={{ width: RBSize.big, height: RBSize.big }}
                       />
@@ -336,7 +337,7 @@ export default function My() {
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
                     {element.metadata
-                      ? element.metadata.rawMetadata?.name
+                      ? element.metadata?.name
                       : "N/A"}
                   </TableCell>
                   <TableCell align="center" style={{ borderColor: "#FFF7ED" }}>
@@ -636,13 +637,15 @@ export default function My() {
             if (selectedItem === MyMenu.own) {
               elementArray = myRegisteredNFTArray?.filter(
                 (nftElement) =>
-                  nftElement.nftAddress === collection.collectionAddress
+                  nftElement.nftAddress.toLowerCase() ===
+                  collection.collectionAddress.toLowerCase()
               );
               type = MyMenu.own;
             } else {
               elementArray = myRentNFTArray?.filter(
                 (nftElement) =>
-                  nftElement.nftAddress === collection.collectionAddress
+                  nftElement.nftAddress.toLowerCase() ===
+                  collection.collectionAddress.toLowerCase()
               );
               type = MyMenu.rent;
             }
