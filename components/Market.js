@@ -310,8 +310,8 @@ export default function Market() {
   }
 
   function buildRowList({ element, key }) {
-    // console.log("call buildRowList()");
-    // console.log("element: ", element);
+    console.log("call buildRowList()");
+    console.log("element: ", element);
 
     return (
       <TableRow key={key}>
